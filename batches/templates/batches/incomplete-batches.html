@@ -1,0 +1,46 @@
+
+{% extends 'main.html' %}
+{% load static %}
+{% block content %}
+
+<!-- Main Section -->
+<main class="batches">
+    <section class="hero-section text-center">
+      <div class="container container--narrow">
+        <div class="hero-section__box">
+          <h2>Search for <span>Incomplete Batches</span></h2>
+        </div>
+        <div class="hero-section__search">
+          <form class="form" action="#" method="get">
+            <div class="form__field">
+              <label for="formInput#search">Search By Batches </label>
+              <input class="input input--text" id="formInput#search" type="text" name="text"
+                placeholder="Search by Batch tag" />
+            </div>
+
+            <input class="btn btn--sub btn--lg" type="submit" value="Search" />
+          </form>
+        </div>
+      </div>
+    </section>
+    <!-- Search Result: BatchList -->
+    <section class="batchList">
+      <div class="container">  
+        <div class="column">
+            <div class="card project">
+              <a href="{% url 'singleBatch' %}" class="project">               
+                <div class="card__body">
+                  <h3 class="batch__title">criminal batch</h3>
+                  <p><a class="batch__author" href="profile.html">By employee user</a></p>
+                  <p class="batch--rating">
+                    <span style="font-weight: bold;">60%</span> 60 of 100 images
+                  </p>               
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>     
+    </section>
+</main>
+
+{% endblock content %}

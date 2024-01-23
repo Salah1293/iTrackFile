@@ -1,0 +1,24 @@
+{% load static %}
+
+
+<!-- Header Section -->
+ <header class="header">
+    <div class="container container--narrow">
+      <a href="{% url 'landingBatches' %}" class="header__logo">
+      </a>
+      <nav class="header__nav">
+        <input type="checkbox" id="responsive-menu" />
+        <label for="responsive-menu" class="toggle-menu">
+          <span>Menu</span>
+          <div class="toggle-menu__lines"></div>
+        </label>
+        <ul class="header__menu">
+          <li class="header__menuItem"><a href="{% url 'capture' %}">Capture</a></li>
+          <!-- <li class="header__menuItem"><a href="{% url 'incompleteBatch' %}">Incomplete Batches</a></li> -->
+          <li class="header__menuItem"><a href="{% url 'landingBatches' %}">Search</a></li>          
+          <li class="header__menuItem"><a href="{% url 'help' %}">Help</a></li>
+          <li class="header__menuItem"><a href="{% url 'login' %}" class="btn btn--sub">Login</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>

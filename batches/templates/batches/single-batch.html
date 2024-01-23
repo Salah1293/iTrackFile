@@ -1,0 +1,88 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block content %}
+
+<!-- Main Section -->
+<main >
+    <div class="container">
+        <div style="text-align: center;">
+          <div style="text-align:left; margin-top: 10px;">
+          <span class="tag tag--pill tag--sub tag--lg">
+            <small>First</small>
+          </span>
+          <span class="tag tag--pill tag--sub tag--lg">
+            <small>Next</small>
+          </span> 
+          <span class="tag tag--pill tag--sub tag--lg">
+            <small>Prev</small>
+          </span>         
+          <span class="tag tag--pill tag--sub tag--lg">
+            <small>Last</small>
+          </span>
+          <span class="tag tag--pill tag--sub tag--lg">
+            <small>Print</small>
+          </span>
+          <span id="rotateSpan" class="tag tag--pill tag--sub tag--lg" onclick="rotateImage()">
+            <small>Rotate</small>
+        </span>
+        
+        <span id="resetSpan" class="tag tag--pill tag--sub tag--lg" onclick="resetTransform()">
+            <small>Reset</small>
+        </span>
+          <a href="{% url 'updateBatch' %}">
+            <span class="tag tag--pill tag--sub tag--lg">
+            <small>Edit</small>
+          </span>
+          </a>
+          <a href="{% url 'deleteBatch' %}">
+            <span class="tag tag--pill tag--sub tag--lg">
+              <small>Delete</small>
+            </span>
+            </a> 
+            <a href="{% url 'landingBatches' %}" style="float: right;">
+              <span class="tag tag--pill tag--sub tag--lg">
+                <small>X</small>
+              </span>
+              </a>
+            
+          </div>
+          <div class="image-container">          
+              <img id="selectedImage" class="singleBatch__preview" src="{% static 'images/1.jpg' %}" alt="batch title"
+              style="width: 190%; height: 90%; border-radius: 0.7rem; border: 2px solid #070226;" />           
+          </div>         
+          <div style="text-align: center; margin-top: -25px;"> 
+          </div>
+        </div>
+      </div>
+
+      <script>
+        let zoomLevel = 1;
+        let rotationAngle = 0;
+        let isDragging = false;
+        let positionX = 0;
+        let positionY = 0;
+        let startX = 0;
+        let startY = 0;
+
+        function rotateImage() {
+            rotationAngle += 90;
+            updateTransform();
+        }
+
+        function resetTransform() {
+            zoomLevel = 1;
+            rotationAngle = 0;
+            positionX = 0;
+            positionY = 0;
+            updateTransform();
+        }
+
+        function updateTransform() {
+            document.getElementById('selectedImage').style.transform = `scale(${zoomLevel}) rotate(${rotationAngle}deg) translate(${positionX}px, ${positionY}px)`;
+        }
+    </script>
+
+
+  </main>
+
+{% endblock content %}
