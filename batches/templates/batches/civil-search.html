@@ -7,39 +7,35 @@
 <main class="formPage my-xl">
     <div class="content-box">
         <div class="formWrapper">
-            <h2 style="text-align: center;" >Search: CIVIL</h2>
+            <h2 style="text-align: center;" >CIVIL</h2>
             <a class="backButton" href="{% url 'landingBatches' %}"><i class="im im-angle-left"><</i></a>
             <br>
-            <form class="form" method="POST">
+            <form class="form" method="GET" action="{% url 'civilResults' %}">
                 {% csrf_token %}
                 <!-- Input:Text -->
                 <div class="form__field">
-                    <label for="formInput#text">Case Number</label>
-                    <input class="input input--text" id="formInput#text" type="text" name="text"
-                        placeholder="Enter text" />
-                </div>
-                <!-- Input:Text -->
-                <div class="form__field">
-                    <label for="formInput#text">Order Date (mm/dd/yyyy)</label>
-                    <input class="input input--text" id="formInput#text" type="date" name="text"
-                        placeholder="Enter text" />
-                </div>
-                <!-- Input:Text -->
-                <div class="form__field">
-                    <label for="formInput#text">Last Name</label>
-                    <input class="input input--text" id="formInput#text" type="text" name="text"
-                        placeholder="Enter text" />
-                </div>
-                <!-- Input:Text -->
-                <div class="form__field">
-                    <label for="formInput#text">First Name</label>
-                    <input class="input input--text" id="formInput#text" type="text" name="text"
-                        placeholder="Enter text" />
-                </div>
+                    <!-- {% for field in form %}
+                              <label for="formInput#text">{{field.label}}</label>
+                              {{field}}
+                              {% endfor %} -->
+          
+                    {% for field in form %} {% if field.name == 'docindex2' %}
+                    <label for="formInput#text">Order Date</label>
+                    <input type="date" name="start_date" class="input" autocomplete="off"/>
+                    <input type="date" name="end_date" class="input" autocomplete="off" />
+                    {% elif field.name != 'start_date' and field.name != 'end_date' %}
+                    <label for="formInput#text">{{ field.label }}</label>
+                    {{ field }} 
+                    {% endif %} 
+                    {% endfor %}
+          
+                  </div>
+               <a href="{% url 'civilResults' %}">
                 <input class="btn btn--sub btn--lg  my-md" type="submit" value="Search" />
+                </a>
                 <a href="{% url 'landingBatches' %}">
-                    <input class="btn btn--sub btn--lg  my-md" type="submit" value="Canecl" />
-                    </a>
+                    <input class="btn btn--sub btn--lg  my-md" type="button" value="Canecl" />
+                </a>
             </form>
         </div>
     </div>

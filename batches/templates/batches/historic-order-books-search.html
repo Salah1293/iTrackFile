@@ -7,24 +7,25 @@
 <main class="formPage my-xl">
     <div class="content-box">
         <div class="formWrapper">
-            <h2 style="text-align: center;" >Search: Historic Order/Minute Books</h2>
+            <h2 style="text-align: center;" >Historic Order/Minute Books</h2>
             <a class="backButton" href="{% url 'landingBatches' %}"><i class="im im-angle-left"><</i></a>
             <br>
             
 
-            <form class="form" method="POST">
+            <form class="form" method="GET" action="{% url 'historicOrderBooksResults' %}">
                 {% csrf_token %}
                 <!-- Input:Text -->
                 <div class="form__field">
-                    <label for="formInput#text">Year</label>
-                    <input class="input input--text" id="formInput#text" type="number" name="text" 
-                    placeholder="Enter a Year" min="1900" max="2100" required />
+                    {% for field in form %}
+                    <label for="formInput#text">{{field.label}}</label>
+                    {{field}}
+                    {% endfor %}
                 </div>
-
-                
+                <a href="{% url 'historicOrderBooksResults' %}">
                 <input class="btn btn--sub btn--lg  my-md" type="submit" value="Search" />
+                </a>
                 <a href="{% url 'landingBatches' %}">
-                    <input class="btn btn--sub btn--lg  my-md" type="submit" value="Canecl" />
+                    <input class="btn btn--sub btn--lg  my-md" type="button" value="Canecl" />
                     </a>
             </form>
         </div>

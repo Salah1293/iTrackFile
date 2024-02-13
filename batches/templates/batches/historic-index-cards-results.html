@@ -1,0 +1,56 @@
+
+{% extends 'main.html' %}
+{% load static %}
+{% block content %}
+
+<!-- Main Section -->
+<main class="batches">
+   
+    <!-- Search Result: BatchList -->
+    <section class="batchList">
+      <div class="container">  
+        <div class="column">
+          <div id="table-container" class="table-container">
+          <table id="my-styled-table" class="table table-striped my-styled-table" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Last Name</th>
+                    <th>First Name</th>
+                    <th>Subject</th>
+                    <th>Status</th>
+                    <th>Owner</th>
+                    <th>Instrument</th>
+                    <th>Record Source</th>
+                    <th>Book Record</th>
+                    <th>Page</th>
+                    <th>Date</th>
+                    <th>Dates Before 1753</th>
+                    <th>Comments</th>
+                </tr>
+            </thead>
+            <tbody>
+              {% for element in historicIndexCards %}
+                <tr>
+                  <td>{% if element.docindex1 %}{{ element.docindex1 }}{% endif %}</td>
+                  <td>{% if element.docindex2 %}{{ element.docindex2 }}{% endif %}</td>
+                  <td>{% if element.docindex3 %}{{ element.docindex3 }}{% endif %}</td>
+                  <td>{% if element.docindex10 %}{{ element.docindex10 }}{% endif %}</td>
+                  <td>{% if element.docindex11 %}{{ element.docindex11 }}{% endif %}</td>
+                  <td>{% if element.docindex9 %}{{ element.docindex2 }}{% endif %}</td>
+                  <td>{% if element.docindex4 %}{{ element.docindex4 }}{% endif %}</td>
+                  <td>{% if element.docindex5 %}{{ element.docindex5 }}{% endif %}</td>
+                  <td>{% if element.docindex6 %}{{ element.docindex6 }}{% endif %}</td>
+                  <td>{% if element.docindex7 %}{{ element.docindex7 }}{% endif %}</td>
+                  <td>{% if element.docindex12 %}{{ element.docindex2 }}{% endif %}</td>
+                  <td>{% if element.docindex8 %}{{ element.docindex8 }}{% endif %}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+        </table>
+      </div>
+          </div>
+        </div>     
+    </section>
+</main>
+
+{% endblock content %}

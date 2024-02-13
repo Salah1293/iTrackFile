@@ -7,39 +7,25 @@
 <main class="formPage my-xl">
     <div class="content-box">
         <div class="formWrapper">
-            <h2 style="text-align: center;" >Search: HR</h2>
+            <h2 style="text-align: center;" >HR</h2>
             <a class="backButton" href="{% url 'landingBatches' %}"><i class="im im-angle-left"><</i></a>
             <br>
             
 
-            <form class="form" method="POST">
+            <form class="form" method="GET" action="{% url 'hrResults' %}">
                 {% csrf_token %}
                 <!-- Input:Text -->
                 <div class="form__field">
-                    <label for="formInput#text">Last Name</label>
-                    <input class="input input--text" id="formInput#text" type="text" name="text"
-                        placeholder="Enter text" />
+                    {% for field in form %}
+                    <label for="formInput#text">{{field.label}}</label>
+                    {{field}}
+                    {% endfor %}
                 </div>
-
-                <!-- Input:Text -->
-                <div class="form__field">
-                    <label for="formInput#text">First Name</label>
-                    <input class="input input--text" id="formInput#text" type="text" name="text"
-                        placeholder="Enter text" />
-                </div>
-
-                <!-- Input:Text -->
-                <div class="form__field">
-                    <label for="formInput#text">EIN</label>
-                    <input class="input input--text" id="formInput#text" type="text" name="text"
-                        placeholder="Enter text" />
-                </div>
-
-                
-
+                <a href="{% url 'hrResults' %}" >
                 <input class="btn btn--sub btn--lg  my-md" type="submit" value="Search" />
+                </a>
                 <a href="{% url 'landingBatches' %}">
-                    <input class="btn btn--sub btn--lg  my-md" type="submit" value="Canecl" />
+                    <input class="btn btn--sub btn--lg  my-md" type="button" value="Canecl" />
                 </a>
             </form>
             

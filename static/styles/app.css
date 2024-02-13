@@ -120,7 +120,8 @@ img {
     transform-origin: 0 0;
   }
   .toggle-menu__lines::after {
-    top: 4.6rem;btn btn--sub btn--lg
+    top: 4.6rem;
+    /* btn btn--sub btn--lg; */
     transform-origin: 0 0;
   }
 
@@ -973,8 +974,37 @@ img {
 
 /* Style for the Reset button */
 .image-controls #resetBtn {
-  background-color: #f44336; /* Red color for the reset button */
+  background-color: #f44336; 
   color: #ffffff;
 }
 
 
+#table-container {
+  overflow: auto;
+  max-height: 800px; 
+}
+
+#my-styled-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  border: 2px solid black; 
+}
+
+#my-styled-table th,
+#my-styled-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  white-space: nowrap; 
+  font-size: 13px;
+}
+
+#my-styled-table th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+  text-align: left;
+}
+
+#my-styled-table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
