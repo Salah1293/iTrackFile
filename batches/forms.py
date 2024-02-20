@@ -156,3 +156,21 @@ class HrForm(ModelForm):
 
         for name, field in self.fields.items():
             field.widget.attrs.update({'class' : 'input', 'autocomplete' : 'off'})
+
+
+#classForm of historic index cards 
+class BondBooksForm(ModelForm):
+    class Meta:
+        model = PvdmDocs116
+        fields = ['docindex1', 'docindex2']
+        labels = {
+            'docindex1' : 'Book',
+            'docindex2' : 'Page',
+        }
+
+
+    def __init__(self, *args, **kwargs):
+        super(BondBooksForm, self).__init__(*args, **kwargs)
+
+        for name, field in self.fields.items():
+            field.widget.attrs.update({'class' : 'input', 'autocomplete' : 'off'})

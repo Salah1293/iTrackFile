@@ -117,43 +117,43 @@ def civilResults (request):
             end_date = form.cleaned_data.get('end_date')
 
            
-            # query = Q()
-
-            # if case_number:
-            #     query &= Q(docindex1=case_number)
-            # if start_date and end_date:
-            #     query &= Q(docindex2__range=[start_date, end_date])
-            # if last_name:
-            #     query &= (Q(docindex11=last_name) | Q(docindex6=last_name))
-            # if first_name:
-            #     query &= (Q(docindex12=first_name) | Q(docindex7=first_name))
-
-            
-            # if query:
-            #     civil = PvdmDocs12.objects.filter(query)
-            # else:
-            #     civil = PvdmDocs12.objects.none()
-
-
             query = Q()
 
             if case_number:
                 query &= Q(docindex1=case_number)
             if start_date and end_date:
                 query &= Q(docindex2__range=[start_date, end_date])
+            if last_name:
+                query &= (Q(docindex11=last_name) | Q(docindex6=last_name))
+            if first_name:
+                query &= (Q(docindex12=first_name) | Q(docindex7=first_name))
 
-            if last_name or first_name:
-                name_query = Q()
-                if last_name:
-                    name_query |= Q(docindex11=last_name) | Q(docindex6=last_name)
-                if first_name:
-                    name_query |= Q(docindex12=first_name) | Q(docindex7=first_name)
-                query &= name_query
-
+            
             if query:
                 civil = PvdmDocs12.objects.filter(query)
             else:
                 civil = PvdmDocs12.objects.none()
+
+
+            # query = Q()
+
+            # if case_number:
+            #     query &= Q(docindex1=case_number)
+            # if start_date and end_date:
+            #     query &= Q(docindex2__range=[start_date, end_date])
+
+            # if last_name or first_name:
+            #     name_query = Q()
+            #     if last_name:
+            #         name_query |= Q(docindex11=last_name) | Q(docindex6=last_name)
+            #     if first_name:
+            #         name_query |= Q(docindex12=first_name) | Q(docindex7=first_name)
+            #     query &= name_query
+
+            # if query:
+            #     civil = PvdmDocs12.objects.filter(query)
+            # else:
+            #     civil = PvdmDocs12.objects.none()
 
             context = {'form': form, 'civil': civil, 'resultCount' : civil.count()}
             return render(request, 'batches/civil-results.html', context)
@@ -334,6 +334,7 @@ def hrSearch (request):
 
 #hr display results
 def hrResults(request):
+
     form = HrForm()
     if request.method == 'GET':
         form = HrForm(request.GET)
@@ -364,3 +365,43 @@ def hrResults(request):
 
     context = {'form' : form, 'hr' : PvdmDocs15.objects.none()}
     return render(request, 'batches/hr-results.html', context)
+
+#bond books search
+def bondBooksSearch(request):
+    form = BondBooksForm()
+    context = {'form' : form}
+    return render(request, 'batches/bond-books-search.html', context)
+
+
+#bond books display results
+def bondBooksResults(request):
+    form = BondBooksForm()
+    if request.method == 'GET':
+        form = HrForm(request.GET)
+        if form.is_valid():
+            book = form.cleaned_data.get('docindex1', '')
+            page = form.cleaned_data.get('docindex2', '')
+            
+
+
+            query = Q()
+
+            if book:
+                query &= Q(docindex1=book)
+            if page:
+                query &= Q(docindex2=page)
+            
+
+                
+            if query:
+                bondBooks = PvdmDocs116.objects.filter(query)
+            else:
+                bondBooks = PvdmDocs15.objects.none()
+
+            context = {'form' : form, 'bondBooks' : bondBooks, 'resultCount' : bondBooks.count()}
+            return render(request, 'batches/bond-books-results.html', context)
+        
+
+    context = {'form' : form, 'bondBooks' : PvdmDocs116.objects.none()}
+    return render(request, 'batches/bond-books-results.html', context)
+    

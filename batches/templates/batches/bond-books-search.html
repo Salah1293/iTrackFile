@@ -1,0 +1,39 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block content %}
+
+
+<!-- Main Section -->
+<main class="formPage my-xl">
+    <div class="content-box">
+        <div class="formWrapper">
+            <h2 style="text-align: center;" >BOND BOOKS</h2>
+            <a class="backButton" href="{% url 'landingBatches' %}"><i class="im im-angle-left"><</i></a>
+            <br>
+            <form id="myForm" class="form" method="GET" action="{% url 'bondBooksResults' %}">
+                {% csrf_token %}
+                <!-- Input:Text -->
+                <div class="form__field">
+                    {% for field in form %}
+                    <label for="formInput#text">{{field.label}}</label>
+                    {{field}}
+                    {% endfor %}
+                </div>
+                <a href="{% url 'bondBooksResults' %}" >
+                <button class="btn btn--sub btn--lg  my-md" type="submit">Search</button>
+                </a>
+                <button type="button" class="btn btn--sub btn--lg my-md" onclick="resetForm()">Clear</button>
+                <a href="{% url 'landingBatches' %}">
+                <button class="btn btn--sub btn--lg  my-md" type="button">Canecl</button>
+                </a>
+            </form>         
+        </div>
+    </div>
+</main>
+
+<script>   
+    function resetForm(){
+        document.getElementById('myForm').reset();
+    }
+</script>
+{% endblock content %}
