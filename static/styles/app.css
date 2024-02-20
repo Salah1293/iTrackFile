@@ -299,7 +299,7 @@ img {
   Pagination
 ========================*/
 .pagination {
-  margin-top: 8rem;
+  margin-top: 1rem;
   margin-bottom: 10rem;
 }
 
@@ -455,9 +455,9 @@ img {
 } */
 
 .singleBatch__preview {
-  max-width: 100%; /* Ensure the image does not exceed its container's width */
-  height: auto; /* Maintain the image's aspect ratio */
-  width: 100%; /* Make the image take up 100% of its container's width */
+  max-width: 100%; 
+  height: auto; 
+  width: 100%; 
   border-radius: 0.7rem;
 }
 
@@ -868,8 +868,8 @@ img {
 }
 
 .button-container button {
-  flex: 1 0 22%; /* Adjust the width as needed */
-  margin: 5px;   /* Adjust the margin as needed */
+  flex: 1 0 22%; 
+  margin: 5px;  
 }
 
 
@@ -981,7 +981,8 @@ img {
 
 #table-container {
   overflow-y: auto;
-  max-height: 550px; 
+  max-height: 450px;
+  
 }
 
 #my-styled-table {
@@ -1009,6 +1010,6 @@ img {
 }
 
 #my-styled-table tbody tr:nth-child(even) {
-  background-color: #f9f9f9;
+  background-color: #d8cdcd;
 }
 

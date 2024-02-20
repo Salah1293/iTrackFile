@@ -3,6 +3,7 @@ from .models import *
 from django.db.models import Q
 from .utils import *
 from .forms import *
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
 
 # Create your views here.
@@ -56,7 +57,7 @@ def criminalSearch(request):
 def criminalResults (request):
 
     form = CriminalForm()
-
+    
     if request.method == "GET":
         form = CriminalForm(request.GET)
         if form.is_valid():
@@ -65,7 +66,6 @@ def criminalResults (request):
             defendant_first_name = form.cleaned_data.get('docindex7', '')
             start_date = form.cleaned_data.get('start_date')
             end_date = form.cleaned_data.get('end_date')
-
 
             query = Q()
 
@@ -77,20 +77,45 @@ def criminalResults (request):
                 query &= Q(docindex6=defendant_last_name)
             if defendant_first_name:
                 query &= Q(docindex7=defendant_first_name)
-
-            
-            if query:
-                criminal = PvdmDocs11.objects.filter(query)
-            else:
-                criminal = PvdmDocs11.objects.none()
                 
+            criminal = PvdmDocs11.objects.filter(query) if query else PvdmDocs11.objects.none()
 
-            
+            resultCount = criminal.count() if query else 0
 
-            context = {'form': form, 'criminal': criminal, 'resultCount' : criminal.count()}
+            page = request.GET.get('page')
+            result = 25
+            paginator = Paginator(criminal, result)
+
+            # print("Page:", page)  
+            # print("Paginator num_pages:", paginator.num_pages)
+
+            try:
+                criminal = paginator.page(page)
+            except PageNotAnInteger:
+                page = 1
+                criminal = paginator.page(page)
+            except EmptyPage:
+                page = paginator.num_pages
+                criminal = paginator.page(page)
+
+            leftIndex = (int(page) - 4)
+
+            if leftIndex < 1:
+                leftIndex = 1
+
+            rightIndex = (int(page) + 5)
+
+            if rightIndex > paginator.num_pages:
+                rightIndex = paginator.num_pages + 1
+
+            custom_range = range(leftIndex, rightIndex)
+                    
+            context = {'form': form, 'criminal': criminal,
+                       'resultCount' : resultCount, 'paginator' : paginator,
+                         'custom_range' : custom_range}
             return render(request, 'batches/criminal-results.html', context)
 
-    context={'form' : form, 'criminal' : PvdmDocs11.objects.none()}    
+    context={'form' : form, 'criminal' : PvdmDocs11.objects.none(), 'resultCount' : 0}    
     return redirect('criminalResults')
 
 
