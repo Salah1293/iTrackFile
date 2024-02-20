@@ -35,8 +35,9 @@
                     <th>Subject Suffix</th>
                     <th>Date Scanned</th>
                 </tr>
-            </thead>
+            </thead>      
             <tbody>
+              <div class="table-body">
               {% for element in civil %}
                 <tr>
                     <td>{% if element.docindex1 %}{{ element.docindex1 }}{% endif %}</td>
@@ -63,6 +64,8 @@
                 {% endfor %}
             </tbody>
         </table>
+        </div>
+        <p>Result: {{resultCount}} row{{ resultCount|pluralize:'s'}}</p>
     </div>
           </div>
         </div>     

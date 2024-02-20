@@ -10,9 +10,7 @@
             <h2 style="text-align: center;" >HISTORIC INDEX CARDS</h2>
             <a class="backButton" href="{% url 'landingBatches' %}"><i class="im im-angle-left"><</i></a>
             <br>
-            
-
-            <form class="form" method="GET" action="{% url 'historicIndexCardsResults' %}">
+            <form id="myForm" class="form" method="GET" action="{% url 'historicIndexCardsResults' %}">
                 {% csrf_token %}
                 <!-- Input:Text -->
                 <div class="form__field">
@@ -21,15 +19,21 @@
                     {{field}}
                     {% endfor %}
                 </div>
-
                 <a href="{% url 'historicIndexCardsResults' %}" >
-                <input class="btn btn--sub btn--lg  my-md" type="submit" value="Search" />
+                <button class="btn btn--sub btn--lg  my-md" type="submit">Search</button>
                 </a>
+                <button type="button" class="btn btn--sub btn--lg my-md" onclick="resetForm()">Clear</button>
                 <a href="{% url 'landingBatches' %}">
-                    <input class="btn btn--sub btn--lg  my-md" type="button" value="Canecl" />
-                    </a>
+                <button class="btn btn--sub btn--lg  my-md" type="button">Canecl</button>
+                </a>
             </form>
         </div>
     </div>
 </main>
+
+<script> 
+    function resetForm(){
+        document.getElementById('myForm').reset();
+    }
+</script>
 {% endblock content %}

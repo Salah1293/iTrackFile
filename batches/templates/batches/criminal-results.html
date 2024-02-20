@@ -37,6 +37,7 @@
                 </tr>
             </thead>
             <tbody>
+              <div class="table-body">           
               {% for element in criminal %}
                 <tr>
                   <td>{% if element.docindex1 %}{{ element.docindex1 }}{% endif %}</td>
@@ -62,7 +63,9 @@
                 </tr>
                 {% endfor %}
             </tbody>
-        </table>
+        </table>  
+        </div>
+        <p>Result: {{resultCount}} row{{ resultCount|pluralize:'s'}}</p>
       </div>
           </div>
         </div>     

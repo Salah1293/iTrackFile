@@ -10,18 +10,10 @@
             <h2 style="text-align: center;" >CRIMINAL</h2>
             <a class="backButton" href="{% url 'landingBatches' %}"><i class="im im-angle-left"><</i></a>
             <br>
-            
-
-            <form class="form" method="GET" action="{% url 'criminalResults' %}">
+            <form id="myForm" class="form" method="GET" action="{% url 'criminalResults' %}">
                 {% csrf_token %}
-
                 <!-- Input:Text -->
                 <div class="form__field">
-                    <!-- {% for field in form %}
-                              <label for="formInput#text">{{field.label}}</label>
-                              {{field}}
-                              {% endfor %} -->
-          
                     {% for field in form %} {% if field.name == 'docindex2' %}
                     <label for="formInput#text">Order Date</label>
                     <input type="date" name="start_date" class="input" autocomplete="off"/>
@@ -30,46 +22,27 @@
                     <label for="formInput#text">{{ field.label }}</label>
                     {{ field }} 
                     {% endif %} 
-                    {% endfor %}
-          
-                  </div>
+                    {% endfor %} 
+                </div>
+                <div class="button-group">
                 <a href="{% url 'criminalSearch' %}">
-                <input class="btn btn--sub btn--lg  my-md" type="submit" value="Search" />
+                <button class="btn btn--sub btn--lg  my-md" type="submit">Search</button>
                 </a>
+                <button type="button" class="btn btn--sub btn--lg my-md" onclick="resetForm()">Clear</button>
                 <a href="{% url 'landingBatches' %}">
-                    <input class="btn btn--sub btn--lg  my-md" type="button" value="Canecl" />
+                <button class="btn btn--sub btn--lg  my-md" type="button">Canecl</button>
                 </a>
+            </div>
             </form>
         </div>
     </div>
 </main>
+
+<script>  
+    function resetForm(){
+        document.getElementById('myForm').reset();
+    }
+</script>
 {% endblock content %}
 
 
-
-<!-- <div class="form__field">
-    <label for="formInput#text">Case Number</label>
-    <input class="input input--text" id="formInput#text" type="text" name="case_number" />
-</div>
-
-
-<div class="form__field">
-    <label for="formInput#text">Order Date (mm/dd/yyyy)</label>
-    <input class="input input--text" id="formInput#text" type="date" name="order_date" />
-</div>
-
-
-<div class="form__field">
-    <label for="formInput#text">Defendant Last Name</label>
-    <input class="input input--text" id="formInput#text" type="text" name="defendant_last_name" />
-</div>
-
-
-<div class="form__field">
-    <label for="formInput#text">Defendant First Name</label>
-    <input class="input input--text" id="formInput#text" type="text" name="defendant_first_name" />
-</div>
-<input class="btn btn--sub btn--lg  my-md" type="submit" value="Search" />
-<a href="{% url 'landingBatches' %}">
-    <input class="btn btn--sub btn--lg  my-md" type="submit" value="Canecl" />
-    </a> -->

@@ -21,8 +21,9 @@
                     <th>Scan Date</th>
                     <th>Document Type</th>
                     </tr>
-            </thead>
+            </thead>    
             <tbody>
+              <div class="table-body">              
               {% for element in hr %}
                 <tr>
                   <td>{% if element.docindex1 %}{{ element.docindex1 }}{% endif %}</td>
@@ -35,6 +36,8 @@
                 {% endfor %}
             </tbody>
         </table>
+        </div>
+        <p>Result: {{resultCount}} row{{ resultCount|pluralize:'s'}}</p>
       </div>
           </div>
         </div>     

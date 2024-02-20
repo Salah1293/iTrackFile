@@ -20,7 +20,9 @@
                     <th>Page B</th>
                 </tr>
             </thead>
+          
             <tbody>
+              <div class="table-body">
               {% for element in historicOrderBooks %}
                 <tr>
                     <td>{% if element.docindex1 %}{{ element.docindex1 }}{% endif %}</td>
@@ -31,7 +33,9 @@
                 {% endfor %}
             </tbody>
         </table>
-    </div>
+        </div>
+        <p>Result: {{resultCount}} row{{ resultCount|pluralize:'s'}}</p>
+      </div>
           </div>
         </div>     
     </section>

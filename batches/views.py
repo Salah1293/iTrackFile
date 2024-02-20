@@ -12,12 +12,9 @@ def deleteBatch (request):
 
     return render(request , 'batches/delete-batch.html')
 
-
-
 def updateBatch (request):
 
     return render(request , 'batches/update-batch.html')
-
 
 def incompleteBatch (request):
     civil = PvdmDocs12.objects.all()
@@ -25,35 +22,25 @@ def incompleteBatch (request):
 
     return render(request , 'batches/incomplete-batches.html', context)
 
-
 def fillingBatch (request):
 
     return render(request , 'batches/filling-batch.html')
-
 
 def landingBatches (request):
 
     return render(request , 'batches/landing-page.html')
 
-
 def singleBatch (request):
 
     return render(request , 'batches/single-batch.html')
-
-
-
-
-
 
 def newBatch (request):
 
     return render(request , 'batches/new-batch.html')
 
-
 def scannerSetting (request):
 
     return render(request , 'batches/scanner-setting.html')
-
 
 def capture (request):
 
@@ -74,20 +61,33 @@ def criminalResults (request):
         form = CriminalForm(request.GET)
         if form.is_valid():
             case_number = form.cleaned_data.get('docindex1', '')
-            order_date = form.cleaned_data.get('docindex2', '')
             defendant_last_name = form.cleaned_data.get('docindex6', '')
             defendant_first_name = form.cleaned_data.get('docindex7', '')
             start_date = form.cleaned_data.get('start_date')
             end_date = form.cleaned_data.get('end_date')
 
-            criminal = PvdmDocs11.objects.filter(
-                Q(docindex1=case_number) |
-                Q(docindex2__range=[start_date, end_date]) |
-                Q(docindex6=defendant_last_name) |
-                Q(docindex7=defendant_first_name) 
-            )
 
-            context = {'form': form, 'criminal': criminal}
+            query = Q()
+
+            if case_number:
+                query &= Q(docindex1=case_number)
+            if start_date and end_date:
+                query &= Q(docindex2__range=[start_date, end_date])
+            if defendant_last_name:
+                query &= Q(docindex6=defendant_last_name)
+            if defendant_first_name:
+                query &= Q(docindex7=defendant_first_name)
+
+            
+            if query:
+                criminal = PvdmDocs11.objects.filter(query)
+            else:
+                criminal = PvdmDocs11.objects.none()
+                
+
+            
+
+            context = {'form': form, 'criminal': criminal, 'resultCount' : criminal.count()}
             return render(request, 'batches/criminal-results.html', context)
 
     context={'form' : form, 'criminal' : PvdmDocs11.objects.none()}    
@@ -100,6 +100,7 @@ def civilSearch (request):
     context = {'form':form}
     return render(request , 'batches/civil-search.html', context)
 
+
 #civil display resylts
 def civilResults (request):
     form = CivilForm()
@@ -108,20 +109,53 @@ def civilResults (request):
         form = CivilForm(request.GET)
         if form.is_valid():
             case_number = form.cleaned_data.get('docindex1', '')
-            order_date = form.cleaned_data.get('docindex2', '')
-            defenfant_last_name = form.cleaned_data.get('docindex11', '')
-            defenfant_first_name = form.cleaned_data.get('docindex12', '')
+            # defendant_last_name = form.cleaned_data.get('docindex11', '')
+            # defendant_first_name = form.cleaned_data.get('docindex12', '')
+            last_name = form.cleaned_data.get('last_name', '')
+            first_name = form.cleaned_data.get('first_name', '')
             start_date = form.cleaned_data.get('start_date')
             end_date = form.cleaned_data.get('end_date')
 
-            civil = PvdmDocs12.objects.filter(
-                Q(docindex1=case_number) |
-                Q(docindex2__range=[start_date, end_date]) |
-                Q(docindex11=defenfant_last_name) |
-                Q(docindex12=defenfant_first_name)
-            )
+           
+            # query = Q()
 
-            context = {'form': form, 'civil': civil}
+            # if case_number:
+            #     query &= Q(docindex1=case_number)
+            # if start_date and end_date:
+            #     query &= Q(docindex2__range=[start_date, end_date])
+            # if last_name:
+            #     query &= (Q(docindex11=last_name) | Q(docindex6=last_name))
+            # if first_name:
+            #     query &= (Q(docindex12=first_name) | Q(docindex7=first_name))
+
+            
+            # if query:
+            #     civil = PvdmDocs12.objects.filter(query)
+            # else:
+            #     civil = PvdmDocs12.objects.none()
+
+
+            query = Q()
+
+            if case_number:
+                query &= Q(docindex1=case_number)
+            if start_date and end_date:
+                query &= Q(docindex2__range=[start_date, end_date])
+
+            if last_name or first_name:
+                name_query = Q()
+                if last_name:
+                    name_query |= Q(docindex11=last_name) | Q(docindex6=last_name)
+                if first_name:
+                    name_query |= Q(docindex12=first_name) | Q(docindex7=first_name)
+                query &= name_query
+
+            if query:
+                civil = PvdmDocs12.objects.filter(query)
+            else:
+                civil = PvdmDocs12.objects.none()
+
+            context = {'form': form, 'civil': civil, 'resultCount' : civil.count()}
             return render(request, 'batches/civil-results.html', context)
         
     
@@ -129,12 +163,12 @@ def civilResults (request):
     return redirect('civilResults')
 
 
-
 #criminal cases search
 def criminalCasesSearch (request):
     form = CriminalCasesForm()
     context = {'form': form}
     return render(request , 'batches/criminal-cases-search.html', context)
+
 
 #criminal cases display results
 def criminalCasesResults(request):
@@ -144,17 +178,29 @@ def criminalCasesResults(request):
         if form.is_valid():
             date = form.cleaned_data.get('docindex1', '')
             case_number = form.cleaned_data.get('docindex2', '')
-            Last_Corporation = form.cleaned_data.get('docindex3', '')
-            First = form.cleaned_data.get('docindex4', '')
+            last_Corporation = form.cleaned_data.get('docindex3', '')
+            first = form.cleaned_data.get('docindex4', '')
 
-            criminalCases = PvdmDocs17.objects.filter(
-                Q(docindex1=date) |
-                Q(docindex2=case_number) |
-                Q(docindex3=Last_Corporation) |
-                Q(docindex4=First)
-            )
+            
+            query = Q()
 
-            context = {'form': form, 'criminalCases': criminalCases}
+            
+            if date:
+                query &= Q(docindex1=date)
+            if case_number:
+                query &= Q(docindex2=case_number)
+            if last_Corporation:
+                query &= Q(docindex3=last_Corporation)
+            if first:
+                query &= Q(docindex4=first)
+
+            
+            if query:
+                criminalCases = PvdmDocs15.objects.filter(query)
+            else:
+                criminalCases = PvdmDocs15.objects.none()
+
+            context = {'form': form, 'criminalCases': criminalCases, 'resultCount' : criminalCases.count()}
             return render(request, 'batches/criminal-cases-results.html', context)
         
     
@@ -169,8 +215,6 @@ def criminalJuvenileSearch (request):
     return render(request , 'batches/criminal-juvenile-Search.html', context)
 
 
-
-
 #criminal junevile display results
 def criminalJuvenileResults (request):
     form = CriminalJuvenileForm()
@@ -178,20 +222,30 @@ def criminalJuvenileResults (request):
         form = CriminalJuvenileForm(request.GET)
         if form.is_valid():
             case_number = form.cleaned_data.get('docindex1', '')
-            order_data = form.cleaned_data.get('docindex2', '')
             defendant_last_name = form.cleaned_data.get('docindex6', '')
             defendant_first_name = form.cleaned_data.get('docindex7', '')
             start_date = form.cleaned_data.get('start_date')
             end_date = form.cleaned_data.get('end_date')
 
-            ciminalJuvenile = PvdmDocs13.objects.filter(
-                Q(docindex1=case_number) |
-                Q(docindex2__range=[start_date, end_date]) |
-                Q(docindex6=defendant_last_name) |
-                Q(docindex7=defendant_first_name)
-            )
 
-            context = {'form' : form,'ciminalJuvenile' : ciminalJuvenile}
+            query = Q()
+
+            if case_number:
+                query &= Q(docindex1=case_number)
+            if start_date and end_date:
+                query &= Q(docindex2__range=[start_date, end_date])
+            if defendant_last_name:
+                query &= Q(docindex6=defendant_last_name)
+            if defendant_first_name:
+                query &= Q(docindex7=defendant_first_name)
+
+            
+            if query:
+                ciminalJuvenile = PvdmDocs15.objects.filter(query)
+            else:
+                ciminalJuvenile = PvdmDocs15.objects.none()
+
+            context = {'form' : form,'ciminalJuvenile' : ciminalJuvenile, 'resultCount' : ciminalJuvenile.count()}
             return render(request, 'batches/criminal-juvenile-results.html', context)
         
     
@@ -215,12 +269,21 @@ def historicIndexCardsResults(request):
             last_name = form.cleaned_data.get('docindex1', '')
             first_name = form.cleaned_data.get('docindex2', '')
 
-            historicIndexCards = PvdmDocs114.objects.filter(
-                Q(docindex1=last_name) |
-                Q(docindex2=first_name)
-            )
 
-            context = {'form' : form, 'historicIndexCards': historicIndexCards}
+            query = Q()
+
+            if last_name:
+                query &= Q(docindex1=last_name)
+            if first_name:
+                query &= Q(docindex2=first_name)
+
+            
+            if query:
+                historicIndexCards = PvdmDocs15.objects.filter(query)
+            else:
+                historicIndexCards = PvdmDocs15.objects.none()
+
+            context = {'form' : form, 'historicIndexCards': historicIndexCards, 'resultCount' : historicIndexCards.count()}
             return render(request, 'batches/historic-index-cards-results.html', context)
         
 
@@ -234,6 +297,7 @@ def historicOrderBooksSearch (request):
     context = {'form' : form}
     return render(request, 'batches/historic-order-books-Search.html', context)
 
+
 #historic order books display results
 def historicOrderBooksResults(request):
     form = HistoricOrderBooksForm()
@@ -243,11 +307,18 @@ def historicOrderBooksResults(request):
         if form.is_valid():
             year = form.cleaned_data.get('docindex2', '')
 
-            historicOrderBooks = PvdmDocs113.objects.filter(
-                docindex2 = year
-            )
 
-            context = {'form' : form, 'historicOrderBooks' : historicOrderBooks}
+            query = Q()
+
+            if year:
+                query &= Q(docindex1=year)
+
+            if query:
+                historicOrderBooks = PvdmDocs15.objects.filter(query)
+            else:
+                historicOrderBooks = PvdmDocs15.objects.none()
+
+            context = {'form' : form, 'historicOrderBooks' : historicOrderBooks, 'resultCount' : historicOrderBooks.count()}
             return render(request, 'batches/historic-order-books-results.html', context)
 
     context = {'form' : form, 'historicOrderBooks' : PvdmDocs113.objects.none()}
@@ -271,13 +342,23 @@ def hrResults(request):
             first_name = form.cleaned_data.get('docindex2', '')
             ein = form.cleaned_data.get('docindex3', '')
 
-            hr = PvdmDocs15.objects.filter(
-                Q(docindex1=last_name) |
-                Q(docindex2=first_name) |
-                Q(docindex3=ein)
-            )
 
-            context = {'form' : form, 'hr' : hr}
+            query = Q()
+
+            if last_name:
+                query &= Q(docindex1=last_name)
+            if first_name:
+                query &= Q(docindex2=first_name)
+            if ein:
+                query &= Q(docindex3=ein)
+
+                
+            if query:
+                hr = PvdmDocs15.objects.filter(query)
+            else:
+                hr = PvdmDocs15.objects.none()
+
+            context = {'form' : form, 'hr' : hr, 'resultCount' : hr.count()}
             return render(request, 'batches/hr-results.html', context)
         
 

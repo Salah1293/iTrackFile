@@ -10,15 +10,10 @@
             <h2 style="text-align: center;" >CIVIL</h2>
             <a class="backButton" href="{% url 'landingBatches' %}"><i class="im im-angle-left"><</i></a>
             <br>
-            <form class="form" method="GET" action="{% url 'civilResults' %}">
+            <form id="myForm" class="form" method="GET" action="{% url 'civilResults' %}">
                 {% csrf_token %}
                 <!-- Input:Text -->
-                <div class="form__field">
-                    <!-- {% for field in form %}
-                              <label for="formInput#text">{{field.label}}</label>
-                              {{field}}
-                              {% endfor %} -->
-          
+                <!-- <div class="form__field">
                     {% for field in form %} {% if field.name == 'docindex2' %}
                     <label for="formInput#text">Order Date</label>
                     <input type="date" name="start_date" class="input" autocomplete="off"/>
@@ -28,16 +23,40 @@
                     {{ field }} 
                     {% endif %} 
                     {% endfor %}
-          
-                  </div>
-               <a href="{% url 'civilResults' %}">
-                <input class="btn btn--sub btn--lg  my-md" type="submit" value="Search" />
+                </div> -->
+
+
+                <div class="form__field">
+                    <label for="case_number">Case Number</label>
+                    <input type="text" name="case_number" class="input" autocomplete="off"/>
+                </div>
+                <div class="form__field">
+                    <label for="order_date">Order Date</label>
+                    <input type="date" name="order_date" class="input" autocomplete="off"/>
+                </div>
+                <div class="form__field">
+                    <label for="first_name">Last Name</label>
+                    <input type="text" name="last_name" class="input" autocomplete="off"/>
+                </div>
+                <div class="form__field">
+                    <label for="last_name">First Name</label>
+                    <input type="text" name="first_name" class="input" autocomplete="off"/>
+                </div>
+                <a href="{% url 'civilResults' %}">
+                <button class="btn btn--sub btn--lg  my-md" type="submit">Search</button>
                 </a>
+                <button type="button" class="btn btn--sub btn--lg my-md" onclick="resetForm()">Clear</button>
                 <a href="{% url 'landingBatches' %}">
-                    <input class="btn btn--sub btn--lg  my-md" type="button" value="Canecl" />
+                <button class="btn btn--sub btn--lg  my-md" type="button">Canecl</button>
                 </a>
             </form>
         </div>
     </div>
 </main>
+
+<script>   
+    function resetForm(){
+        document.getElementById('myForm').reset();
+    }
+</script>
 {% endblock content %}

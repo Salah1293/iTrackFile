@@ -980,8 +980,8 @@ img {
 
 
 #table-container {
-  overflow: auto;
-  max-height: 800px; 
+  overflow-y: auto;
+  max-height: 550px; 
 }
 
 #my-styled-table {
@@ -1003,8 +1003,12 @@ img {
   background-color: #f2f2f2;
   font-weight: bold;
   text-align: left;
+  position: sticky; 
+  top: 0; 
+  z-index: 1; 
 }
 
 #my-styled-table tbody tr:nth-child(even) {
   background-color: #f9f9f9;
 }
+
