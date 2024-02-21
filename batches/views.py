@@ -82,36 +82,10 @@ def criminalResults (request):
 
             resultCount = criminal.count() if query else 0
 
-            page = request.GET.get('page')
-            result = 25
-            paginator = Paginator(criminal, result)
-
-            # print("Page:", page)  
-            # print("Paginator num_pages:", paginator.num_pages)
-
-            try:
-                criminal = paginator.page(page)
-            except PageNotAnInteger:
-                page = 1
-                criminal = paginator.page(page)
-            except EmptyPage:
-                page = paginator.num_pages
-                criminal = paginator.page(page)
-
-            leftIndex = (int(page) - 4)
-
-            if leftIndex < 1:
-                leftIndex = 1
-
-            rightIndex = (int(page) + 5)
-
-            if rightIndex > paginator.num_pages:
-                rightIndex = paginator.num_pages + 1
-
-            custom_range = range(leftIndex, rightIndex)
+            custom_range, criminal = paginate(request, criminal)
                     
             context = {'form': form, 'criminal': criminal,
-                       'resultCount' : resultCount, 'paginator' : paginator,
+                       'resultCount' : resultCount,
                          'custom_range' : custom_range}
             return render(request, 'batches/criminal-results.html', context)
 
@@ -153,11 +127,12 @@ def civilResults (request):
             if first_name:
                 query &= (Q(docindex12=first_name) | Q(docindex7=first_name))
 
-            
-            if query:
-                civil = PvdmDocs12.objects.filter(query)
-            else:
-                civil = PvdmDocs12.objects.none()
+
+            civil = PvdmDocs12.objects.filter(query) if query else PvdmDocs12.objects.none()
+
+            resultCount = civil.count() if query else 0
+
+            custom_range, civil = paginate(request, civil)
 
 
             # query = Q()
@@ -180,11 +155,13 @@ def civilResults (request):
             # else:
             #     civil = PvdmDocs12.objects.none()
 
-            context = {'form': form, 'civil': civil, 'resultCount' : civil.count()}
+            context = {'form': form, 'civil': civil,
+                        'resultCount' : resultCount,
+                         'custom_range' : custom_range}
             return render(request, 'batches/civil-results.html', context)
         
     
-    context={'form' : form, 'civil' : PvdmDocs12.objects.none()}    
+    context={'form' : form, 'civil' : PvdmDocs12.objects.none(), 'resultCount' : 0}    
     return redirect('civilResults')
 
 
@@ -219,17 +196,20 @@ def criminalCasesResults(request):
             if first:
                 query &= Q(docindex4=first)
 
-            
-            if query:
-                criminalCases = PvdmDocs15.objects.filter(query)
-            else:
-                criminalCases = PvdmDocs15.objects.none()
 
-            context = {'form': form, 'criminalCases': criminalCases, 'resultCount' : criminalCases.count()}
+            criminalCases = PvdmDocs17.objects.filter(query) if query else PvdmDocs17.objects.none()
+
+            resultCount = criminalCases.count() if query else 0
+
+            custom_range, criminalCases = paginate(request, criminalCases)
+
+            context = {'form': form, 'criminalCases': criminalCases,
+                        'resultCount' : resultCount,
+                         'custom_range' : custom_range}
             return render(request, 'batches/criminal-cases-results.html', context)
         
     
-    context={'form' : form, 'criminalCases' : PvdmDocs17.objects.none()}    
+    context={'form' : form, 'criminalCases' : PvdmDocs17.objects.none(), 'resultCount' : 0}    
     return redirect('criminalCasesResults')
         
 
@@ -264,17 +244,20 @@ def criminalJuvenileResults (request):
             if defendant_first_name:
                 query &= Q(docindex7=defendant_first_name)
 
-            
-            if query:
-                ciminalJuvenile = PvdmDocs15.objects.filter(query)
-            else:
-                ciminalJuvenile = PvdmDocs15.objects.none()
 
-            context = {'form' : form,'ciminalJuvenile' : ciminalJuvenile, 'resultCount' : ciminalJuvenile.count()}
+            ciminalJuvenile = PvdmDocs13.objects.filter(query) if query else PvdmDocs13.objects.none()
+
+            resultCount = ciminalJuvenile.count() if query else 0
+
+            custom_range, ciminalJuvenile = paginate(request, ciminalJuvenile)
+
+            context = {'form' : form,'ciminalJuvenile' : ciminalJuvenile,
+                        'resultCount' : resultCount,
+                         'custom_range' : custom_range}
             return render(request, 'batches/criminal-juvenile-results.html', context)
         
     
-    context={'form' : form, 'ciminalJuvenile' : PvdmDocs13.objects.none()}    
+    context={'form' : form, 'ciminalJuvenile' : PvdmDocs13.objects.none(), 'resultCount' : 0}    
     return redirect('criminalJuvenileResults')
 
    
@@ -302,17 +285,20 @@ def historicIndexCardsResults(request):
             if first_name:
                 query &= Q(docindex2=first_name)
 
-            
-            if query:
-                historicIndexCards = PvdmDocs15.objects.filter(query)
-            else:
-                historicIndexCards = PvdmDocs15.objects.none()
 
-            context = {'form' : form, 'historicIndexCards': historicIndexCards, 'resultCount' : historicIndexCards.count()}
+            historicIndexCards = PvdmDocs114.objects.filter(query) if query else PvdmDocs114.objects.none()
+
+            resultCount = historicIndexCards.count() if query else 0
+
+            custom_range, historicIndexCards = paginate(request, historicIndexCards)
+
+            context = {'form' : form, 'historicIndexCards': historicIndexCards, 
+                       'resultCount' : resultCount,
+                         'custom_range' : custom_range}
             return render(request, 'batches/historic-index-cards-results.html', context)
         
 
-    context = {'form' : form, 'historicIndexCards' : PvdmDocs114.objects.none()}
+    context = {'form' : form, 'historicIndexCards' : PvdmDocs114.objects.none(), 'resultCount' : 0}
     return redirect('hitoricIndexCardsResults')
 
 
@@ -338,15 +324,19 @@ def historicOrderBooksResults(request):
             if year:
                 query &= Q(docindex1=year)
 
-            if query:
-                historicOrderBooks = PvdmDocs15.objects.filter(query)
-            else:
-                historicOrderBooks = PvdmDocs15.objects.none()
 
-            context = {'form' : form, 'historicOrderBooks' : historicOrderBooks, 'resultCount' : historicOrderBooks.count()}
+            historicOrderBooks = PvdmDocs113.objects.filter(query) if query else PvdmDocs113.objects.none()
+
+            resultCount = historicOrderBooks.count() if query else 0
+
+            custom_range, historicOrderBooks = paginate(request, historicOrderBooks)
+
+            context = {'form' : form, 'historicOrderBooks' : historicOrderBooks,
+                        'resultCount' : resultCount,
+                         'custom_range' : custom_range}
             return render(request, 'batches/historic-order-books-results.html', context)
 
-    context = {'form' : form, 'historicOrderBooks' : PvdmDocs113.objects.none()}
+    context = {'form' : form, 'historicOrderBooks' : PvdmDocs113.objects.none(), 'resultCount' : 0}
     return redirect('historicOrderBooks')
 
 
@@ -378,17 +368,20 @@ def hrResults(request):
             if ein:
                 query &= Q(docindex3=ein)
 
-                
-            if query:
-                hr = PvdmDocs15.objects.filter(query)
-            else:
-                hr = PvdmDocs15.objects.none()
 
-            context = {'form' : form, 'hr' : hr, 'resultCount' : hr.count()}
+            hr = PvdmDocs15.objects.filter(query) if query else PvdmDocs15.objects.none()
+
+            resultCount = hr.count() if query else 0
+
+            custom_range, hr = paginate(request, hr)
+
+            context = {'form' : form, 'hr' : hr,
+                        'resultCount' : resultCount,
+                         'custom_range' : custom_range}
             return render(request, 'batches/hr-results.html', context)
         
 
-    context = {'form' : form, 'hr' : PvdmDocs15.objects.none()}
+    context = {'form' : form, 'hr' : PvdmDocs15.objects.none(), 'resultCount' : 0}
     return render(request, 'batches/hr-results.html', context)
 
 #bond books search
@@ -408,7 +401,6 @@ def bondBooksResults(request):
             page = form.cleaned_data.get('docindex2', '')
             
 
-
             query = Q()
 
             if book:
@@ -417,16 +409,18 @@ def bondBooksResults(request):
                 query &= Q(docindex2=page)
             
 
-                
-            if query:
-                bondBooks = PvdmDocs116.objects.filter(query)
-            else:
-                bondBooks = PvdmDocs15.objects.none()
+            bondBooks = PvdmDocs116.objects.filter(query) if query else PvdmDocs116.objects.none()
 
-            context = {'form' : form, 'bondBooks' : bondBooks, 'resultCount' : bondBooks.count()}
+            resultCount = bondBooks.count() if query else 0
+
+            custom_range, bondBooks = paginate(request, bondBooks)
+
+            context = {'form' : form, 'bondBooks' : bondBooks,
+                        'resultCount' : resultCount,
+                         'custom_range' : custom_range}
             return render(request, 'batches/bond-books-results.html', context)
         
 
-    context = {'form' : form, 'bondBooks' : PvdmDocs116.objects.none()}
+    context = {'form' : form, 'bondBooks' : PvdmDocs116.objects.none(), 'resultCount' : 0}
     return render(request, 'batches/bond-books-results.html', context)
     

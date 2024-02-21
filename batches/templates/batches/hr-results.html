@@ -42,6 +42,7 @@
           </div>
         </div>     
     </section>
+    {% include 'pagination.html' with queryset=hr custom_range=custom_range %}
 </main>
 
 {% endblock content %}
