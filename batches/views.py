@@ -424,3 +424,170 @@ def bondBooksResults(request):
     context = {'form' : form, 'bondBooks' : PvdmDocs116.objects.none(), 'resultCount' : 0}
     return render(request, 'batches/bond-books-results.html', context)
     
+
+#charters search
+def chartersSearch(request):
+    form = ChartersForm()
+    context = {'form' : form}
+    return render(request, 'batches/charters-search.html', context)
+
+#charters display results
+def chartersResults(request):
+    form = ChartersForm()
+    if request.method == 'GET':
+        form = HrForm(request.GET)
+        if form.is_valid():
+            charter_name = form.cleaned_data.get('docindex1', '')
+            book = form.cleaned_data.get('docindex2', '')
+            page = form.cleaned_data.get('docindex3', '')
+
+
+            query = Q()
+
+            if charter_name:
+                query &= Q(docindex1=charter_name)
+            if book:
+                query &= Q(docindex2=book)
+            if page:
+                query &= Q(docindex3=page)
+
+
+            charters = PvdmDocs19.objects.filter(query) if query else PvdmDocs19.objects.none()
+
+            resultCount = charters.count() if query else 0
+
+            custom_range, charters = paginate(request, charters)
+
+            context = {'form' : form, 'charters' : charters,
+                        'resultCount' : resultCount,
+                         'custom_range' : custom_range}
+            return render(request, 'batches/charters-results.html', context)
+        
+
+    context = {'form' : form, 'charters' : PvdmDocs19.objects.none(), 'resultCount' : 0}
+    return render(request, 'batches/charters-results.html', context)
+
+
+#concealed weapons search
+def ConcealedWeaponsSearch(request):
+    form = ConcealedWeaponsForm()
+    context = {'form' : form}
+    return render(request, 'batches/concealed-weapons-search.html', context)
+
+#concealed weapons display results
+def ConcealedWeaponsResults(request):
+    form = ConcealedWeaponsForm()
+    if request.method == 'GET':
+        form = HrForm(request.GET)
+        if form.is_valid():
+            case_number = form.cleaned_data.get('docindex1', '')
+            subject_company = form.cleaned_data.get('docindex7', '')
+            subject_last_name = form.cleaned_data.get('docindex8', '')
+            subject_first_name = form.cleaned_data.get('docindex9', '')
+
+
+            query = Q()
+
+            if case_number:
+                query &= Q(docindex1=case_number)
+            if subject_company:
+                query &= Q(docindex7=subject_company)
+            if subject_last_name:
+                query &= Q(docindex8=subject_last_name)
+            if subject_first_name:
+                query &= Q(docindex9=subject_first_name)
+
+
+            concealedWeapons = PvdmDocs112.objects.filter(query) if query else PvdmDocs112.objects.none()
+
+            resultCount = concealedWeapons.count() if query else 0
+
+            custom_range, concealedWeapons = paginate(request, concealedWeapons)
+
+            context = {'form' : form, 'concealedWeapons' : concealedWeapons,
+                        'resultCount' : resultCount,
+                         'custom_range' : custom_range}
+            return render(request, 'batches/concealed-weapons-results.html', context)
+        
+
+    context = {'form' : form, 'concealedWeapons' : PvdmDocs112.objects.none(), 'resultCount' : 0}
+    return render(request, 'batches/concealed-weapons-results.html', context)
+
+#indictmenys search
+def indictmentsSearch(request):
+    form = IndictmentsForm()
+    context = {'form' : form}
+    return render(request, 'batches/indictments-search.html', context)
+
+#indictmenys display results
+def indictmentsResults(request):
+    form = ConcealedWeaponsForm()
+    if request.method == 'GET':
+        form = HrForm(request.GET)
+        if form.is_valid():
+            case_number = form.cleaned_data.get('docindex1', '')
+            defendant_first_name = form.cleaned_data.get('docindex3', '')
+            defendant_last_name = form.cleaned_data.get('docindex5', '')
+
+
+            query = Q()
+
+            if case_number:
+                query &= Q(docindex1=case_number)
+            if defendant_first_name:
+                query &= Q(docindex3=defendant_first_name)
+            if defendant_last_name:
+                query &= Q(docindex5=defendant_last_name)
+
+
+            indictments = PvdmDocs110.objects.filter(query) if query else PvdmDocs110.objects.none()
+
+            resultCount = indictments.count() if query else 0
+
+            custom_range, indictments = paginate(request, indictments)
+
+            context = {'form' : form, 'indictments' : indictments,
+                        'resultCount' : resultCount,
+                         'custom_range' : custom_range}
+            return render(request, 'batches/indictments-results.html', context)
+        
+    context = {'form' : form, 'indictments' : PvdmDocs110.objects.none(), 'resultCount' : 0}
+    return render(request, 'batches/indictments-results.html', context)
+
+#law&chancery search
+def lawChancerySearch(request):
+    form = LawChanceryForm()
+    context = {'form' : form}
+    return render(request, 'batches/law-chancery-search.html', context)
+
+#bond law&chancery display results
+def lawChanceryResults(request):
+    form = LawChanceryForm()
+    if request.method == 'GET':
+        form = HrForm(request.GET)
+        if form.is_valid():
+            date = form.cleaned_data.get('docindex1', '')
+            law_Chancery = form.cleaned_data.get('docindex2', '')
+
+
+            query = Q()
+
+            if date:
+                query &= Q(docindex1=date)
+            if law_Chancery:
+                query &= Q(docindex2=law_Chancery)
+
+
+            lawChancery = PvdmDocs16.objects.filter(query) if query else PvdmDocs16.objects.none()
+
+            resultCount = lawChancery.count() if query else 0
+
+            custom_range, lawChancery = paginate(request, lawChancery)
+
+            context = {'form' : form, 'lawChancery' : lawChancery,
+                        'resultCount' : resultCount,
+                         'custom_range' : custom_range}
+            return render(request, 'batches/law-chancery-results.html', context)
+        
+    context = {'form' : form, 'lawChancery' : PvdmDocs16.objects.none(), 'resultCount' : 0}
+    return render(request, 'batches/law-chancery-results.html', context)

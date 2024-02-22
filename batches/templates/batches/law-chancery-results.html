@@ -14,15 +14,14 @@
           <table id="my-styled-table" class="table table-striped my-styled-table" style="width:100%">
             <thead>
                 <tr>
-                    <th>Book</th>
-                    <th>Page</th>
+                    <th>Date</th>
+                    <th>LAW/CHANCERY#</th>
                     <th>Document Creation Date</th>
                     <th>Document ID</th>
-                    </tr>
             </thead>    
             <tbody>
               <div class="table-body">              
-              {% for element in bondBooks %}
+              {% for element in lawChancery %}
                 <tr>
                   <td>{% if element.docindex1 %}{{ element.docindex1 }}{% endif %}</td>
                   <td>{% if element.docindex2 %}{{ element.docindex2 }}{% endif %}</td>
@@ -38,7 +37,7 @@
           </div>
         </div>     
     </section>
-    {% include 'pagination.html' with queryset=bondBooks custom_range=custom_range %}
+    {% include 'pagination.html' with queryset=lawChancery custom_range=custom_range %}
 </main>
 
 {% endblock content %}

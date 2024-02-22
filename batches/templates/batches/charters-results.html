@@ -14,6 +14,7 @@
           <table id="my-styled-table" class="table table-striped my-styled-table" style="width:100%">
             <thead>
                 <tr>
+                    <th>Charter Name</th>
                     <th>Book</th>
                     <th>Page</th>
                     <th>Document Creation Date</th>
@@ -22,10 +23,11 @@
             </thead>    
             <tbody>
               <div class="table-body">              
-              {% for element in bondBooks %}
+              {% for element in charters %}
                 <tr>
                   <td>{% if element.docindex1 %}{{ element.docindex1 }}{% endif %}</td>
                   <td>{% if element.docindex2 %}{{ element.docindex2 }}{% endif %}</td>
+                  <td>{% if element.docindex3 %}{{ element.docindex3 }}{% endif %}</td>
                   <td>{% if element.createdate %}{{ element.createdate }}{% endif %}</td>
                   <td>{% if element.docid %}{{ element.docid }}{% endif %}</td>
                 </tr>
@@ -38,7 +40,7 @@
           </div>
         </div>     
     </section>
-    {% include 'pagination.html' with queryset=bondBooks custom_range=custom_range %}
+    {% include 'pagination.html' with queryset=charters custom_range=custom_range %}
 </main>
 
 {% endblock content %}

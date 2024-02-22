@@ -14,18 +14,32 @@
           <table id="my-styled-table" class="table table-striped my-styled-table" style="width:100%">
             <thead>
                 <tr>
-                    <th>Book</th>
-                    <th>Page</th>
+                    <th>Case Number</th>
+                    <th>Defendant Company</th>
+                    <th>Defendant First Name</th>
+                    <th>Defendant Middle</th>
+                    <th>Defendant Last Name</th>
+                    <th>Defendant Suffix</th>
+                    <th>ROA Code</th>
+                    <th>ROA Date</th>
+                    <th>Scan Date</th>
                     <th>Document Creation Date</th>
                     <th>Document ID</th>
                     </tr>
             </thead>    
             <tbody>
               <div class="table-body">              
-              {% for element in bondBooks %}
+              {% for element in indictments %}
                 <tr>
                   <td>{% if element.docindex1 %}{{ element.docindex1 }}{% endif %}</td>
                   <td>{% if element.docindex2 %}{{ element.docindex2 }}{% endif %}</td>
+                  <td>{% if element.docindex3 %}{{ element.docindex3 }}{% endif %}</td>
+                  <td>{% if element.docindex4 %}{{ element.docindex4 }}{% endif %}</td>
+                  <td>{% if element.docindex5 %}{{ element.docindex5 }}{% endif %}</td>
+                  <td>{% if element.docindex6 %}{{ element.docindex6 }}{% endif %}</td>
+                  <td>{% if element.docindex7 %}{{ element.docindex7 }}{% endif %}</td>
+                  <td>{% if element.docindex8 %}{{ element.docindex8 }}{% endif %}</td>
+                  <td>{% if element.docindex9 %}{{ element.docindex9 }}{% endif %}</td>
                   <td>{% if element.createdate %}{{ element.createdate }}{% endif %}</td>
                   <td>{% if element.docid %}{{ element.docid }}{% endif %}</td>
                 </tr>
@@ -38,7 +52,7 @@
           </div>
         </div>     
     </section>
-    {% include 'pagination.html' with queryset=bondBooks custom_range=custom_range %}
+    {% include 'pagination.html' with queryset=indictments custom_range=custom_range %}
 </main>
 
 {% endblock content %}

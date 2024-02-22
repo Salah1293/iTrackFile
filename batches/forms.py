@@ -104,7 +104,7 @@ class CriminalJuvenileForm(ModelForm):
             field.widget.attrs.update({'class': 'input', 'autocomplete': 'off'})
 
 
-#classForm of historic index cards 
+#classForm of historic index
 class HistoricIndexCardsForm(ModelForm):
     class Meta:
         model = PvdmDocs114
@@ -158,7 +158,7 @@ class HrForm(ModelForm):
             field.widget.attrs.update({'class' : 'input', 'autocomplete' : 'off'})
 
 
-#classForm of historic index cards 
+#classForm of bond books
 class BondBooksForm(ModelForm):
     class Meta:
         model = PvdmDocs116
@@ -171,6 +171,81 @@ class BondBooksForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(BondBooksForm, self).__init__(*args, **kwargs)
+
+        for name, field in self.fields.items():
+            field.widget.attrs.update({'class' : 'input', 'autocomplete' : 'off'})
+
+
+#classForm of Charters
+class ChartersForm(ModelForm):
+    class Meta:
+        model = PvdmDocs19
+        fields = ['docindex1', 'docindex2', 'docindex3']
+        labels = {
+            'docindex1' : 'Charter Name',
+            'docindex2' : 'Book',
+            'docindex3' : 'Page'
+        }
+
+
+    def __init__(self, *args, **kwargs):
+        super(ChartersForm, self).__init__(*args, **kwargs)
+
+        for name, field in self.fields.items():
+            field.widget.attrs.update({'class' : 'input', 'autocomplete' : 'off'})
+
+
+#classForm of Concealed Weapons
+class ConcealedWeaponsForm(ModelForm):
+    class Meta:
+        model = PvdmDocs112
+        fields = ['docindex1', 'docindex7', 'docindex8', 'docindex9']
+        labels = {
+            'docindex1' : 'Case Number',
+            'docindex7' : 'Subject Company',
+            'docindex8' : 'Subject Last Name',
+            'docindex9' : 'Subject First Name'
+        }
+
+
+    def __init__(self, *args, **kwargs):
+        super(ConcealedWeaponsForm, self).__init__(*args, **kwargs)
+
+        for name, field in self.fields.items():
+            field.widget.attrs.update({'class' : 'input', 'autocomplete' : 'off'})
+
+#classForm of indictments
+class IndictmentsForm(ModelForm):
+    class Meta:
+        model = PvdmDocs110
+        fields = ['docindex1', 'docindex3', 'docindex5']
+        labels = {
+            'docindex1' : 'Case Number',
+            'docindex3' : 'Defendant First Name',
+            'docindex5' : 'Defendant Last Name'
+        }
+
+
+    def __init__(self, *args, **kwargs):
+        super(IndictmentsForm, self).__init__(*args, **kwargs)
+
+        for name, field in self.fields.items():
+            field.widget.attrs.update({'class' : 'input', 'autocomplete' : 'off'})
+
+
+#classForm of law & chancery
+class LawChanceryForm(ModelForm):
+    class Meta:
+        model = PvdmDocs16
+        fields = ['docindex1', 'docindex2']
+        labels = {
+            'docindex1' : 'Date',
+            'docindex2' : 'LAW/CHANCERY#',
+        }
+
+
+    def __init__(self, *args, **kwargs):
+        super(LawChanceryForm, self).__init__(*args, **kwargs)
 
         for name, field in self.fields.items():
             field.widget.attrs.update({'class' : 'input', 'autocomplete' : 'off'})

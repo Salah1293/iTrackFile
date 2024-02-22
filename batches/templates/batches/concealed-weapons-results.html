@@ -1,0 +1,62 @@
+
+{% extends 'main.html' %}
+{% load static %}
+{% block content %}
+
+<!-- Main Section -->
+<main class="batches">
+   
+    <!-- Search Result: BatchList -->
+    <section class="batchList">
+      <div class="container">  
+        <div class="column">
+          <div id="table-container" class="table-container">
+          <table id="my-styled-table" class="table table-striped my-styled-table" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Case Number</th>
+                    <th>Order Date</th>
+                    <th>Judge Initials</th>
+                    <th>Judge Name</th>
+                    <th>Sealed</th>
+                    <th>Scan Date</th>
+                    <th>Subject Company</th>
+                    <th>Subject Last Name</th>
+                    <th>Subject First Name</th>
+                    <th>Subject Middle</th>
+                    <th>Subject Suffix</th>
+                    <th>Document Creation Date</th>
+                    <th>Document ID</th>
+                    </tr>
+            </thead>    
+            <tbody>
+              <div class="table-body">              
+              {% for element in concealedWeapons %}
+                <tr>
+                  <td>{% if element.docindex1 %}{{ element.docindex1 }}{% endif %}</td>
+                  <td>{% if element.docindex2 %}{{ element.docindex2 }}{% endif %}</td>
+                  <td>{% if element.docindex3 %}{{ element.docindex3 }}{% endif %}</td>
+                  <td>{% if element.docindex4 %}{{ element.docindex4 }}{% endif %}</td>
+                  <td>{% if element.docindex5 %}{{ element.docindex5 }}{% endif %}</td>
+                  <td>{% if element.docindex6 %}{{ element.docindex6 }}{% endif %}</td>
+                  <td>{% if element.docindex7 %}{{ element.docindex7 }}{% endif %}</td>
+                  <td>{% if element.docindex8 %}{{ element.docindex8 }}{% endif %}</td>
+                  <td>{% if element.docindex9 %}{{ element.docindex9 }}{% endif %}</td>
+                  <td>{% if element.docindex10 %}{{ element.docindex10 }}{% endif %}</td>
+                  <td>{% if element.docindex11 %}{{ element.docindex11 }}{% endif %}</td>
+                  <td>{% if element.createdate %}{{ element.createdate }}{% endif %}</td>
+                  <td>{% if element.docid %}{{ element.docid }}{% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+        <p>Result: {{resultCount}} row{{ resultCount|pluralize:'s'}}</p>
+      </div>
+          </div>
+        </div>     
+    </section>
+    {% include 'pagination.html' with queryset=concealedWeapons custom_range=custom_range %}
+</main>
+
+{% endblock content %}

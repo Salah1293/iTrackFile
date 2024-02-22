@@ -39,7 +39,7 @@
             <a href="{% url 'bondBooksSearch' %}">
               <button type="button" class="btn btn-secondary">BondBooks</button>
             </a>
-            <a href="">
+            <a href="{% url 'chartersSearch' %}">
               <button type="button" class="btn btn-secondary">Charters</button>
             </a>
             <a href="{% url 'civilSearch' %}">
@@ -48,8 +48,8 @@
             <a href="">
               <button type="button" class="btn btn-secondary">Clerk Orders</button>
             </a>
-            <a href="">
-              <button type="button" class="btn btn-secondary">Conceealedweapo...</button>
+            <a href="{% url 'ConcealedWeaponsSearch' %}">
+              <button type="button" class="btn btn-secondary">Conceealed Weapons</button>
             </a>
             <a href="{% url 'criminalSearch' %}">
               <button type="button" class="btn btn-secondary">Criminal</button>
@@ -72,10 +72,10 @@
             <a href="{% url 'hrSearch' %}">
               <button type="button" class="btn btn-secondary">Hr</button>
             </a>
-            <a href="">
+            <a href="{% url 'indictmentsSearch' %}">
               <button type="button" class="btn btn-secondary">Indictments</button>
             </a>
-            <a href="">
+            <a href="{% url 'lawChancerySearch' %}">
               <button type="button" class="btn btn-secondary">Law & Chancery</button>
             </a>
                         
@@ -83,15 +83,6 @@
         </div>    
         </div>    
     </section>
-    <div class="pagination">
-      <ul class="container">
-        <li><a href="#" class="btn btn--disabled">&#10094; Prev</a></li>
-        <li><a href="#" class="btn btn--sub">01</a></li>
-        <li><a href="#" class="btn">02</a></li>
-        <li><a href="#" class="btn">03</a></li>     
-        <li><a href="#" class="btn">Next &#10095;</a></li>
-      </ul>
-    </div>
 </main>
 
 
