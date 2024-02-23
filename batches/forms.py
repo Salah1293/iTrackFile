@@ -33,21 +33,14 @@ class CivilForm(ModelForm):
     class Meta:
         model = PvdmDocs12
         fields = ['docindex1', 'docindex2', 'docindex11', 'docindex12', 'docindex6', 'docindex7']
-        # labels = {
-        #     'docindex1': 'Case Number',
-        #     'docindex2': 'Order Date',
-        #     'docindex11': 'Defendant Last Name',
-        #     'docindex12': 'Defendant First Name',
-        #     'docindex6': 'Plaintiff Last Name',
-        #     'docindex7': 'Plaintiff First Name'
-        # }
-
+        
         widgets = {
                 'docindex2': forms.DateInput(attrs={'type': 'date'})
             }
         
     last_name = forms.CharField(label='Last Name', required=False)
     first_name = forms.CharField(label='First Name', required=False)
+    case_number = forms.CharField(label='Case Number', required=False)
         
     start_date = forms.DateField(label='Start Date', required=False, widget=forms.DateInput(attrs={'type' : 'date'}))
     end_date = forms.DateField(label='End Date', required=False, widget=forms.DateInput(attrs={'type' : 'date'}))
@@ -57,6 +50,7 @@ class CivilForm(ModelForm):
 
         for name, field in self.fields.items():
             field.widget.attrs.update({'class': 'input', 'autocomplete': 'off'})
+
 
 
 #classModel of criminal cases

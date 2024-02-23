@@ -107,9 +107,7 @@ def civilResults (request):
     if request.method == 'GET':
         form = CivilForm(request.GET)
         if form.is_valid():
-            case_number = form.cleaned_data.get('docindex1', '')
-            # defendant_last_name = form.cleaned_data.get('docindex11', '')
-            # defendant_first_name = form.cleaned_data.get('docindex12', '')
+            case_number = form.cleaned_data.get('case_number', '')
             last_name = form.cleaned_data.get('last_name', '')
             first_name = form.cleaned_data.get('first_name', '')
             start_date = form.cleaned_data.get('start_date')
@@ -122,10 +120,19 @@ def civilResults (request):
                 query &= Q(docindex1=case_number)
             if start_date and end_date:
                 query &= Q(docindex2__range=[start_date, end_date])
+
             if last_name:
                 query &= (Q(docindex11=last_name) | Q(docindex6=last_name))
+                
             if first_name:
                 query &= (Q(docindex12=first_name) | Q(docindex7=first_name))
+                
+            # if last_name and not (case_number or start_date or end_date or first_name):
+            #     query &= (Q(docindex11=last_name) | Q(docindex6=last_name))
+
+            # if first_name and not (case_number or start_date or end_date or last_name):
+            #     query &= (Q(docindex12=first_name) | Q(docindex7=first_name))
+            
 
 
             civil = PvdmDocs12.objects.filter(query) if query else PvdmDocs12.objects.none()
@@ -134,25 +141,6 @@ def civilResults (request):
 
             custom_range, civil = paginate(request, civil)
 
-
-            # query = Q()
-
-            # if case_number:
-            #     query &= Q(docindex1=case_number)
-            # if start_date and end_date:
-            #     query &= Q(docindex2__range=[start_date, end_date])
-
-            # if last_name or first_name:
-            #     name_query = Q()
-            #     if last_name:
-            #         name_query |= Q(docindex11=last_name) | Q(docindex6=last_name)
-            #     if first_name:
-            #         name_query |= Q(docindex12=first_name) | Q(docindex7=first_name)
-            #     query &= name_query
-
-            # if query:
-            #     civil = PvdmDocs12.objects.filter(query)
-            # else:
             #     civil = PvdmDocs12.objects.none()
 
             context = {'form': form, 'civil': civil,
@@ -479,7 +467,7 @@ def ConcealedWeaponsSearch(request):
 def ConcealedWeaponsResults(request):
     form = ConcealedWeaponsForm()
     if request.method == 'GET':
-        form = HrForm(request.GET)
+        form = ConcealedWeaponsForm(request.GET)
         if form.is_valid():
             case_number = form.cleaned_data.get('docindex1', '')
             subject_company = form.cleaned_data.get('docindex7', '')
