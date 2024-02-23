@@ -18,8 +18,13 @@
           <table id="my-styled-table" class="table table-striped my-styled-table" style="width:100%">
             <thead>
                 <tr>
-                    <th>Book</th>
-                    <th>Page</th>
+                    <th>Order Type</th>
+                    <th>Order Date</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Destruction Complete Date</th>
+                    <th>First Case Number</th>
+                    <th>Last Case Number</th>
                     <th>Document Creation Date</th>
                     <th>Document ID</th>
                     </tr>
@@ -30,6 +35,11 @@
                 <tr>
                   <td>{% if element.docindex1 %}{{ element.docindex1 }}{% endif %}</td>
                   <td>{% if element.docindex2 %}{{ element.docindex2 }}{% endif %}</td>
+                  <td>{% if element.docindex3 %}{{ element.docindex3 }}{% endif %}</td>
+                  <td>{% if element.docindex4 %}{{ element.docindex4 }}{% endif %}</td>
+                  <td>{% if element.docindex5 %}{{ element.docindex5 }}{% endif %}</td>
+                  <td>{% if element.docindex6 %}{{ element.docindex6 }}{% endif %}</td>
+                  <td>{% if element.docindex7 %}{{ element.docindex7 }}{% endif %}</td>
                   <td>{% if element.createdate %}{{ element.createdate }}{% endif %}</td>
                   <td>{% if element.docid %}{{ element.docid }}{% endif %}</td>
                 </tr>

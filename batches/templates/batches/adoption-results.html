@@ -1,0 +1,89 @@
+
+{% extends 'main.html' %}
+{% load static %}
+{% block content %}
+
+<!-- Main Section -->
+<main class="batches">
+   
+    <!-- Search Result: BatchList -->
+    <section class="batchList">
+      <div class="container">  
+        <div class="column">
+          <div id="table-title-container">
+            <h2 id="tableName">ADOPTIONS</h2>
+            </div>
+            <br>
+          <div id="table-container" class="table-container">
+          <table id="my-styled-table" class="table table-striped my-styled-table" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Case Number</th>
+                    <th>Order Date</th>
+                    <th>Judge Name</th>
+                    <th>Sealed</th>
+                    <th>Plaintiff Company</th>
+                    <th>Plaintiff Last Name</th>
+                    <th>Plaintiff First Name</th>
+                    <th>Plaintiff Middle Name</th>
+                    <th>Plaintiff Suffix</th>
+                    <th>Defendant Company</th>
+                    <th>Defendant Last Name</th>
+                    <th>Defendant Fisrt Name</th>
+                    <th>Defendant Middle Name</th>
+                    <th>Defendant Suffix</th>
+                    <th>Subject Company</th>
+                    <th>Subject Last Name</th>
+                    <th>Subject FIrst Name</th>
+                    <th>Subject Middle Name</th>
+                    <th>Subject Suffix</th>
+                    <th>Date Scanned</th>
+                    <th>Judge Intials</th>
+                    <th>Scan Date</th>
+                    <th>Document Creation Date</th>
+                    <th>Document ID</th>
+                    </tr>
+            </thead>    
+            <tbody>
+              <div class="table-body">              
+              {% for element in adoption %}
+                <tr>
+                  <td>{% if element.docindex1 %}{{ element.docindex1 }}{% endif %}</td>
+                  <td>{% if element.docindex2 %}{{ element.docindex2 }}{% endif %}</td>
+                  <td>{% if element.docindex3 %}{{ element.docindex3 }}{% endif %}</td>
+                  <td>{% if element.docindex4 %}{{ element.docindex4 }}{% endif %}</td>
+                  <td>{% if element.docindex5 %}{{ element.docindex5 }}{% endif %}</td>
+                  <td>{% if element.docindex6 %}{{ element.docindex6 }}{% endif %}</td>
+                  <td>{% if element.docindex7 %}{{ element.docindex7 }}{% endif %}</td>
+                  <td>{% if element.docindex8 %}{{ element.docindex8 }}{% endif %}</td>
+                  <td>{% if element.docindex9 %}{{ element.docindex9 }}{% endif %}</td>
+                  <td>{% if element.docindex10 %}{{ element.docindex10 }}{% endif %}</td>
+                  <td>{% if element.docindex11 %}{{ element.docindex11 }}{% endif %}</td>
+                  <td>{% if element.docindex12 %}{{ element.docindex12 }}{% endif %}</td>
+                  <td>{% if element.docindex13 %}{{ element.docindex13 }}{% endif %}</td>
+                  <td>{% if element.docindex14 %}{{ element.docindex14 }}{% endif %}</td>
+                  <td>{% if element.docindex15 %}{{ element.docindex15 }}{% endif %}</td>
+                  <td>{% if element.docindex16 %}{{ element.docindex16 }}{% endif %}</td>
+                  <td>{% if element.docindex17 %}{{ element.docindex17 }}{% endif %}</td>
+                  <td>{% if element.docindex18 %}{{ element.docindex18 }}{% endif %}</td>
+                  <td>{% if element.docindex19 %}{{ element.docindex19 }}{% endif %}</td>
+                  <td>{% if element.docindex20 %}{{ element.docindex20 }}{% endif %}</td>
+                  <td>{% if element.docindex21 %}{{ element.docindex21 }}{% endif %}</td>
+                  <td>{% if element.docindex22 %}{{ element.docindex22 }}{% endif %}</td>
+                  <td>{% if element.createdate %}{{ element.createdate }}{% endif %}</td>
+                  <td>{% if element.docid %}{{ element.docid }}{% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+        <br>
+        <p id="result">Result : <span id="resultCount">{{ resultCount }}</span> row{{ resultCount|pluralize:'s'}}</p>
+      </div>
+          </div>
+        </div>     
+    </section>
+    {% include 'pagination.html' with queryset=bondBooks custom_range=custom_range %}
+</main>
+
+{% endblock content %}

@@ -16,9 +16,9 @@
         <div class="hero-section__search">
           <form class="form" action="#" method="get">
             <div class="form__field">
-              <label for="formInput#search">Search By Batches </label>
+              <label for="formInput#search">Search By Batches</label>
               <input class="input input--text" id="formInput#search" type="text" name="text"
-                placeholder="Search by Batch tag" />
+                placeholder="Search by Batch" />
             </div>
 
             <input class="btn btn--sub btn--lg" type="submit" value="Search" />
@@ -33,7 +33,7 @@
           <div class="button-container">  
           <div class="column">
             
-            <a href="">
+            <a href="{% url 'adoptionSearch' %}">
               <button type="button" class="btn btn-secondary">Adoptions</button>
             </a>
             <a href="{% url 'bondBooksSearch' %}">
@@ -45,7 +45,7 @@
             <a href="{% url 'civilSearch' %}">
               <button type="button" class="btn btn-secondary">Civil</button>
             </a>
-            <a href="">
+            <a href="{% url 'clerkOrdersSearch' %}">
               <button type="button" class="btn btn-secondary">Clerk Orders</button>
             </a>
             <a href="{% url 'ConcealedWeaponsSearch' %}">

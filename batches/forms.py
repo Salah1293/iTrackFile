@@ -250,7 +250,7 @@ class LawChanceryForm(ModelForm):
             field.widget.attrs.update({'class' : 'input', 'autocomplete' : 'off'})
 
 
-#classForm of law & chancery
+#classForm of destruction orders
 class DestructionOrdersForm(ModelForm):
     class Meta:
         model = PvdmDocs115
@@ -263,6 +263,54 @@ class DestructionOrdersForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(DestructionOrdersForm, self).__init__(*args, **kwargs)
+
+        for name, field in self.fields.items():
+            field.widget.attrs.update({'class' : 'input', 'autocomplete' : 'off'})
+
+
+#classForm of adoption
+class AdoptionForm(ModelForm):
+    class Meta:
+        model = PvdmDocs14
+        fields = ['docindex1', 'docindex6','docindex7', 'docindex16','docindex17']
+        labels = {
+            'docindex1' : 'Case Number',
+            'docindex6' : 'Plaintiff Last Name',
+            'docindex7' : 'Plaintiff First Name',
+            'docindex16' : 'Subject Last Name',
+            'docindex17' : 'Subject First Name',
+        }
+
+
+    def __init__(self, *args, **kwargs):
+        super(AdoptionForm, self).__init__(*args, **kwargs)
+
+        for name, field in self.fields.items():
+            field.widget.attrs.update({'class' : 'input', 'autocomplete' : 'off'})
+
+
+#classForm of clerk orders
+class ClerkOrdersForm(ModelForm):
+    class Meta:
+        model = PvdmDocs18
+        fields = ['docindex1', 'docindex8','docindex9', 'docindex10','docindex13',
+                  'docindex14', 'docindex15','docindex18', 'docindex19','docindex20']
+        labels = {
+            'docindex1' : 'Case Number',
+            'docindex8' : 'Plaintiff Company',
+            'docindex9' : 'Plaintiff Last Name',
+            'docindex10' : 'Plaintiff First Name',
+            'docindex13' : 'Defendant Company',
+            'docindex14' : 'Defendant Last Name',
+            'docindex15' : 'Defendant First Name',
+            'docindex18' : 'Subject Company',
+            'docindex19' : 'Subject Last Name',
+            'docindex20' : 'Subject First Name',
+        }
+
+
+    def __init__(self, *args, **kwargs):
+        super(ClerkOrdersForm, self).__init__(*args, **kwargs)
 
         for name, field in self.fields.items():
             field.widget.attrs.update({'class' : 'input', 'autocomplete' : 'off'})

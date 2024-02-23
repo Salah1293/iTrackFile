@@ -242,6 +242,8 @@ img {
 
 .hero-section__search > .form input.input--text {
   width: 50rem;
+  color: black;
+  font-weight: 500;
 }
 
 @media screen and (max-width: 700px) {
@@ -860,7 +862,7 @@ img {
 
 
 /*=======================
-  Added
+  Last Added
 ========================*/
 
 .button-container {
@@ -870,7 +872,8 @@ img {
 
 .button-container button {
   flex: 1 0 22%; 
-  margin: 5px;  
+  margin: 5px;
+  font-weight: 700;  
 }
 
 
@@ -1071,7 +1074,6 @@ img {
   width: 100%;
 }
 
-
 #formButton{
   padding: 10px 20px;
   font-size: 16px;
@@ -1104,7 +1106,6 @@ img {
   margin: 0 10px; 
 }
 
-
 .special-input-wrapper .input {
   flex: 1; 
   padding: 10px;
@@ -1118,14 +1119,10 @@ img {
   margin-right: 90px; 
 }
 
-
-
-
 #betweenDates{
   color: black;
   font-weight: 400;
 }
-
 
 #tableName{
   border-radius: 25px; 

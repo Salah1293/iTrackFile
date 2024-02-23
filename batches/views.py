@@ -586,14 +586,14 @@ def lawChanceryResults(request):
     return render(request, 'batches/law-chancery-results.html', context)
 
 
-#Destruction Orders search
+#destruction orders search
 def destructionOrdersSearch(request):
     form = DestructionOrdersForm()
     context = {'form' : form}
     return render(request, 'batches/destruction-orders-search.html', context)
 
 
-#Destruction Orders display results
+#destruction orders display results
 def destructionOrdersResults(request):
     form = DestructionOrdersForm()
     if request.method == 'GET':
@@ -624,3 +624,116 @@ def destructionOrdersResults(request):
         
     context = {'form' : form, 'lawChancery' : PvdmDocs115.objects.none(), 'resultCount' : 0}
     return render(request, 'batches/destruction-orders-results.html', context)
+
+
+#adoption search
+def adoptionSearch(request):
+    form = AdoptionForm()
+    context = {'form' : form}
+    return render(request, 'batches/adoption-search.html', context)
+
+
+#adoption display results
+def adoptionResults(request):
+    form = AdoptionForm()
+    if request.method == 'GET':
+        form = AdoptionForm(request.GET)
+        if form.is_valid():
+            case_number = form.cleaned_data.get('docindex1', '')
+            plaintiff_last_name = form.cleaned_data.get('docindex6', '')
+            plaintiff_first_name = form.cleaned_data.get('docindex7', '')
+            subject_last_name = form.cleaned_data.get('docindex16', '')
+            subject_first_name = form.cleaned_data.get('docindex17', '')
+
+
+            query = Q()
+
+            if case_number:
+                query &= Q(docindex1=case_number)
+            if plaintiff_last_name:
+                query &= Q(docindex6=plaintiff_last_name)
+            if plaintiff_first_name:
+                query &= Q(docindex7=plaintiff_first_name)
+            if subject_last_name:
+                query &= Q(docindex16=subject_last_name)
+            if subject_first_name:
+                query &= Q(docindex17=subject_first_name)
+
+
+            adoption = PvdmDocs14.objects.filter(query) if query else PvdmDocs14.objects.none()
+
+            resultCount = adoption.count() if query else 0
+
+            custom_range, adoption = paginate(request, adoption)
+
+            context = {'form' : form, 'adoption' : adoption,
+                        'resultCount' : resultCount,
+                         'custom_range' : custom_range}
+            return render(request, 'batches/adoption-results.html', context)
+        
+    context = {'form' : form, 'lawChancery' : PvdmDocs14.objects.none(), 'resultCount' : 0}
+    return render(request, 'batches/adoption-results.html', context)
+
+
+#clerk orders search
+def clerkOrdersSearch(request):
+    form = ClerkOrdersForm()
+    context = {'form' : form}
+    return render(request, 'batches/clerk-orders-search.html', context)
+
+
+#clerk orders display results
+def clerkOrdersResults(request):
+    form = ClerkOrdersForm()
+    if request.method == 'GET':
+        form = ClerkOrdersForm(request.GET)
+        if form.is_valid():
+            case_number = form.cleaned_data.get('docindex1', '')
+            plaintiff_company = form.cleaned_data.get('docindex8', '')
+            plaintiff_last_name = form.cleaned_data.get('docindex9', '')
+            plaintiff_first_name = form.cleaned_data.get('docindex10', '')
+            defendant_company = form.cleaned_data.get('docindex13', '')
+            defendant_last_name = form.cleaned_data.get('docindex14', '')
+            defendant_first_name = form.cleaned_data.get('docindex15', '')
+            subject_company = form.cleaned_data.get('docindex18', '')
+            subject_last_name = form.cleaned_data.get('docindex19', '')
+            subject_first_name = form.cleaned_data.get('docindex20', '')
+
+
+            query = Q()
+
+            if case_number:
+                query &= Q(docindex1=case_number)
+            if plaintiff_company:
+                query &= Q(docindex8=plaintiff_company)
+            if plaintiff_last_name:
+                query &= Q(docindex9=plaintiff_last_name)
+            if plaintiff_first_name:
+                query &= Q(docindex10=plaintiff_first_name)
+            if defendant_company:
+                query &= Q(docindex13=defendant_company)
+            if defendant_last_name:
+                query &= Q(docindex14=defendant_last_name)
+            if defendant_first_name:
+                query &= Q(docindex15=defendant_first_name)
+            if subject_company:
+                query &= Q(docindex18=subject_company)
+            if subject_last_name:
+                query &= Q(docindex19=subject_last_name)
+            if subject_first_name:
+                query &= Q(docindex20=subject_first_name)
+
+
+            clerkOrder = PvdmDocs18.objects.filter(query) if query else PvdmDocs18.objects.none()
+
+            resultCount = clerkOrder.count() if query else 0
+
+            custom_range, clerkOrder = paginate(request, clerkOrder)
+
+            context = {'form' : form, 'clerkOrder' : clerkOrder,
+                        'resultCount' : resultCount,
+                         'custom_range' : custom_range}
+            return render(request, 'batches/clerk-orders-results.html', context)
+        
+    context = {'form' : form, 'lawChancery' : PvdmDocs18.objects.none(), 'resultCount' : 0}
+    return render(request, 'batches/clerk-orders-results.html', context)
