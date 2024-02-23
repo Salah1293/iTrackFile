@@ -71,6 +71,10 @@ class CriminalCasesForm(ModelForm):
             'docindex4': 'First'
         }
 
+        widgets = {
+            'docindex1': forms.DateInput(attrs={'type': 'date'})
+        }
+
     def __init__(self, *args, **kwargs):
         super(CriminalCasesForm, self).__init__(*args, **kwargs)
 
@@ -213,6 +217,7 @@ class ConcealedWeaponsForm(ModelForm):
 
         for name, field in self.fields.items():
             field.widget.attrs.update({'class' : 'input', 'autocomplete' : 'off'})
+
 
 #classForm of indictments
 class IndictmentsForm(ModelForm):

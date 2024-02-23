@@ -23,6 +23,7 @@ img {
   width: 95%;
   max-width: 85rem;
   margin: 0 auto;
+  color: black; /*add*/
 }
 
 /*=======================
@@ -53,8 +54,8 @@ img {
 }
 
 .header__menuItem > a {
-  color: var(--color-light);
-  font-weight: 300;
+  color: white;
+  font-weight: 500;
 }
 
 .toggle-menu > span {
@@ -263,7 +264,7 @@ img {
 ========================*/
 
 .BatchList {
-  margin-top: 8rem;
+  margin-top: 6rem;
 }
 
 .BatchList .grid {
@@ -932,7 +933,7 @@ img {
 }
 
 
-/* Add this to your existing CSS or create a new style block */
+
 /* .image-container {
   position: relative;
   overflow: hidden; 
@@ -940,10 +941,10 @@ img {
 
 .image-container {
   position: relative;
-  overflow: hidden; /* Ensure the image is clipped if it overflows the container */
-  width: 100%; /* Set the width of the container */
-  max-width: 900px; /* Set a maximum width if needed */
-  height: 800px; /* Set the height of the container */
+  overflow: hidden; 
+  width: 100%;
+  max-width: 900px; 
+  height: 800px; 
 }
 
 .image-wrapper {
@@ -979,7 +980,7 @@ img {
 }
 
 
-#table-container {
+ #table-container {
   overflow-y: auto;
   max-height: 450px;
   
@@ -989,27 +990,154 @@ img {
   width: 100%;
   border-collapse: collapse;
   margin: 20px 0;
-  border: 2px solid black; 
+  border-radius: 10px;
 }
 
 #my-styled-table th,
 #my-styled-table td {
-  border: 1px solid #ddd;
   padding: 8px;
   white-space: nowrap; 
   font-size: 13px;
+  color: black;
+  font-weight: 500;
+  text-align: center;
+
 }
 
 #my-styled-table th {
-  background-color: #f2f2f2;
+  background-color: var(--color-sub);
+  color: white;
   font-weight: bold;
   text-align: left;
   position: sticky; 
   top: 0; 
-  z-index: 1; 
+  z-index: 1;
+  border-radius: 10px 10px 0 0;
+  text-align: center; 
+
 }
 
 #my-styled-table tbody tr:nth-child(even) {
   background-color: #d8cdcd;
 }
 
+#my-styled-table tbody tr:last-child td {
+  border-bottom-left-radius: 10px; 
+  border-bottom-right-radius: 10px; 
+} 
+
+
+#result{
+  color: black;
+  margin-left: 12px;
+  font-weight: 500;
+  
+}
+
+#resultCount{
+  color: red;
+  font-weight: 700;
+}
+
+#formLabel{
+  font-weight: 500;
+  color: black;
+}
+
+.input-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.input-wrapper label {
+  flex: 1; 
+  margin-right: 10px; 
+  font-weight: bold;
+  /* text-align: center;  */
+}
+
+.input-wrapper input,
+.input-wrapper select,
+.input-wrapper textarea {
+    flex: 2.5; 
+    padding: 6px;
+    border: 1px solid #ccc;
+    border-radius: 4px; 
+}
+
+.input-wrapper select {
+  width: 100%;
+}
+
+
+#formButton{
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: var(--color-sub-light); 
+
+}
+
+#cardName{
+    border-radius: 25px; 
+    background-color: var(--color-sub-light); 
+    padding: 10px 20px; 
+    color: white;
+    text-align: center; 
+    line-height: 1;
+    font-size:xx-large;  
+}
+
+.title-container {
+  display: flex;
+  justify-content: center; 
+  margin-bottom: 20px; 
+}
+
+.special-input-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.special-input-wrapper p {
+  margin: 0 10px; /* Adjust the margin as needed for spacing around the "to" text */
+}
+
+/* Apply the existing input styling, excluding the "Order Date" field */
+.special-input-wrapper .input {
+  flex: 1; /* Adjust flex property to ensure uniformity */
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px; 
+  background-color: var(--color-sub-lighter);
+}
+
+.special-input-wrapper label {
+  width: 120px; /* Adjust width of the label as needed */
+  margin-right: 90px; /* Add margin to separate label and input */
+}
+
+
+
+
+#betweenDates{
+  color: black;
+  font-weight: 400;
+}
+
+
+#tableName{
+  border-radius: 25px; 
+  background-color: var(--color-sub); 
+  padding: 10px 20px; 
+  color: white;
+  text-align: center; 
+  line-height: 1;
+  font-size:xx-large;  
+}
+
+#table-title-container{
+  display: flex;
+  justify-content: center;
+}

@@ -3,37 +3,39 @@
 {% block content %}
 
 
-<!-- Main Section -->
+
 <main class="formPage my-xl">
     <div class="content-box">
         <div class="formWrapper">
-            <h2 style="text-align: center;" >HR</h2>
+            <div class="title-container">
+            <h2 id="cardName">HR</h2>
+        </div>
             <a class="backButton" href="{% url 'landingBatches' %}"><i class="im im-angle-left"><</i></a>
             <br>
             <form id="myForm" class="form" method="GET" action="{% url 'hrResults' %}">
                 {% csrf_token %}
-                <!-- Input:Text -->
+                
                 <div class="form__field">
                     {% for field in form %}
-                    <label for="formInput#text">{{field.label}}</label>
+                    <div class="input-wrapper">
+                    <label id="formLabel" for="formInput#text">{{field.label}}</label>
                     {{field}}
+                    </div>
                     {% endfor %}
                 </div>
-                <a href="{% url 'hrResults' %}" >
-                <button class="btn btn--sub btn--lg  my-md" type="submit">Search</button>
+                <div id="buttonSection">
+                <a href="{% url 'hrResults' %}">
+                <button id="formButton" class="btn btn--sub btn--lg  my-md" type="submit">Search</button>
                 </a>
-                <button type="button" class="btn btn--sub btn--lg my-md" onclick="resetForm()">Clear</button>
+                <button id="formButton" type="button" class="btn btn--sub btn--lg my-md" onclick="resetForm()">Clear</button>
                 <a href="{% url 'landingBatches' %}">
-                <button class="btn btn--sub btn--lg  my-md" type="button">Canecl</button>
+                <button id="formButton" class="btn btn--sub btn--lg  my-md" type="button">Cancel</button>
                 </a>
-            </form>         
+                </div>
+            </form>
         </div>
     </div>
 </main>
+<script src="{% static 'js/scripts.js' %}" ></script>
 
-<script>   
-    function resetForm(){
-        document.getElementById('myForm').reset();
-    }
-</script>
 {% endblock content %}

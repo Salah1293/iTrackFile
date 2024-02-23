@@ -474,6 +474,7 @@ def ConcealedWeaponsSearch(request):
     context = {'form' : form}
     return render(request, 'batches/concealed-weapons-search.html', context)
 
+
 #concealed weapons display results
 def ConcealedWeaponsResults(request):
     form = ConcealedWeaponsForm()
@@ -513,11 +514,13 @@ def ConcealedWeaponsResults(request):
     context = {'form' : form, 'concealedWeapons' : PvdmDocs112.objects.none(), 'resultCount' : 0}
     return render(request, 'batches/concealed-weapons-results.html', context)
 
+
 #indictmenys search
 def indictmentsSearch(request):
     form = IndictmentsForm()
     context = {'form' : form}
     return render(request, 'batches/indictments-search.html', context)
+
 
 #indictmenys display results
 def indictmentsResults(request):
@@ -554,11 +557,13 @@ def indictmentsResults(request):
     context = {'form' : form, 'indictments' : PvdmDocs110.objects.none(), 'resultCount' : 0}
     return render(request, 'batches/indictments-results.html', context)
 
+
 #law&chancery search
 def lawChancerySearch(request):
     form = LawChanceryForm()
     context = {'form' : form}
     return render(request, 'batches/law-chancery-search.html', context)
+
 
 #bond law&chancery display results
 def lawChanceryResults(request):
