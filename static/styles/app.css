@@ -1101,12 +1101,12 @@ img {
 }
 
 .special-input-wrapper p {
-  margin: 0 10px; /* Adjust the margin as needed for spacing around the "to" text */
+  margin: 0 10px; 
 }
 
-/* Apply the existing input styling, excluding the "Order Date" field */
+
 .special-input-wrapper .input {
-  flex: 1; /* Adjust flex property to ensure uniformity */
+  flex: 1; 
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px; 
@@ -1114,8 +1114,8 @@ img {
 }
 
 .special-input-wrapper label {
-  width: 120px; /* Adjust width of the label as needed */
-  margin-right: 90px; /* Add margin to separate label and input */
+  width: 120px; 
+  margin-right: 90px; 
 }
 
 

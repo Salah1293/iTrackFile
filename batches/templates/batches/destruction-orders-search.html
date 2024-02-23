@@ -7,11 +7,11 @@
     <div class="content-box">
         <div class="formWrapper">
             <div class="title-container">
-                <h2 id="cardName">CRIMINAL CASES</h2>
+                <h2 id="cardName">DESTRUCTION ORDERS</h2>
             </div>
             <a class="backButton" href="{% url 'landingBatches' %}"><i class="im im-angle-left"><</i></a>
             <br>
-            <form id="myForm" class="form" method="GET" action="{% url 'criminalCasesResults' %}">
+            <form id="myForm" class="form" method="GET" action="{% url 'destructionOrdersResults' %}">
                 {% csrf_token %}      
                 <div class="form__field">
                     {% for field in form %} 
@@ -29,7 +29,7 @@
                     {% endfor %}
                 </div>
                 <div id="buttonSection">
-                    <a href="{% url 'criminalCasesResults' %}">
+                    <a href="{% url 'destructionOrdersResults' %}">
                     <button id="formButton" class="btn btn--sub btn--lg  my-md" type="submit">Search</button>
                     </a>
                     <button id="formButton" type="button" class="btn btn--sub btn--lg my-md" onclick="resetForm()">Clear</button>

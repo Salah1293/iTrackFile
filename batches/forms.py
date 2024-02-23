@@ -248,3 +248,21 @@ class LawChanceryForm(ModelForm):
 
         for name, field in self.fields.items():
             field.widget.attrs.update({'class' : 'input', 'autocomplete' : 'off'})
+
+
+#classForm of law & chancery
+class DestructionOrdersForm(ModelForm):
+    class Meta:
+        model = PvdmDocs115
+        fields = ['docindex1', 'docindex2']
+        labels = {
+            'docindex1' : 'Order Type',
+            'docindex2' : 'Order Date',
+        }
+
+
+    def __init__(self, *args, **kwargs):
+        super(DestructionOrdersForm, self).__init__(*args, **kwargs)
+
+        for name, field in self.fields.items():
+            field.widget.attrs.update({'class' : 'input', 'autocomplete' : 'off'})

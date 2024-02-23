@@ -383,7 +383,7 @@ def bondBooksSearch(request):
 def bondBooksResults(request):
     form = BondBooksForm()
     if request.method == 'GET':
-        form = HrForm(request.GET)
+        form = BondBooksForm(request.GET)
         if form.is_valid():
             book = form.cleaned_data.get('docindex1', '')
             page = form.cleaned_data.get('docindex2', '')
@@ -423,7 +423,7 @@ def chartersSearch(request):
 def chartersResults(request):
     form = ChartersForm()
     if request.method == 'GET':
-        form = HrForm(request.GET)
+        form = ChartersForm(request.GET)
         if form.is_valid():
             charter_name = form.cleaned_data.get('docindex1', '')
             book = form.cleaned_data.get('docindex2', '')
@@ -512,9 +512,9 @@ def indictmentsSearch(request):
 
 #indictmenys display results
 def indictmentsResults(request):
-    form = ConcealedWeaponsForm()
+    form = IndictmentsForm()
     if request.method == 'GET':
-        form = HrForm(request.GET)
+        form = IndictmentsForm(request.GET)
         if form.is_valid():
             case_number = form.cleaned_data.get('docindex1', '')
             defendant_first_name = form.cleaned_data.get('docindex3', '')
@@ -557,7 +557,7 @@ def lawChancerySearch(request):
 def lawChanceryResults(request):
     form = LawChanceryForm()
     if request.method == 'GET':
-        form = HrForm(request.GET)
+        form = LawChanceryForm(request.GET)
         if form.is_valid():
             date = form.cleaned_data.get('docindex1', '')
             law_Chancery = form.cleaned_data.get('docindex2', '')
@@ -584,3 +584,43 @@ def lawChanceryResults(request):
         
     context = {'form' : form, 'lawChancery' : PvdmDocs16.objects.none(), 'resultCount' : 0}
     return render(request, 'batches/law-chancery-results.html', context)
+
+
+#Destruction Orders search
+def destructionOrdersSearch(request):
+    form = DestructionOrdersForm()
+    context = {'form' : form}
+    return render(request, 'batches/destruction-orders-search.html', context)
+
+
+#Destruction Orders display results
+def destructionOrdersResults(request):
+    form = DestructionOrdersForm()
+    if request.method == 'GET':
+        form = DestructionOrdersForm(request.GET)
+        if form.is_valid():
+            order_type = form.cleaned_data.get('docindex1', '')
+            order_date = form.cleaned_data.get('docindex2', '')
+
+
+            query = Q()
+
+            if order_type:
+                query &= Q(docindex1=order_type)
+            if order_date:
+                query &= Q(docindex2=order_date)
+
+
+            destructionOrders = PvdmDocs115.objects.filter(query) if query else PvdmDocs115.objects.none()
+
+            resultCount = destructionOrders.count() if query else 0
+
+            custom_range, destructionOrders = paginate(request, destructionOrders)
+
+            context = {'form' : form, 'destructionOrders' : destructionOrders,
+                        'resultCount' : resultCount,
+                         'custom_range' : custom_range}
+            return render(request, 'batches/destruction-orders-results.html', context)
+        
+    context = {'form' : form, 'lawChancery' : PvdmDocs115.objects.none(), 'resultCount' : 0}
+    return render(request, 'batches/destruction-orders-results.html', context)
