@@ -4,7 +4,7 @@ from django.db.models import Q
 from .forms import *
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
-
+#pagination super class
 def paginate(request, query):
     page = request.GET.get('page')
     result = 25
@@ -33,4 +33,31 @@ def paginate(request, query):
 
     return custom_range, query
 
-    
+
+#factory method for form creation
+def createForm(request, template, classFrom):
+    form = classFrom()
+    context = {'form' : form}
+    return render(request, template, context)
+
+
+#factory method for card search
+def createSearch(request, form, params, model_class, template):
+    if request.method == 'GET':
+        form = form()
+        if form.is_valid():
+            query = Q()
+            for param, field in params.items():
+                value = form.cleaned_data.get(param, '')
+                if value:
+                    query &= Q(**{field:value})
+
+                results = model_class.objects.filter(query) if query else model_class.objects.none()
+                result_count = results.count() if query else 0
+                custom_range, results = paginate(request, results)
+                context = {'form':form, 'results': results,
+                            'result_count':result_count, 'custom_range':custom_range}
+                return render(request, template, context)
+    context = {'from': form, 'results':model_class.objects.none(), result_count:0}
+    return redirect(template)
+

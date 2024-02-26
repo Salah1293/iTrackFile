@@ -49,9 +49,7 @@ def capture (request):
 
 #criminal search
 def criminalSearch(request):
-    form = CriminalForm()
-    context = {'form': form}
-    return render(request, 'batches/criminal-search.html', context)
+    return createForm(request, 'batches/criminal-search.html', CriminalForm)
 
 #criminal display resylts
 def criminalResults (request):
@@ -95,9 +93,7 @@ def criminalResults (request):
 
 #civil search
 def civilSearch (request):
-    form = CivilForm()
-    context = {'form':form}
-    return render(request , 'batches/civil-search.html', context)
+    return createForm(request, 'batches/civil-search.html', CivilForm)
 
 
 #civil display resylts
@@ -155,9 +151,7 @@ def civilResults (request):
 
 #criminal cases search
 def criminalCasesSearch (request):
-    form = CriminalCasesForm()
-    context = {'form': form}
-    return render(request , 'batches/criminal-cases-search.html', context)
+    return createForm(request, 'batches/criminal-cases-search.html', CriminalCasesForm)
 
 
 #criminal cases display results
@@ -203,9 +197,7 @@ def criminalCasesResults(request):
 
 #criminal junevile search
 def criminalJuvenileSearch (request):
-    form = CriminalJuvenileForm()
-    context = {'form': form}
-    return render(request , 'batches/criminal-juvenile-Search.html', context)
+    return createForm(request, 'batches/criminal-juvenile-Search.html', CriminalJuvenileForm)
 
 
 #criminal junevile display results
@@ -251,9 +243,7 @@ def criminalJuvenileResults (request):
    
 #historic index cards search
 def historicIndexCardsSearch (request):
-    form = HistoricIndexCardsForm()
-    context = {'form' : form}
-    return render(request , 'batches/hisoric-index-cards-search.html', context)
+    return createForm(request, 'batches/hisoric-index-cards-search.html', HistoricIndexCardsForm)
 
 
 #historic index cards display results
@@ -292,9 +282,7 @@ def historicIndexCardsResults(request):
 
 #historic order books search
 def historicOrderBooksSearch (request):
-    form = HistoricOrderBooksForm()
-    context = {'form' : form}
-    return render(request, 'batches/historic-order-books-Search.html', context)
+    return createForm(request, 'batches/historic-order-books-Search.html', HistoricOrderBooksForm)
 
 
 #historic order books display results
@@ -330,10 +318,7 @@ def historicOrderBooksResults(request):
 
 #he search
 def hrSearch (request):
-    form = HrForm()
-    context = {'form' : form}
-    return render(request, 'batches/hr-search.html', context)
-
+    return createForm(request, 'batches/hr-search.html', HrForm)
 
 #hr display results
 def hrResults(request):
@@ -372,12 +357,10 @@ def hrResults(request):
     context = {'form' : form, 'hr' : PvdmDocs15.objects.none(), 'resultCount' : 0}
     return render(request, 'batches/hr-results.html', context)
 
+
 #bond books search
 def bondBooksSearch(request):
-    form = BondBooksForm()
-    context = {'form' : form}
-    return render(request, 'batches/bond-books-search.html', context)
-
+    return createForm(request, 'batches/bond-books-search.html', BondBooksForm)
 
 #bond books display results
 def bondBooksResults(request):
@@ -415,9 +398,8 @@ def bondBooksResults(request):
 
 #charters search
 def chartersSearch(request):
-    form = ChartersForm()
-    context = {'form' : form}
-    return render(request, 'batches/charters-search.html', context)
+    return createForm(request, 'batches/charters-search.html', ChartersForm)
+
 
 #charters display results
 def chartersResults(request):
@@ -458,13 +440,12 @@ def chartersResults(request):
 
 #concealed weapons search
 def ConcealedWeaponsSearch(request):
-    form = ConcealedWeaponsForm()
-    context = {'form' : form}
-    return render(request, 'batches/concealed-weapons-search.html', context)
+    return createForm(request, 'batches/concealed-weapons-search.html', ConcealedWeaponsForm)
 
 
 #concealed weapons display results
 def ConcealedWeaponsResults(request):
+
     form = ConcealedWeaponsForm()
     if request.method == 'GET':
         form = ConcealedWeaponsForm(request.GET)
@@ -505,9 +486,7 @@ def ConcealedWeaponsResults(request):
 
 #indictmenys search
 def indictmentsSearch(request):
-    form = IndictmentsForm()
-    context = {'form' : form}
-    return render(request, 'batches/indictments-search.html', context)
+    return createForm(request, 'batches/indictments-search.html', IndictmentsForm)
 
 
 #indictmenys display results
@@ -548,9 +527,7 @@ def indictmentsResults(request):
 
 #law&chancery search
 def lawChancerySearch(request):
-    form = LawChanceryForm()
-    context = {'form' : form}
-    return render(request, 'batches/law-chancery-search.html', context)
+    return createForm(request, 'batches/law-chancery-search.html', LawChanceryForm)
 
 
 #bond law&chancery display results
@@ -588,9 +565,7 @@ def lawChanceryResults(request):
 
 #destruction orders search
 def destructionOrdersSearch(request):
-    form = DestructionOrdersForm()
-    context = {'form' : form}
-    return render(request, 'batches/destruction-orders-search.html', context)
+    return createForm(request, 'batches/destruction-orders-search.html', DestructionOrdersForm)
 
 
 #destruction orders display results
@@ -628,9 +603,7 @@ def destructionOrdersResults(request):
 
 #adoption search
 def adoptionSearch(request):
-    form = AdoptionForm()
-    context = {'form' : form}
-    return render(request, 'batches/adoption-search.html', context)
+    return createForm(request, 'batches/adoption-search.html', AdoptionForm)
 
 
 #adoption display results
@@ -677,9 +650,7 @@ def adoptionResults(request):
 
 #clerk orders search
 def clerkOrdersSearch(request):
-    form = ClerkOrdersForm()
-    context = {'form' : form}
-    return render(request, 'batches/clerk-orders-search.html', context)
+    return createForm(request, 'batches/clerk-orders-search.html', ClerkOrdersForm)
 
 
 #clerk orders display results
