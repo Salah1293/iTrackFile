@@ -847,3 +847,98 @@ class PvdmObjs19(models.Model):
     class Meta:
         managed = False
         db_table = 'PVDM_OBJS_1_9'
+
+
+
+class PvdmDg1(models.Model):
+    dgid = models.AutoField(db_column='DGID', primary_key=True)  # Field name made lowercase.
+    dgname = models.CharField(db_column='DGNAME', unique=True, max_length=255, db_collation='Latin1_General_CI_AS')  # Field name made lowercase.
+    path = models.TextField(db_column='PATH', db_collation='Latin1_General_CI_AS')  # Field name made lowercase. This field type is a guess.
+    type = models.SmallIntegerField(db_column='TYPE')  # Field name made lowercase.
+    lastupdatetime = models.DateTimeField(db_column='LASTUPDATETIME', blank=True, null=True)  # Field name made lowercase.
+    size = models.FloatField(db_column='SIZE')  # Field name made lowercase.
+    readwrite = models.BooleanField(db_column='READWRITE')  # Field name made lowercase.
+    origdgname = models.CharField(db_column='ORIGDGNAME', max_length=255, db_collation='Latin1_General_CI_AS')  # Field name made lowercase.
+    encryptkeyname = models.CharField(db_column='ENCRYPTKEYNAME', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+    encryptkeyvalue = models.TextField(db_column='ENCRYPTKEYVALUE', db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+    trashuserid = models.IntegerField(db_column='TRASHUSERID', blank=True, null=True)  # Field name made lowercase.
+    trashdatetime = models.DateTimeField(db_column='TRASHDATETIME', blank=True, null=True)  # Field name made lowercase.
+    dginfo = models.TextField(db_column='DGINFO', db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'PVDM_DG_1'
+
+
+
+class ImagePathExportTmp(models.Model):
+    casenumber = models.CharField(db_column='CASENUMBER', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+    label = models.CharField(db_column='LABEL', max_length=25, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+    dgid = models.IntegerField(db_column='DGID')  # Field name made lowercase.
+    docid = models.IntegerField(db_column='DOCID', blank=True, null=True)  # Field name made lowercase.
+    dgname = models.CharField(db_column='DGNAME', max_length=255, db_collation='Latin1_General_CI_AS')  # Field name made lowercase.
+    filename = models.CharField(db_column='FILENAME', primary_key=True, max_length=900, db_collation='Latin1_General_CI_AS')  # Field name made lowercase.
+    orderdate = models.DateTimeField(db_column='ORDERDATE', blank=True, null=True)  # Field name made lowercase.
+    judgename = models.CharField(db_column='JUDGENAME', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+    sealed = models.CharField(db_column='SEALED', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+    defendantcompany = models.CharField(db_column='DEFENDANTCOMPANY', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+    defendantlastname = models.CharField(db_column='DEFENDANTLASTNAME', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+    defendantfirstname = models.CharField(db_column='DEFENDANTFIRSTNAME', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+    defendantmiddle = models.CharField(db_column='DEFENDANTMIDDLE', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+    defendantsuffix = models.CharField(db_column='DEFENDANTSUFFIX', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+    plaintiffcompany = models.CharField(db_column='PLAINTIFFCOMPANY', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+    plaintifflastname = models.CharField(db_column='PLAINTIFFLASTNAME', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+    plaintifffirstname = models.CharField(db_column='PLAINTIFFFIRSTNAME', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+    plaintiffmiddle = models.CharField(db_column='PLAINTIFFMIDDLE', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+    plaintiffsuffix = models.CharField(db_column='PLAINTIFFSUFFIX', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+    subjectcompany = models.CharField(db_column='SUBJECTCOMPANY', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+    subjectlastname = models.CharField(db_column='SUBJECTLASTNAME', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+    subjectfirstname = models.CharField(db_column='SUBJECTFIRSTNAME', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+    subjectmiddle = models.CharField(db_column='SUBJECTMIDDLE', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+    subjectsuffix = models.CharField(db_column='SUBJECTSUFFIX', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+    roa_code = models.CharField(db_column='ROA_CODE', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+    roa_date = models.DateTimeField(db_column='ROA_DATE', blank=True, null=True)  # Field name made lowercase.
+    doctitle = models.CharField(db_column='DOCTITLE', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+    scandate = models.DateTimeField(db_column='SCANDATE', blank=True, null=True)  # Field name made lowercase.
+    judgeinitials = models.CharField(db_column='JUDGEINITIALS', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'IMAGE_PATH_EXPORT_TMP'
+
+
+
+class ImageRecsNotToImport1(models.Model):
+    casenumber = models.CharField(db_column='CASENUMBER', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+    label = models.CharField(db_column='LABEL', max_length=25, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+    dgid = models.IntegerField(db_column='DGID')  # Field name made lowercase.
+    docid = models.IntegerField(db_column='DOCID', blank=True, null=True)  # Field name made lowercase.
+    dgname = models.CharField(db_column='DGNAME', max_length=255, db_collation='Latin1_General_CI_AS')  # Field name made lowercase.
+    filename = models.CharField(db_column='FILENAME', max_length=900, db_collation='Latin1_General_CI_AS')  # Field name made lowercase.
+    orderdate = models.DateTimeField(db_column='ORDERDATE', blank=True, null=True)  # Field name made lowercase.
+    judgename = models.CharField(db_column='JUDGENAME', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+    sealed = models.CharField(db_column='SEALED', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+    defendantcompany = models.CharField(db_column='DEFENDANTCOMPANY', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+    defendantlastname = models.CharField(db_column='DEFENDANTLASTNAME', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+    defendantfirstname = models.CharField(db_column='DEFENDANTFIRSTNAME', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+    defendantmiddle = models.CharField(db_column='DEFENDANTMIDDLE', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+    defendantsuffix = models.CharField(db_column='DEFENDANTSUFFIX', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+    plaintiffcompany = models.CharField(db_column='PLAINTIFFCOMPANY', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+    plaintifflastname = models.CharField(db_column='PLAINTIFFLASTNAME', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+    plaintifffirstname = models.CharField(db_column='PLAINTIFFFIRSTNAME', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+    plaintiffmiddle = models.CharField(db_column='PLAINTIFFMIDDLE', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+    plaintiffsuffix = models.CharField(db_column='PLAINTIFFSUFFIX', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+    subjectcompany = models.CharField(db_column='SUBJECTCOMPANY', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+    subjectlastname = models.CharField(db_column='SUBJECTLASTNAME', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+    subjectfirstname = models.CharField(db_column='SUBJECTFIRSTNAME', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+    subjectmiddle = models.CharField(db_column='SUBJECTMIDDLE', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+    subjectsuffix = models.CharField(db_column='SUBJECTSUFFIX', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+    roa_code = models.CharField(db_column='ROA_CODE', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+    roa_date = models.DateTimeField(db_column='ROA_DATE', blank=True, null=True)  # Field name made lowercase.
+    doctitle = models.CharField(db_column='DOCTITLE', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+    scandate = models.DateTimeField(db_column='SCANDATE', blank=True, null=True)  # Field name made lowercase.
+    judgeinitials = models.CharField(db_column='JUDGEINITIALS', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'IMAGE_RECS_NOT_TO_IMPORT_1'

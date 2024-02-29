@@ -25,7 +25,7 @@
             <tbody>
               <div class="table-body">              
               {% for element in bondBooks %}
-                <tr>
+                <tr ondblclick="redirectToSingleImage('{{element.docid}}')">
                   <td>{% if element.docindex1 %}{{ element.docindex1 }}{% endif %}</td>
                   <td>{% if element.docindex2 %}{{ element.docindex2 }}{% endif %}</td>
                   <td>{% if element.createdate %}{{ element.createdate }}{% endif %}</td>
@@ -43,5 +43,11 @@
     </section>
     {% include 'pagination.html' with queryset=bondBooks custom_range=custom_range %}
 </main>
+<script>
 
+  function redirectToSingleImage(docId) {
+     
+      window.location.href = `/single-image/${docId}/`;
+  }
+</script>
 {% endblock content %}

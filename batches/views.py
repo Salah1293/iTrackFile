@@ -708,3 +708,29 @@ def clerkOrdersResults(request):
         
     context = {'form' : form, 'lawChancery' : PvdmDocs18.objects.none(), 'resultCount' : 0}
     return render(request, 'batches/clerk-orders-results.html', context)
+
+
+
+def viewImage(request, pk):  
+    image = PvdmObjs116.objects.filter(docid=pk).first() 
+    if image:
+        dg_id = image.docid
+        dg_query = PvdmDg1.objects.filter(docid=dg_id).first()
+        if dg_query:
+            path = dg_query.path + image.filelist
+            context = {'path': path}
+            return render(request, 'batches/single-image.html', context)  
+
+    image_query = ImagePathExportTmp.objects.filter(docid=pk).first()  
+    if image_query:
+        path = image_query.filelist
+        context = {'path': path}
+        return render(request, 'batches/single-image.html', context)  
+
+    image_not_imported_query = ImageRecsNotToImport1.objects.filter(docid=pk).first()
+    if image_not_imported_query:
+        context = {'path': path}  
+        return render(request, 'batches/single-image.html', context) 
+
+    return None
+
