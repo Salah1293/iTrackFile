@@ -1138,3 +1138,8 @@ img {
   display: flex;
   justify-content: center;
 }
+
+#warningMessage{
+  text-align: center;
+  background-color: var(--color-sub);
+}

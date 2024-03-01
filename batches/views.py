@@ -4,7 +4,7 @@ from django.db.models import Q
 from .utils import *
 from .forms import *
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-
+from django.contrib import messages
 
 # Create your views here.
 
@@ -31,9 +31,9 @@ def landingBatches (request):
 
     return render(request , 'batches/landing-page.html')
 
-def singleBatch (request):
+# def singleBatch (request):
 
-    return render(request , 'batches/single-batch.html')
+#     return render(request , 'batches/single-batch.html')
 
 def newBatch (request):
 
@@ -712,25 +712,44 @@ def clerkOrdersResults(request):
 
 
 def viewImage(request, pk):  
-    image = PvdmObjs116.objects.filter(docid=pk).first() 
+    image = PvdmObjs116.objects.filter(docid=pk).first()
+    print('------------------')
+    print(image.docid, image.filelist) 
+    print('----------------------------------')
+ 
     if image:
-        dg_id = image.docid
-        dg_query = PvdmDg1.objects.filter(docid=dg_id).first()
+        dg_id = image.dgid
+        dg_query = PvdmDg1.objects.filter(dgid=dg_id).first()
+        print('--------------------------')
+        print(dg_query.path)
+        print('---------------------------')
         if dg_query:
             path = dg_query.path + image.filelist
+            print('--------------------------')
+            print(path)
+            print('--------------------------')
             context = {'path': path}
-            return render(request, 'batches/single-image.html', context)  
+            return render(request, 'batches/single-image.html', context) 
+
+    else:
+        messages.error(request, "Image not found")
 
     image_query = ImagePathExportTmp.objects.filter(docid=pk).first()  
     if image_query:
         path = image_query.filelist
         context = {'path': path}
         return render(request, 'batches/single-image.html', context)  
+    
+    else:
+        return redirect('landingBatches')
 
     image_not_imported_query = ImageRecsNotToImport1.objects.filter(docid=pk).first()
     if image_not_imported_query:
         context = {'path': path}  
         return render(request, 'batches/single-image.html', context) 
+    
+    else:
+        return redirect('landingBatches')
 
-    return None
+    # return None
 
