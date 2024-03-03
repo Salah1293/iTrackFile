@@ -1143,3 +1143,11 @@ img {
   text-align: center;
   background-color: var(--color-sub);
 }
+
+
+#spanButton{
+  background-color: var(--color-sub);
+  color: white;
+  padding: 5px 10px;
+  font-size: 12px;
+}

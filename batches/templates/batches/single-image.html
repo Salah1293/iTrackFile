@@ -7,47 +7,47 @@
     <div class="container">
         <div style="text-align: center;">
           <div style="text-align:left; margin-top: 10px;">
-          <span class="tag tag--pill tag--sub tag--lg">
-            <small>First</small>
+          <span id="spanButton" class="tag tag--pill tag--sub tag--lg">
+            First
           </span>
-          <span class="tag tag--pill tag--sub tag--lg">
-            <small>Next</small>
+          <span id="spanButton" class="tag tag--pill tag--sub tag--lg">
+            Next
           </span> 
-          <span class="tag tag--pill tag--sub tag--lg">
-            <small>Prev</small>
+          <span id="spanButton" class="tag tag--pill tag--sub tag--lg">
+           Prev
           </span>         
-          <span class="tag tag--pill tag--sub tag--lg">
-            <small>Last</small>
+          <span id="spanButton" class="tag tag--pill tag--sub tag--lg">
+            Last
           </span>
-          <span class="tag tag--pill tag--sub tag--lg">
-            <small>Print</small>
+          <span id="spanButton" class="tag tag--pill tag--sub tag--lg">
+           Print
           </span>
-          <span id="rotateSpan" class="tag tag--pill tag--sub tag--lg" onclick="rotateImage()">
-            <small>Rotate</small>
+          <span id="spanButton" class="tag tag--pill tag--sub tag--lg" onclick="rotateImage()">
+            Rotate
         </span>
         
-        <span id="resetSpan" class="tag tag--pill tag--sub tag--lg" onclick="resetTransform()">
-            <small>Reset</small>
+        <span id="spanButton" class="tag tag--pill tag--sub tag--lg" onclick="resetTransform()">
+            Reset
         </span>
           <a href="{% url 'updateBatch' %}">
-            <span class="tag tag--pill tag--sub tag--lg">
-            <small>Edit</small>
+            <span id="spanButton" class="tag tag--pill tag--sub tag--lg">
+            Edit
           </span>
           </a>
           <a href="{% url 'deleteBatch' %}">
-            <span class="tag tag--pill tag--sub tag--lg">
-              <small>Delete</small>
+            <span id="spanButton" class="tag tag--pill tag--sub tag--lg">
+              Delete
             </span>
             </a> 
             <a href="{% url 'landingBatches' %}" style="float: right;">
-              <span class="tag tag--pill tag--sub tag--lg">
-                <small>X</small>
+              <span id="spanButton" class="tag tag--pill tag--sub tag--lg">
+                X
               </span>
               </a>
             
           </div>
           <div class="image-container">          
-              <img id="selectedImage" class="singleBatch__preview" src="{{path}}" alt="batch title"
+              <img id="selectedImage" class="singleBatch__preview" src="{% url 'view_image' pk=image.docid %}" alt="image title"
               style="width: 190%; height: 90%; border-radius: 0.7rem; border: 2px solid #070226;" />           
           </div>         
           <div style="text-align: center; margin-top: -25px;"> 
@@ -55,7 +55,7 @@
         </div>
       </div>
 
-      <script>
+      <!-- <script>
         let zoomLevel = 1;
         let rotationAngle = 0;
         let isDragging = false;
@@ -80,7 +80,7 @@
         function updateTransform() {
             document.getElementById('selectedImage').style.transform = `scale(${zoomLevel}) rotate(${rotationAngle}deg) translate(${positionX}px, ${positionY}px)`;
         }
-    </script>
+    </script> -->
 
 
   </main>
