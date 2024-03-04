@@ -7,6 +7,8 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.contrib import messages
 from django.http import FileResponse, HttpResponse
 import os
+import base64
+
 # Create your views here.
 
 
@@ -733,14 +735,22 @@ def viewImage(request, pk):
             print('--------------------------')
 
             try:
+                # with open(path, 'rb') as f:
+                #     return FileResponse(f)
+                ######################
+                # return FileResponse(open(path, 'rb'))
                 with open(path, 'rb') as f:
-                    return FileResponse(f)
+                    image_data = base64.b64encode(f.read()).decode('utf-8')
+                    return render(request, 'batches/single-image.html', {'image_data': image_data})
             except FileNotFoundError:
-                return HttpResponse("Image not found")
+                # return HttpResponse("Image not found")
+                return HttpResponse("Image not found", status=404)
         else:
-            return HttpResponse("Image path not found")
+            # return HttpResponse("Image path not found")
+            return HttpResponse("Image path not found", status=404)
     else:
-        return HttpResponse("Image not found")
+        # return HttpResponse("Image not found")
+        return HttpResponse("Image not found", status=404)
 
 
 
