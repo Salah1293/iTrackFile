@@ -8,6 +8,8 @@ from django.contrib import messages
 from django.http import FileResponse, HttpResponse
 import os
 import base64
+import io
+from PIL import Image
 
 # Create your views here.
 
@@ -739,18 +741,26 @@ def viewImage(request, pk):
                 #     return FileResponse(f)
                 ######################
                 # return FileResponse(open(path, 'rb'))
-                with open(path, 'rb') as f:
-                    image_data = base64.b64encode(f.read()).decode('utf-8')
+                # with open(path, 'rb') as f:
+                #     image_data = base64.b64encode(f.read()).decode('utf-8')
+                #     return render(request, 'batches/single-image.html', {'image_data': image_data})
+                with Image.open(path) as img:
+                    output = io.BytesIO()
+                    img.convert("RGB").save(output, format="JPEG")
+                    image_data = base64.b64encode(output.getvalue()).decode('utf-8')
                     return render(request, 'batches/single-image.html', {'image_data': image_data})
             except FileNotFoundError:
                 # return HttpResponse("Image not found")
-                return HttpResponse("Image not found", status=404)
+                # return HttpResponse("Image not found", status=404)
+                return render(request, 'batches/single-image.html', {'image_data': None})
         else:
             # return HttpResponse("Image path not found")
-            return HttpResponse("Image path not found", status=404)
+            # return HttpResponse("Image path not found", status=404)
+            return render(request, 'batches/single-image.html', {'image_data': None})
     else:
         # return HttpResponse("Image not found")
-        return HttpResponse("Image not found", status=404)
+        # return HttpResponse("Image not found", status=404)
+        return render(request, 'batches/single-image.html', {'image_data': None})
 
 
 
