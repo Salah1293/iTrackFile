@@ -462,6 +462,7 @@ img {
   height: auto; 
   width: 100%; 
   border-radius: 0.7rem;
+  /* box-shadow: 5px 5px 5px 5px rgba(141, 9, 171, 0.15); */
 }
 
 
@@ -877,53 +878,6 @@ img {
 }
 
 
-/* #selectedImage {
-  width: 900px;
-  height: 600px;
-  object-fit: contain;
-  border-radius: 0.7rem;
-} */
-
-
-/* #selectedImage {
-  max-width: 100%;   
-  max-height: 100%;  
-  width: 800px;      
-  height: 600px;     
-  object-fit: contain;  
-  border-radius: 0.7rem;
-}
-
-
-#selectedImage.zoomed {
-  cursor: grab;
-  transition: transform 0.3s ease-in-out;
-}
-
-#selectedImage.zoomed.grabbing {
-  cursor: grabbing;
-}  */
-
-#selectedImage {
-  max-width: 100%;
-  max-height: 100%;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  border-radius: 0.7rem;
-}
-
-#selectedImage.zoomed {
-  cursor: grab;
-  transition: transform 0.3s ease-in-out;
-}
-
-#selectedImage.zoomed.grabbing {
-  cursor: grabbing;
-}
-
-
-
 .scrollable-image {
   height: 90px;
   width: 90px;
@@ -948,6 +902,8 @@ img {
   width: 100%;
   max-width: 900px; 
   height: 800px; 
+  /* box-shadow: 2px 2px 5px 5px rgba(0, 0, 0, 0.15); */
+  /* text-align: center; */
 }
 
 .image-wrapper {
@@ -976,7 +932,7 @@ img {
   font-size: 18px;
 }
 
-/* Style for the Reset button */
+
 .image-controls #resetBtn {
   background-color: #f44336; 
   color: #ffffff;
@@ -986,6 +942,7 @@ img {
  #table-container {
   overflow-y: auto;
   max-height: 450px;
+  margin-top: 4px;
   
 }
 
@@ -1000,7 +957,7 @@ img {
 #my-styled-table td {
   padding: 8px;
   white-space: nowrap; 
-  font-size: 13px;
+  font-size: 18px;
   color: black;
   font-weight: 500;
   text-align: center;
@@ -1139,15 +1096,155 @@ img {
   justify-content: center;
 }
 
-#warningMessage{
-  text-align: center;
-  background-color: var(--color-sub);
+/* 
+#selectedImage {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 2rem;
+  border: 8px solid  var(--color-sub);
+} */
+
+
+#buttonsContainer{
+  margin-bottom: 8px;
+  margin-top: 10px;
 }
 
-
-#spanButton{
+#spanButton {
   background-color: var(--color-sub);
   color: white;
   padding: 5px 10px;
   font-size: 12px;
+  border-radius: 5px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+#viewContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh; 
+}
+
+#singleSelectedImage {
+  text-align: center;
+  
+  
+}
+
+.singleBatch__preview {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 1rem;
+  /* border: 4px solid var(--color-sub); */
+  
+}
+
+
+/* #selectedImage.zoomed {
+  cursor: grab;
+  transition: transform 0.3s ease-in-out;
+}
+
+#selectedImage.zoomed.grabbing {
+  cursor: grabbing;
+} */
+
+#batchy{
+  margin-top: 25px;
+  
+}
+
+
+.popup{
+  width: 400px;
+  height: 600px;
+  background-color: rgba(255, 255, 255, 0.5);
+  position: absolute;
+  border-radius: 10px;
+  top: -150%;
+  left: 50%;
+  opacity: 0;
+  margin-top: 70px;
+  transform: translate(-50%,-50%) scale(1.25);
+  text-align: center;
+  padding: 0 30px 30px;
+  box-shadow: 2px 2px 5px 5px rgba(0, 0, 0, 0.15);
+  transition: top 0ms ease-in-out 200ms,
+              opacity 200ms ease-in-out 0ms,
+              transform 20ms ease-in-out 0ms;
+}
+
+.popup.active{
+  top: 50%;
+  opacity: 1;
+  transform: translate(-50%,-50%) scale(1);
+  transition: top 0ms ease-in-out 0ms,
+              opacity 200ms ease-in-out 0ms,
+              transform 20ms ease-in-out 0ms;
+}
+
+.popup .close-btn{
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  width: 15px;
+  height: 15px;
+  background: var(--color-sub); 
+  color: white;
+  text-align: center;
+  line-height: 16px;
+  border-radius: 15px;
+  cursor: pointer;
+}
+
+.popup .form h2{
+  text-align: center;
+  counter-reset: var(--color-sub); 
+  margin: 10px 0px 20px;
+  font-size: 25px;
+}
+
+.popup .form .form-element {
+  margin: 15px 0px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.popup .form .form-element label{
+  font-size: 14px;
+  color: rgb(147, 139, 139);
+  font-weight: bold;
+
+  flex: 1; 
+  margin-right: 10px;
+}
+
+.popup .form .form-element input[name='field'],
+.popup .form .form-element select,
+.popup .form .form-element textarea
+{
+  margin-top: 5px;
+  display: block;
+  width: 100%;
+  padding: 10px;
+  outline: none;
+  border: 1px solid #aaa;
+  border-radius: 5px;
+  box-shadow: 2px 2px 5px 5px rgba(0, 0, 0, 0.15);
+  background-color: rgba(255, 255, 255, 0.5);
+
+  flex: 5;
+}
+
+
+.popup .form .form-element select{
+  width: 100%;
+
 }

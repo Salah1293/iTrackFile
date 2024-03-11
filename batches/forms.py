@@ -32,7 +32,8 @@ class CriminalForm(ModelForm):
 class CivilForm(ModelForm):
     class Meta:
         model = PvdmDocs12
-        fields = ['docindex1', 'docindex2', 'docindex11', 'docindex12', 'docindex6', 'docindex7']
+        fields = ['docindex1', 'docindex2', 'docindex11', 'docindex12',
+                   'docindex6', 'docindex7','docindex17','docindex16']
         
         widgets = {
                 'docindex2': forms.DateInput(attrs={'type': 'date'})
@@ -314,3 +315,22 @@ class ClerkOrdersForm(ModelForm):
 
         for name, field in self.fields.items():
             field.widget.attrs.update({'class' : 'input', 'autocomplete' : 'off'})
+
+
+# #update cards starts from here
+# class UpdateBondBooks(ModelForm):
+#     class Meta:
+#         model = PvdmDocs116
+#         fields = ['docindex1', 'docindex2']
+
+#         labels = {
+#             'docindex1' : 'book',
+#             'docindex2' : 'page'
+#         }
+
+
+#     def __init__(self, *args, **kwargs):
+#         super(UpdateBondBooks, self).__init__(*args, **kwargs)
+
+#         for name, field in self.fields.items():
+#             field.widget.attrs.update({'class' : 'input', 'autocomplete' : 'off'})

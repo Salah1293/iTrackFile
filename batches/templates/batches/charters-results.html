@@ -4,16 +4,14 @@
 {% block content %}
 
 
-<main class="batches">
-   
-    
-    <section class="batchList">
+<main class="batches">  
+    <section id="batchy" class="batchList">
       <div class="container">  
         <div class="column">
           <div id="table-title-container">
             <h2 id="tableName">CHARTERS</h2>
             </div>
-            <br>
+            
           <div id="table-container" class="table-container">
             <div class="table-wrapper">
             <table id="my-styled-table" class="table table-striped my-styled-table" style="width:100%">
@@ -37,13 +35,14 @@
                   <td>{% if element.docid %}{{ element.docid }}{% endif %}</td>
                 </tr>
                 {% endfor %}
+              </div>
             </tbody>
         </table>
         </div>
         <br>
         <p id="result">Result : <span id="resultCount">{{ resultCount }}</span> row{{ resultCount|pluralize:'s'}}</p>
       </div>
-          </div>
+          
         </div>     
     </section>
     {% include 'pagination.html' with queryset=charters custom_range=custom_range %}

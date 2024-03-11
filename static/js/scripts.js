@@ -27,5 +27,28 @@ function resetTransform() {
 }
 
 function updateTransform() {
-    document.getElementById('selectedImage').style.transform = `scale(${zoomLevel}) rotate(${rotationAngle}deg) translate(${positionX}px, ${positionY}px)`;
+    document.get('selectedImage').style.transform = `scale(${zoomLevel}) rotate(${rotationAngle}deg) translate(${positionX}px, ${positionY}px)`;
 }
+
+// let popup = document.getElementById("popup");
+
+
+// function openPopup(){
+//     popup.classList.add('open-popup');
+// }
+
+// function closePopup(){
+//     popup.classList.remove('open-popup');
+// }
+
+document.querySelector(".editbtn").addEventListener('click', function(){
+    document.querySelector('.popup').classList.add('active');
+});
+
+
+document.querySelector(".popup .close-btn").addEventListener('click', function(){
+    document.querySelector('.popup').classList.remove('active');
+});
+
+
+

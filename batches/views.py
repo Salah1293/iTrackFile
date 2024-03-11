@@ -123,10 +123,12 @@ def civilResults (request):
                 query &= Q(docindex2__range=[start_date, end_date])
 
             if last_name:
-                query &= (Q(docindex11=last_name) | Q(docindex6=last_name))
+                query &= (Q(docindex11=last_name) | Q(docindex6=last_name) |
+                          Q(docindex16=last_name))
                 
             if first_name:
-                query &= (Q(docindex12=first_name) | Q(docindex7=first_name))
+                query &= (Q(docindex12=first_name) | Q(docindex7=first_name) |
+                          Q(docindex17=first_name))
                 
             # if last_name and not (case_number or start_date or end_date or first_name):
             #     query &= (Q(docindex11=last_name) | Q(docindex6=last_name))
@@ -763,29 +765,18 @@ def viewImage(request, pk):
         return render(request, 'batches/single-image.html', {'image_data': None})
 
 
+# def editImageMetaData(request, pk):
+#     data = PvdmObjs116.objects.get(docid=pk)
+#     form = UpdateBondBooks(instance=data)
 
-    #         context = {'path': path}
-    #         return render(request, 'batches/single-image.html', context) 
+#     if request.method == 'POST':
+#         form = UpdateBondBooks(request.POST, instance=data)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('singleImage')
+        
+#     context = {'form':form}
+#     return render(request, 'batches/single-image.html', context)
 
-    # else:
-    #     messages.error(request, "Image not found")
 
-    # image_query = ImagePathExportTmp.objects.filter(docid=pk).first()  
-    # if image_query:
-    #     path = image_query.filelist
-    #     context = {'path': path}
-    #     return render(request, 'batches/single-image.html', context)  
-    
-    # else:
-    #     return redirect('landingBatches')
-
-    # image_not_imported_query = ImageRecsNotToImport1.objects.filter(docid=pk).first()
-    # if image_not_imported_query:
-    #     context = {'path': path}  
-    #     return render(request, 'batches/single-image.html', context) 
-    
-    # else:
-    #     return redirect('landingBatches')
-
-    # # return None
 

@@ -7,7 +7,7 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 #pagination super class
 def paginate(request, query):
     page = request.GET.get('page')
-    result = 25
+    result = 50
     paginator = Paginator(query, result)
 
     try:

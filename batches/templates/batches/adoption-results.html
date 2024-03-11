@@ -3,17 +3,15 @@
 {% load static %}
 {% block content %}
 
-<!-- Main Section -->
+
 <main class="batches">
-   
-    <!-- Search Result: BatchList -->
-    <section class="batchList">
+    <section id="batchy" class="batchList">
       <div class="container">  
         <div class="column">
           <div id="table-title-container">
             <h2 id="tableName">ADOPTIONS</h2>
             </div>
-            <br>
+            
           <div id="table-container" class="table-container">
           <table id="my-styled-table" class="table table-striped my-styled-table" style="width:100%">
             <thead>
@@ -74,13 +72,13 @@
                   <td>{% if element.docid %}{{ element.docid }}{% endif %}</td>
                 </tr>
                 {% endfor %}
+              </div>
             </tbody>
         </table>
         </div>
         <br>
         <p id="result">Result : <span id="resultCount">{{ resultCount }}</span> row{{ resultCount|pluralize:'s'}}</p>
-      </div>
-          </div>
+      </div>         
         </div>     
     </section>
     {% include 'pagination.html' with queryset=bondBooks custom_range=custom_range %}

@@ -5,21 +5,14 @@
 
 
 <main class="batches">  
-    <section class="batchList">
+    <section id="batchy" class="batchList">
       <div class="container">  
         <div class="column">
           <div id="table-title-container">
             <h2 id="tableName">BOND BOOKS</h2>
           </div>
-            <!-- <br>
-            {% for msg in messages %}
-            <div id="warningMessage" class="alert alert-warning" role="alert">
-              {{msg}}
-            </div>
-            {% endfor %}
-            <br> -->
           <div id="table-container" class="table-container">
-          <table id="my-styled-table" class="table table-striped my-styled-table" style="width:100%">
+          <table id="my-styled-table" class="table table-striped my-styled-table" >
             <thead>
                 <tr>
                     <th>Book</th>
@@ -38,6 +31,7 @@
                   <td>{% if element.docid %}{{ element.docid }}{% endif %}</td>
                 </tr>
                 {% endfor %}
+              </div>
             </tbody>
         </table>
         </div>
@@ -45,7 +39,7 @@
         <p id="result">Result : <span id="resultCount">{{ resultCount }}</span> row{{ resultCount|pluralize:'s'}}</p>
       </div>
           </div>
-        </div>     
+             
     </section>
     {% include 'pagination.html' with queryset=bondBooks custom_range=custom_range %}
 </main>

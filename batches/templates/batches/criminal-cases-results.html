@@ -7,13 +7,13 @@
 <main class="batches">
    
     <!-- Search Result: BatchList -->
-    <section class="batchList">
+    <section id="batchy" class="batchList">
       <div class="container">  
         <div class="column">
           <div id="table-title-container">
             <h2 id="tableName">CRIMINAL CASES</h2>
             </div>
-            <br>
+          
           <div id="table-container" class="table-container">
           <table id="my-styled-table" class="table table-striped my-styled-table" style="width:100%">
             <thead>
@@ -38,6 +38,7 @@
                   <td>{% if element.docindex6 %}{{ element.docindex6 }}{% endif %}</td>
                 </tr>
               {% endfor %}
+            </div> 
             </tbody>
         </table>
         </div>
@@ -45,7 +46,7 @@
         <p id="result">Result : <span id="resultCount">{{ resultCount }}</span> row{{ resultCount|pluralize:'s'}}</p>
       </div>
           </div>
-        </div>     
+            
     </section>
     {% include 'pagination.html' with queryset=criminalCases custom_range=custom_range %}
 </main>

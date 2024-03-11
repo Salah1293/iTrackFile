@@ -2,87 +2,47 @@
 {% load static %}
 {% block content %}
 
-<!-- Main Section -->
 <main >
-    <div class="container">
-        <div style="text-align: center;">
-          <div style="text-align:left; margin-top: 10px;">
-          <span id="spanButton" class="tag tag--pill tag--sub tag--lg">
-            First
-          </span>
-          <span id="spanButton" class="tag tag--pill tag--sub tag--lg">
-            Next
-          </span> 
-          <span id="spanButton" class="tag tag--pill tag--sub tag--lg">
-           Prev
-          </span>         
-          <span id="spanButton" class="tag tag--pill tag--sub tag--lg">
-            Last
-          </span>
-          <span id="spanButton" class="tag tag--pill tag--sub tag--lg">
-           Print
-          </span>
-          <span id="spanButton" class="tag tag--pill tag--sub tag--lg" onclick="rotateImage()">
-            Rotate
-        </span>
-        
-        <span id="spanButton" class="tag tag--pill tag--sub tag--lg" onclick="resetTransform()">
-            Reset
-        </span>
-          <a href="{% url 'updateBatch' %}">
-            <span id="spanButton" class="tag tag--pill tag--sub tag--lg">
-            Edit
-          </span>
-          </a>
-          <a href="{% url 'deleteBatch' %}">
-            <span id="spanButton" class="tag tag--pill tag--sub tag--lg">
-              Delete
-            </span>
-            </a> 
-            <a href="{% url 'landingBatches' %}" style="float: right;">
-              <span id="spanButton" class="tag tag--pill tag--sub tag--lg">
-                X
-              </span>
-              </a>
-            
+    <div id="viewContainer" class="container">        
+          <div id="buttonsContainer">
+            <span id="spanButton" >First</span>
+            <span id="spanButton" >Next</span>
+            <span id="spanButton" >Prev</span>
+            <span id="spanButton" >Last</span>
+            <span id="spanButton" >Print</span>
+            <span id="spanButton"  onclick="rotateImage()">Rotate</span>
+            <span id="spanButton"  onclick="resetTransform()">Reset</span>
+            <span class="editbtn" id="spanButton"  >Edit</span>        
+            <a href="{% url 'deleteBatch' %}">
+             <span id="spanButton" >Delete</span>
+            </a>  
           </div>
-          <div class="image-container">          
-              <img id="selectedImage" class="singleBatch__preview" src="data:image/jpeg;base64,{{ image_data }}" alt="image title"
-              style="width: 190%; height: 90%; border-radius: 0.7rem; border: 2px solid #070226;" />           
-          </div>         
-          <div style="text-align: center; margin-top: -25px;"> 
+          <div id="singleSelectedImage" class="image-container" >          
+              <img id="selectedImage" class="singleBatch__preview" src="data:image/jpeg;base64,{{image_data}}" alt="image title" />           
           </div>
+          <div class="popup" id="popup">
+            <div class="close-btn">&times;</div>
+          <form  method="POST">
+            <h2>Update Info</h2>
+            {% csrf_token %}
+            <div class="form-element">
+              {% for field in form %}
+              <label>{{field.label}}</label>
+              {{field}}
+              {% endfor %}      
+            </div>
+            <button id="spanButton" class="cls" type="button">Update</button> 
+          </form>   
         </div>
+
       </div>
 
-      <!-- <script>
-        let zoomLevel = 1;
-        let rotationAngle = 0;
-        let isDragging = false;
-        let positionX = 0;
-        let positionY = 0;
-        let startX = 0;
-        let startY = 0;
-
-        function rotateImage() {
-            rotationAngle += 90;
-            updateTransform();
-        }
-
-        function resetTransform() {
-            zoomLevel = 1;
-            rotationAngle = 0;
-            positionX = 0;
-            positionY = 0;
-            updateTransform();
-        }
-
-        function updateTransform() {
-            document.getElementById('selectedImage').style.transform = `scale(${zoomLevel}) rotate(${rotationAngle}deg) translate(${positionX}px, ${positionY}px)`;
-        }
-    </script> -->
-
+      
+       
+     
 
   </main>
+  <script src="{% static 'js/scripts.js' %}"></script>
+
 
 {% endblock content %}
