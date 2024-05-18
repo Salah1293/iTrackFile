@@ -11,8 +11,8 @@
           <div id="table-title-container">
             <h2 id="tableName">BOND BOOKS</h2>
           </div>
-          <div id="table-container" class="table-container">
-          <table id="my-styled-table" class="table table-striped my-styled-table" >
+          <div id="table-container" class="table-container">  
+            <table id="my-styled-table" class="table table-striped my-styled-table" >
             <thead>
                 <tr>
                     <th>Book</th>
@@ -22,15 +22,18 @@
                     </tr>
             </thead>    
             <tbody>
-              <div class="table-body">              
-              {% for element in bondBooks %}
-                <tr ondblclick="redirectToSingleImage('{{element.docid}}')">
+              <div class="table-body">      
+                {% with data=bondBooks|default:tableData %}        
+              {% for element in data %}
+                <tr onclick="redirectToSingleImage('{{element.docid}}', '{{ all_ids|join:',' }}')">
                   <td>{% if element.docindex1 %}{{ element.docindex1 }}{% endif %}</td>
                   <td>{% if element.docindex2 %}{{ element.docindex2 }}{% endif %}</td>
                   <td>{% if element.createdate %}{{ element.createdate }}{% endif %}</td>
                   <td>{% if element.docid %}{{ element.docid }}{% endif %}</td>
                 </tr>
+                </tr>
                 {% endfor %}
+                {% endwith %}
               </div>
             </tbody>
         </table>
@@ -38,16 +41,11 @@
         <br>
         <p id="result">Result : <span id="resultCount">{{ resultCount }}</span> row{{ resultCount|pluralize:'s'}}</p>
       </div>
-          </div>
-             
+          </div>        
     </section>
     {% include 'pagination.html' with queryset=bondBooks custom_range=custom_range %}
 </main>
-<script>
 
-  function redirectToSingleImage(docId) {
-     
-      window.location.href = `/single-image/${docId}/`;
-  }
-</script>
+<script src="{% static 'js/results.js' %}"></script>
+
 {% endblock content %}

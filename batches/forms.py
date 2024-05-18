@@ -317,20 +317,391 @@ class ClerkOrdersForm(ModelForm):
             field.widget.attrs.update({'class' : 'input', 'autocomplete' : 'off'})
 
 
-# #update cards starts from here
-# class UpdateBondBooks(ModelForm):
-#     class Meta:
-#         model = PvdmDocs116
-#         fields = ['docindex1', 'docindex2']
 
-#         labels = {
-#             'docindex1' : 'book',
-#             'docindex2' : 'page'
-#         }
+############################# update cards ###################################
+
+#abstract class for update process
+class BaseUpdateForm(ModelForm):
+    class Meta:
+        abstract = True
+
+    def __init__(self, *args, **kwargs):
+        super(BaseUpdateForm, self).__init__(*args, **kwargs)
+
+        for name, field in self.fields.items():
+            field.widget.attrs.update({'class': 'input', 'autocomplete': 'off'})
 
 
-#     def __init__(self, *args, **kwargs):
-#         super(UpdateBondBooks, self).__init__(*args, **kwargs)
 
-#         for name, field in self.fields.items():
-#             field.widget.attrs.update({'class' : 'input', 'autocomplete' : 'off'})
+
+
+#update card bond books
+class UpdateBondBooks(BaseUpdateForm):
+    class Meta:
+        model = PvdmDocs116
+        fields = ['docindex1', 'docindex2']
+
+        labels = {
+            'docindex1' : 'book',
+            'docindex2' : 'page'
+        }
+
+
+
+
+#update card chaeters
+class UpdateCharters(BaseUpdateForm):
+    class Meta:
+        model = PvdmDocs19
+        fields = ['docindex1', 'docindex2', 'docindex3']
+
+        labels = {
+            'docindex1' : 'Charter Name',
+            'docindex2' : 'book',
+            'docindex3' : 'page'
+        }
+
+
+
+#update card adoption
+class UpdateAdoption(BaseUpdateForm):
+    class Meta:
+        model = PvdmDocs14
+        fields = ['docindex1', 'docindex2', 'docindex3', 'docindex4', 'docindex5',
+                  'docindex6', 'docindex7', 'docindex8', 'docindex9', 'docindex10',
+                  'docindex11', 'docindex12', 'docindex13', 'docindex14', 'docindex15',
+                  'docindex16', 'docindex17', 'docindex18', 'docindex19', 'docindex20',
+                  'docindex21', 'docindex22']
+
+        labels = {
+            'docindex1' : 'Case Number',
+            'docindex2' : 'Order Date',
+            'docindex3' : 'Judge Name',
+            'docindex4' : 'Sealed',
+            'docindex5' : 'Plaintiff Company',
+            'docindex6' : 'Plaintiff Last Name',
+            'docindex7' : 'Plaintiff First Name',
+            'docindex8' : 'Plaintiff Middle Name',
+            'docindex9' : 'Plaintiff Suffix',
+            'docindex10' : 'Defendant Company',
+            'docindex11' : 'Defendant Last Name',
+            'docindex12' : 'Defendant First Name',
+            'docindex13' : 'Defendant Middle Name',
+            'docindex14' : 'Defendant Suffix',
+            'docindex15' : 'Subject Company',
+            'docindex16' : 'Subject Last Name',
+            'docindex17' : 'Subject First Name',
+            'docindex18' : 'Subject Middle Name',
+            'docindex19' : 'Subject Suffix',
+            'docindex20' : 'Date Scanned',
+            'docindex21' : 'Judge Initials',
+            'docindex22' : 'Scan Date'
+        }
+
+
+
+#update card civil
+class UpdateCivil(BaseUpdateForm):
+    class Meta:
+        model = PvdmDocs12
+        fields = ['docindex1', 'docindex2', 'docindex3', 'docindex4', 'docindex5',
+                  'docindex6', 'docindex7', 'docindex8', 'docindex9', 'docindex10',
+                  'docindex11', 'docindex12', 'docindex13', 'docindex14', 'docindex15',
+                  'docindex16', 'docindex17', 'docindex18', 'docindex19', 'docindex20',
+                  'docindex21', 'docindex22']
+
+        labels = {
+            'docindex1' : 'Case Number',
+            'docindex2' : 'Order Date',
+            'docindex3' : 'Judge Name',
+            'docindex4' : 'Sealed',
+            'docindex5' : 'Plaintiff Company',
+            'docindex6' : 'Plaintiff Last Name',
+            'docindex7' : 'Plaintiff First Name',
+            'docindex8' : 'Plaintiff Middle Name',
+            'docindex9' : 'Plaintiff Suffix',
+            'docindex10' : 'Defendant Company',
+            'docindex11' : 'Defendant Last Name',
+            'docindex12' : 'Defendant First Name',
+            'docindex13' : 'Defendant Middle Name',
+            'docindex14' : 'Defendant Suffix',
+            'docindex15' : 'Subject Company',
+            'docindex16' : 'Subject Last Name',
+            'docindex17' : 'Subject First Name',
+            'docindex18' : 'Subject Middle Name',
+            'docindex19' : 'Subject Suffix',
+            'docindex20' : 'Date Scanned',
+            'docindex21' : 'Judge Initials',
+            'docindex22' : 'Scan Date'
+        }
+
+
+#update card clerk orders
+class UpdateClerkOrders(BaseUpdateForm):
+    class Meta:
+        model = PvdmDocs18
+        fields = ['docindex1', 'docindex2', 'docindex3', 'docindex4', 'docindex5',
+                  'docindex6', 'docindex7', 'docindex8', 'docindex9', 'docindex10',
+                  'docindex11', 'docindex12', 'docindex13', 'docindex14', 'docindex15',
+                  'docindex16', 'docindex17', 'docindex18', 'docindex19', 'docindex20',
+                  'docindex21', 'docindex22', 'docindex23']
+
+        labels = {
+            'docindex1' : 'Case Number',
+            'docindex2' : 'Order Date',
+            'docindex3' : 'Clerk Key',
+            'docindex4' : 'Clerk Name',
+            'docindex5' : 'Sealed',
+            'docindex6' : 'Document Type Code',
+            'docindex7' : 'Document Type',
+            'docindex8' : 'Plaintiff Company',
+            'docindex9' : 'Plaintiff Last Name',
+            'docindex10' : 'Plaintiff First Name',
+            'docindex11' : 'Plaintiff Middle Name',
+            'docindex12' : 'Plaintiff Suffix',
+            'docindex13' : 'Defendant Company',
+            'docindex14' : 'Defendant Last Name',
+            'docindex15' : 'Defendant First Name',
+            'docindex16' : 'Defendant Middle Name',
+            'docindex17' : 'Defendant Suffix',
+            'docindex18' : 'Subject Company',
+            'docindex19' : 'Subject Last Name',
+            'docindex20' : 'Subject First Name',
+            'docindex21' : 'Subject Middle Name',
+            'docindex22' : 'Subject Suffix',
+            'docindex23' : 'Date Scanned'
+        }
+
+
+#update card concealed weapons
+class UpdateConcealedWeapons(BaseUpdateForm):
+    class Meta:
+        model = PvdmDocs112
+        fields = ['docindex1', 'docindex2', 'docindex3', 'docindex4', 'docindex5',
+                  'docindex6', 'docindex7', 'docindex8', 'docindex9', 'docindex10',
+                  'docindex11']
+
+        labels = {
+            'docindex1' : 'Case Number',
+            'docindex2' : 'Order Date',
+            'docindex3' : 'Judge Initials',
+            'docindex4' : 'Judge Name',
+            'docindex5' : 'Sealed',
+            'docindex6' : 'Scan Date',
+            'docindex7' : 'Subject Company',
+            'docindex8' : 'Subject Last Name',
+            'docindex9' : 'Subject First Name',
+            'docindex10' : 'Subject Middle Name',
+            'docindex11' : 'Subject Suffix'
+            }
+        
+
+#update card criminal
+class UpdateCriminal(BaseUpdateForm):
+    class Meta:
+        model = PvdmDocs11
+        fields = ['docindex1', 'docindex2', 'docindex3', 'docindex4', 'docindex5',
+                  'docindex6', 'docindex7', 'docindex8', 'docindex9', 'docindex10',
+                  'docindex11', 'docindex12', 'docindex13', 'docindex14', 'docindex15',
+                  'docindex16', 'docindex17', 'docindex18', 'docindex19', 'docindex20',
+                  'docindex21', 'docindex22']
+
+        labels = {
+            'docindex1' : 'Case Number',
+            'docindex2' : 'Order Date',
+            'docindex3' : 'Judge Name',
+            'docindex4' : 'Sealed',
+            'docindex5' : 'Plaintiff Company',
+            'docindex6' : 'Plaintiff Last Name',
+            'docindex7' : 'Plaintiff First Name',
+            'docindex8' : 'Plaintiff Middle Name',
+            'docindex9' : 'Plaintiff Suffix',
+            'docindex10' : 'Defendant Company',
+            'docindex11' : 'Defendant Last Name',
+            'docindex12' : 'Defendant First Name',
+            'docindex13' : 'Defendant Middle Name',
+            'docindex14' : 'Defendant Suffix',
+            'docindex15' : 'Subject Company',
+            'docindex16' : 'Subject Last Name',
+            'docindex17' : 'Subject First Name',
+            'docindex18' : 'Subject Middle Name',
+            'docindex19' : 'Subject Suffix',
+            'docindex20' : 'Date Scanned',
+            'docindex21' : 'Judge Initials',
+            'docindex22' : 'Scan Date'
+        }
+
+
+#update card criminal cases
+class UpdateCriminalCases(BaseUpdateForm):
+    class Meta:
+        model = PvdmDocs17
+        fields = ['docindex1', 'docindex2', 'docindex3', 'docindex4', 'docindex5']
+
+        labels = {
+            'docindex1' : 'Date',
+            'docindex2' : 'Case Number',
+            'docindex3' : 'Last/Corporation',
+            'docindex4' : 'First',
+            'docindex5' : 'Middle'
+            }
+        
+
+
+#update card criminal Juvenile
+class UpdateCriminalJuvenile(BaseUpdateForm):
+    class Meta:
+        model = PvdmDocs13
+        fields = ['docindex1', 'docindex2', 'docindex3', 'docindex4', 'docindex5',
+                  'docindex6', 'docindex7', 'docindex8', 'docindex9', 'docindex10',
+                  'docindex11', 'docindex12', 'docindex13', 'docindex14', 'docindex15',
+                  'docindex16', 'docindex17', 'docindex18', 'docindex19', 'docindex20',
+                  'docindex21', 'docindex22']
+
+        labels = {
+            'docindex1' : 'Case Number',
+            'docindex2' : 'Order Date',
+            'docindex3' : 'Judge Name',
+            'docindex4' : 'Sealed',
+            'docindex5' : 'Plaintiff Company',
+            'docindex6' : 'Plaintiff Last Name',
+            'docindex7' : 'Plaintiff First Name',
+            'docindex8' : 'Plaintiff Middle Name',
+            'docindex9' : 'Plaintiff Suffix',
+            'docindex10' : 'Defendant Company',
+            'docindex11' : 'Defendant Last Name',
+            'docindex12' : 'Defendant First Name',
+            'docindex13' : 'Defendant Middle Name',
+            'docindex14' : 'Defendant Suffix',
+            'docindex15' : 'Subject Company',
+            'docindex16' : 'Subject Last Name',
+            'docindex17' : 'Subject First Name',
+            'docindex18' : 'Subject Middle Name',
+            'docindex19' : 'Subject Suffix',
+            'docindex20' : 'Date Scanned',
+            'docindex21' : 'Judge Initials',
+            'docindex22' : 'Scan Date'
+        }
+
+
+#update card Destructiojn Orders
+class UpdateDestructionOrders(BaseUpdateForm):
+    class Meta:
+        model = PvdmDocs115
+        fields = ['docindex1', 'docindex2', 'docindex3', 'docindex4', 'docindex5',
+                  'docindex6', 'docindex7']
+
+        labels = {
+            'docindex1' : 'Order Type',
+            'docindex2' : 'Order Date',
+            'docindex3' : 'Start Date',
+            'docindex4' : 'End Date',
+            'docindex5' : 'Destruction Complete Date',
+            'docindex6' : 'First Case Number',
+            'docindex7' : 'Last Case Number'
+            }
+
+
+#update card Destructiojn Orders
+class UpdateDestructionOrders(BaseUpdateForm):
+    class Meta:
+        model = PvdmDocs115
+        fields = ['docindex1', 'docindex2', 'docindex3', 'docindex4', 'docindex5',
+                  'docindex6', 'docindex7']
+
+        labels = {
+            'docindex1' : 'Order Type',
+            'docindex2' : 'Order Date',
+            'docindex3' : 'Start Date',
+            'docindex4' : 'End Date',
+            'docindex5' : 'Destruction Complete Date',
+            'docindex6' : 'First Case Number',
+            'docindex7' : 'Last Case Number'
+            }
+
+
+#update card historic index cards
+class UpdateHistoricIndexCards(BaseUpdateForm):
+    class Meta:
+        model = PvdmDocs114
+        fields = ['docindex1', 'docindex2', 'docindex3', 'docindex4', 'docindex5',
+                  'docindex6', 'docindex7', 'docindex8']
+
+        labels = {
+            'docindex1' : 'Last Name',
+            'docindex2' : 'First Name',
+            'docindex3' : 'Subject',
+            'docindex4' : 'Record Source',
+            'docindex5' : 'Book Record',
+            'docindex6' : 'Page',
+            'docindex7' : 'Date',
+            'docindex7' : 'Comments'
+            }
+
+
+#update card historic order books
+class UpdateHistoricOrderBooks(BaseUpdateForm):
+    class Meta:
+        model = PvdmDocs113
+        fields = ['docindex1', 'docindex2', 'docindex3', 'docindex4']
+
+        labels = {
+            'docindex1' : 'Book Type',
+            'docindex2' : 'Year',
+            'docindex3' : 'Page A',
+            'docindex4' : 'Page B'
+            }
+
+
+#update card hr
+class UpdateHr(BaseUpdateForm):
+    class Meta:
+        model = PvdmDocs15
+        fields = ['docindex1', 'docindex2', 'docindex3', 'docindex4',
+                  'docindex5', 'docindex6'
+                  ]
+
+        labels = {
+            'docindex1' : 'Last Name',
+            'docindex2' : 'First Name',
+            'docindex3' : 'EIN',
+            'docindex4' : 'Employment Type',
+            'docindex5' : 'Scan Date',
+            'docindex6' : 'Document Type'
+            }
+
+
+#update card indictments
+class UpdateIndictments(BaseUpdateForm):
+    class Meta:
+        model = PvdmDocs110
+        fields = ['docindex1', 'docindex2', 'docindex3', 'docindex4',
+                  'docindex5', 'docindex6', 'docindex7', 'docindex8',
+                  'docindex9'
+                  ]
+
+        labels = {
+            'docindex1' : 'Case Number',
+            'docindex2' : 'Defendant Company',
+            'docindex3' : 'Defendant First Name',
+            'docindex4' : 'Defendant Middle',
+            'docindex5' : 'Defendant Last Name',
+            'docindex6' : 'Defendant Suffix',
+            'docindex7' : 'ROA Code',
+            'docindex8' : 'ROA Date',
+            'docindex9' : 'Scan Date'
+            }
+
+
+#update card Law Chancery
+class UpdateLawChancery(BaseUpdateForm):
+    class Meta:
+        model = PvdmDocs16
+        fields = ['docindex1', 'docindex2'
+                  ]
+
+        labels = {
+            'docindex1' : 'Date',
+            'docindex2' : 'Law/Chancery#'
+            }
+

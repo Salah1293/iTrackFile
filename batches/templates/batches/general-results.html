@@ -1,0 +1,29 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block content %}
+
+<main class="batches">
+    <section id="batchy" class="batchList">
+        <div class="container">
+            <div class="column">
+
+              <select id="table-selector">
+                    <option value="" selected disabled>Select Table</option>
+                    {% for table_name, results in all_results.items %}
+                        {% if results %}
+                        <option value="{{ table_name }}" onclick="loadTableResults('{{ table_name }}')">{{ table_name }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+
+                <div id="table-results-container">
+                    
+                </div>
+            </div>
+        </div>
+    </section>
+
+</main>
+<script src="{% static 'js/results.js' %}"></script>
+
+{% endblock content %}

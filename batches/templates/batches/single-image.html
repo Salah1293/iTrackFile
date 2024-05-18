@@ -3,23 +3,45 @@
 {% block content %}
 
 <main >
-    <div id="viewContainer" class="container">        
+    <div id="viewContainer" class="container"> 
           <div id="buttonsContainer">
-            <span id="spanButton" >First</span>
-            <span id="spanButton" >Next</span>
-            <span id="spanButton" >Prev</span>
-            <span id="spanButton" >Last</span>
-            <span id="spanButton" >Print</span>
-            <span id="spanButton"  onclick="rotateImage()">Rotate</span>
-            <span id="spanButton"  onclick="resetTransform()">Reset</span>
-            <span class="editbtn" id="spanButton"  >Edit</span>        
-            <a href="{% url 'deleteBatch' %}">
-             <span id="spanButton" >Delete</span>
-            </a>  
+            <input type="hidden" id="ids_list" value="{{ ids_list|join:',' }}">
+            <a class="back-link" href="{{ previous_page_url }}">Back</a>
+            {% if first_doc != none %}
+            <span id="spanButton" class="firstBtn" data-item-id="{{ first_doc }}">First</span>
+            {% endif %}
+            {% if next_doc != None %}
+            <span id="spanButton" class="nextBtn" data-item-id="{{ next_doc }}">Next</span>
+            {% endif %}
+            {% if prev_doc != None %}          
+            <span id="spanButton" class="prevBtn" data-item-id="{{ prev_doc }}">Prev</span>
+            {% endif %}
+            {% if last_doc != None %}
+            <span id="spanButton" class="lastBtn" data-item-id="{{ last_doc }}">Last</span> 
+            {% endif %}  
+            <span id="spanButton" onclick="displayPrintImagePopup()">Print</span>
+            <span id="spanButton" onclick="rotateImage()">Rotate</span>
+            <span id="spanButton" onclick="resetTransform()">Reset</span>
+            <span id="spanButton" class="editbtn">Edit</span>             
+            <span id="spanButton" class="deletebtn">Delete</span>  
           </div>
-          <div id="singleSelectedImage" class="image-container" >          
-              <img id="selectedImage" class="singleBatch__preview" src="data:image/jpeg;base64,{{image_data}}" alt="image title" />           
-          </div>
+
+          <div id="singleSelectedImage" class="image-container">
+            {% if image_data %}
+            <input type="hidden" id="imageDataArr" value="{{ image_data }}">
+                <img id="selectedImage" class="singleBatch__preview" src="data:image/jpeg;base64,{{ image_data.0 }}" alt="Image">
+                {% if image_data|length > 1 %}   
+                <p id="imageIndexParagraph" class="image-index" >{{ ccurrent_index|default:1 }} of {{ image_data_length }}</p>
+                <button class="prevImageBtn" style="display: none;" onclick="navigateImage(-1)">❮</button>
+                <button class="nextImageBtn" onclick="navigateImage(1)">❯</button>
+                <input type="hidden" id="imageDataLength" value="{{ image_data_length }}">
+                <input type="hidden" id="currentImageIndex" value="0">
+                {% endif %}
+            {% else %}
+                <p>No images available.</p>
+            {% endif %}
+         </div>
+
           <div class="popup" id="popup">
             <div class="close-btn">&times;</div>
           <form  method="POST">
@@ -31,18 +53,67 @@
               {{field}}
               {% endfor %}      
             </div>
-            <button id="spanButton" class="cls" type="button">Update</button> 
-          </form>   
+            <br>
+            <button name="edit" id="spanButton" class="cls" type="submit">Update</button> 
+          </form>
+        </div>
+        <div class="delete-popup" id="delete-popup">
+          <div class="close-btn">&times;</div>
+          <form  method="POST">
+            <h2>Delete Document</h2>
+            <p>Are you sure you wanna delete the document?</p>
+            {% csrf_token %}
+            <br>
+            <button name="delete" id="spanButton" class="cls" type="submit">Delete</button>
+            <button id="spanButton" class="cancel-btn" type="button">Cancel</button>  
+          </form>
+        </div>  
+
+
+
+
+        <div id="printImagePopup" class="popup-print">
+          <div class="popup-content">
+              <span class="close-btn" onclick="closePrintImagePopup()">&times;</span>           
+              <div class="print-icon" onclick="printImage()">
+                <i class="fas fa-print"></i>
+              </div>            
+              <div class="image-container">
+                  <img id="printableImage" src="" alt="Printable Image">              
+              </div>
+          </div>
+      </div>
+
+
+
+<div id="printOptionsPopup" class="popup-print" style="display: none;">
+  <div class="popup-content">
+      <span class="close-btn" onclick="closePrintOptionsPopup()">&times;</span>
+      
+      {% if image_data|length > 1 %}
+        <div class="print-options">
+          <input type="checkbox" id="printCurrentImage" checked>current image
+          <input type="checkbox" id="printAllImages">all images
+          <br>
+          <button onclick="printSelectedImages()">Print</button>
+        </div>
+      {% endif %}
+      
+      <div class="image-container">
+        <img id="printableImage" src="" alt="Printable Image">
+      </div>
+  </div>
+</div>
+      
+
+        <div id="printPopup" class="popup" style="display: none;">
+          <img id="printImage" class="singleBatch__preview" src="" alt="Image for printing">
         </div>
 
       </div>
-
-      
-       
-     
-
   </main>
-  <script src="{% static 'js/scripts.js' %}"></script>
 
+
+  <script src="{% static 'js/single-image.js' %}"></script>
 
 {% endblock content %}

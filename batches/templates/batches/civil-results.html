@@ -15,7 +15,7 @@
         <div id="table-container" class="table-container">
           <table id="my-styled-table" class="table table-striped my-styled-table" style="width:100%">
             <thead>
-                <tr>
+              <tr onclick="redirectToSingleImage('{{element.docid}}', '{{ all_ids|join:',' }}')">
                     <th>Case Number</th>
                     <th>Order Date</th>
                     <th>Judge Name</th>
@@ -40,8 +40,9 @@
             </thead>      
             <tbody>
               <div class="table-body">
-              {% for element in civil %}
-                <tr>
+                {% with data=civil|default:tableData %}
+              {% for element in data %}
+                <tr onclick="redirectToSingleImage('{{element.docid}}', '{{ all_ids|join:',' }}')">
                     <td>{% if element.docindex1 %}{{ element.docindex1 }}{% endif %}</td>
                     <td>{% if element.docindex2 %}{{ element.docindex2 }}{% endif %}</td>
                     <td>{% if element.docindex3 %}{{ element.docindex3 }}{% endif %}</td>
@@ -64,6 +65,7 @@
                     <td>{% if element.docindex20 %}{{ element.docindex20 }}{% endif %}</td>
                   </tr>
                 {% endfor %}
+                {% endwith %}
               </div>
             </tbody>
         </table>
@@ -76,5 +78,7 @@
     </section>
     {% include 'pagination.html' with queryset=civil custom_range=custom_range %}
 </main>
+
+<script src="{% static 'js/results.js' %}"></script>
 
 {% endblock content %}

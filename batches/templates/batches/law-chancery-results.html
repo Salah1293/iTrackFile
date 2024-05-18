@@ -24,15 +24,17 @@
                     <th>Document ID</th>
             </thead>    
             <tbody>
-              <div class="table-body">              
-              {% for element in lawChancery %}
-                <tr>
+              <div class="table-body">
+                {% with data=lawChancery|default:tableData %}              
+              {% for element in data %}
+              <tr onclick="redirectToSingleImage('{{element.docid}}', '{{ all_ids|join:',' }}')">
                   <td>{% if element.docindex1 %}{{ element.docindex1 }}{% endif %}</td>
                   <td>{% if element.docindex2 %}{{ element.docindex2 }}{% endif %}</td>
                   <td>{% if element.createdate %}{{ element.createdate }}{% endif %}</td>
                   <td>{% if element.docid %}{{ element.docid }}{% endif %}</td>
                 </tr>
                 {% endfor %}
+                {% endwith %}
               </div>
             </tbody>
         </table>
@@ -45,5 +47,7 @@
     </section>
     {% include 'pagination.html' with queryset=lawChancery custom_range=custom_range %}
 </main>
+
 <script src="{% static 'js/scripts.js' %}"></script>
+
 {% endblock content %}

@@ -1,0 +1,41 @@
+{% extends 'main.html' %} 
+{% block content %}
+
+<!-- Main Section -->
+<main class="formPage my-xl">
+  <div class="content-box">
+    <div class="formWrapper">
+      <h2 style="text-align: center">Scanner Setting</h2>
+      <a class="backButton" href="{% url 'landingBatches' %}"
+        ><i class="im im-angle-left"><</i></a
+      >
+      <br />
+
+      <form class="form" method="POST">
+        {% csrf_token %}
+        <!-- Input:Text -->
+        <div class="form__field">
+          <label for="formInput#text">Scanner Name</label>
+          <input
+            class="input input--text"
+            id="formInput#text"
+            type="text"
+            name="text"
+            placeholder="Enter text"
+          />
+        </div>
+
+        <input class="btn btn--sub btn--lg my-md" type="submit" value="Ok" />
+        <a href="{% url 'landingBatches' %}">
+          <input
+            class="btn btn--sub btn--lg my-md"
+            type="submit"
+            value="Canecl"
+          />
+        </a>
+      </form>
+    </div>
+  </div>
+</main>
+
+{% endblock content %}
