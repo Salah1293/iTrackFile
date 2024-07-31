@@ -6,7 +6,6 @@ let positionY = 0;
 let startX = 0;
 let startY = 0;
 
-//var image_data = JSON.parse('{{ image_data|escapejs }}');
 
 function rotateImage() {
     rotationAngle += 90;
@@ -48,73 +47,107 @@ document.querySelector(".delete-popup .cancel-btn").addEventListener('click', fu
     document.querySelector('.delete-popup').classList.remove('active');
 });
 
+document.querySelector(".popup .cancel-btn").addEventListener('click', function () {
+    document.querySelector('.popup').classList.remove('active');
+});
+
+
+
+document.querySelector(".printbtn").addEventListener('click', function () {
+    populatePrintOptions();
+    document.querySelector('.print-popup').classList.add('active');
+});
+
+
+document.querySelector(".print-popup .close-btn").addEventListener('click', function () {
+    document.querySelector('.print-popup').classList.remove('active');
+});
+
+
+document.querySelector(".print-popup .cancel-btn").addEventListener('click', function () {
+    document.querySelector('.print-popup').classList.remove('active');
+});
+
 
 
 var idsList = document.getElementById('ids_list').value;
 document.querySelector(".firstBtn").addEventListener('click', function () {
-    // console.log("First  button clicked");
+    console.log("First  button clicked", section); 
+    console.log("last button.", section.value); 
     let firstDocId = this.getAttribute('data-item-id');
     if (firstDocId) {
-        let newUrl = `/single-image/${firstDocId}/?ids=${encodeURIComponent(idsList)}`;
+        let newUrl = `/single-image/${section.value}/${firstDocId}/?ids=${encodeURIComponent(idsList)}`;
         window.location.href = newUrl;
     }
 });
 
 document.querySelector(".lastBtn").addEventListener('click', function () {
-    // console.log("last button.");
+    console.log("last button.", section); 
+    console.log("last button.", section.value); 
     let lastDocId = this.getAttribute('data-item-id');
     if (lastDocId) {
-        let newUrl = `/single-image/${lastDocId}/?ids=${encodeURIComponent(idsList)}`;
+        let newUrl = `/single-image/${section.value}/${lastDocId}/?ids=${encodeURIComponent(idsList)}`;
         window.location.href = newUrl;
     }
 });
 
 document.querySelector(".prevBtn").addEventListener('click', function () {
-    // console.log("prev button.");
+    console.log("prev button.", section); 
+    console.log("last button.", section.value); 
     let prevDocId = this.getAttribute('data-item-id');
     if (prevDocId) {
-        let newUrl = `/single-image/${prevDocId}/?ids=${encodeURIComponent(idsList)}`;
+        let newUrl = `/single-image/${section.value}/${prevDocId}/?ids=${encodeURIComponent(idsList)}`;
         window.location.href = newUrl;
     }
 });
 
+// document.querySelector(".nextBtn").addEventListener('click', function () {
+//     console.log("Next button clicked", section); 
+//     console.log("last button.", section.value); 
+//     let nextDocId = this.getAttribute('data-item-id');
+//     if (nextDocId) {
+//         let newUrl = `/single-image/${section.value}/${nextDocId}/?ids=${encodeURIComponent(idsList)}`;
+//         window.location.href = newUrl;
+//     }
+// });
+
+
+
 document.querySelector(".nextBtn").addEventListener('click', function () {
-    // console.log("Next button clicked");
+    console.log("Next button clicked");
     let nextDocId = this.getAttribute('data-item-id');
-    // console.log("Next document ID:", nextDocId);
+    console.log("Next document ID:", nextDocId);
+    // Check if `nextDocId` is correctly retrieved and the URL generation works as expected
     if (nextDocId) {
-        let newUrl = `/single-image/${nextDocId}/?ids=${encodeURIComponent(idsList)}`;
+        let newUrl = `/single-image/${section.value}/${nextDocId}/?ids=${encodeURIComponent(idsList)}`;
+        console.log("New URL:", newUrl);
+        // Ensure the new URL is correct and navigate to it
         window.location.href = newUrl;
     }
 });
+
+
 
 
 function navigateImage(direction) {
-    console.log("Navigating image:", direction);
     const imageDataLength = parseInt(document.getElementById('imageDataLength').value);
     let currentImageIndex = parseInt(document.getElementById('currentImageIndex').value);
-    // let ImageData = (document.getElementById('selectedImage').src);
+    let ImageData = (document.getElementById('selectedImage').src);
     let ImageDataArr = document.getElementById('imageDataArr').value;
 
-    // Calculate the new image index
+   
     var newIndex = currentImageIndex + direction;
-    // console.log("New index 1:", newIndex);
 
 
-    // Handle wrapping around for next and previous images
+    
     if (newIndex < 0) {
-        newIndex = imageDataLength - 1; // Wrap around to the last image
+        newIndex = imageDataLength - 1; 
     } else if (newIndex >= imageDataLength) {
-        newIndex = 0; // Wrap around to the first image
+        newIndex = 0; 
     }
 
-    // Update the current image index
     document.getElementById('currentImageIndex').value = newIndex;
-    // console.log("currentImageIndex:", currentImageIndex);
-    // console.log("New index 2:", newIndex);
-    // console.log("Image data length:",  imageDataLength );
-    // console.log("Image data ----- :",  ImageData);
-
+   
 
 
     var yyy = ImageDataArr.slice(1, -1);
@@ -122,25 +155,17 @@ function navigateImage(direction) {
     var zzz =[];
 
     xxx.forEach((element, index) => {
-        // Remove the single quotes using replace()
         let cleanElement = element.trim().replace(/'/g, '');
         zzz.push(cleanElement);
-        // console.log(`The ${index + 1} is: ${cleanElement}`);
+        console.log(`The ${index + 1} is: ${cleanElement}`);
     });
-    // if (imageDataLength > 1) {
-    //     document.getElementById('imageIndexParagraph').textContent = `${newIndex + 1} of ${imageDataLength}`;
-    // }   
-    currentIndex = newIndex;
-    document.getElementById('imageIndexParagraph').textContent = `${currentIndex + 1} of ${imageDataLength}`;
-   
-    document.getElementById('selectedImage').src = "data:image/jpeg;base64," + zzz[newIndex];
+
+    
+     document.getElementById('selectedImage').src = "data:image/jpeg;base64," + zzz[newIndex];
      
     
-    // Update the visibility of navigation buttons
     updateNavigationButtons(newIndex, imageDataLength);
 }
-
-
 
 
 
@@ -167,127 +192,167 @@ function updateNavigationButtons(currentIndex, totalImages) {
 
 
 
-// function printImage() {
-//     let imageUrl = document.getElementById('selectedImage').src;
-//     document.getElementById('printImage').src = imageUrl;
-//     document.getElementById('printPopup').style.display = 'block';
-//     window.print();
-//     document.getElementById('printPopup').style.display = 'none';
-// }
 
+let draggableElem = document.getElementById('drag-handle');
+let  initialX = 0, initialy = 0;
+let moveElement = false
 
-
-
-// function displayPrintImagePopup() {
-//     console.log("Print button clicked!");
-//     let imageUrl = document.getElementById('selectedImage').src;
-//     document.getElementById('printableImage').src = imageUrl;
-//     document.getElementById('printImagePopup').style.display = 'block';
-// }
-
-// function closePrintImagePopup() {
-//     document.getElementById('printImagePopup').style.display = 'none';
-// }
-
-
-
-
-
-
-
-
-function displayPrintImagePopup() {
-    console.log("Print button clicked!");
-    let imageUrl = document.getElementById('selectedImage').src;
-    document.getElementById('printableImage').src = imageUrl;
-    document.getElementById('printImagePopup').style.display = 'block';
-  }
-  
-  function closePrintImagePopup() {
-    document.getElementById('printImagePopup').style.display = 'none';
-  }
-  
-  function printSelectedImages() {
-    const printCurrentImage = document.getElementById('printCurrentImage').checked;
-    const printAllImages = document.getElementById('printAllImages').checked;
-  
-    if (printCurrentImage) {
-      const imageUrl = document.getElementById('printableImage').src;
-      printImage(imageUrl);
-    } else if (printAllImages) {
-      console.log("Print all images functionality not implemented yet");
-    } else {
-      console.log("No print option selected");
+let events = {
+    mouse: {
+        down: 'mousedown',
+        move: 'mousemove',
+        up: 'mouseup'
+    },
+    touch: {
+        down: 'touchstart',
+        move: 'touchmove',
+        up: 'touchend'
     }
-  }
-  
-  function printImage(imageUrl) {
-    document.getElementById('printImage').src = imageUrl;
-    document.getElementById('printImage').style.margin = "0"; // Set margins to 0
-    document.getElementById('printImage').style.padding = "0"; // Set paddings to 0
-    document.getElementById('printPopup').style.display = 'block';
-    window.print();
-    document.getElementById('printPopup').style.display = 'none';
-  }
+}
+
+let deviceType = '';
+
+const isTouchDevide = () => {
+    try{
+        document.createEvent('TouchEvent');
+        deviceType = 'touch';
+        return true;
+    }
+    catch(e) {
+        deviceType = 'mouse';
+        return false;
+    }
+};
+
+isTouchDevide();
+draggableElem.addEventListener(events[deviceType].down,
+    (e) => {
+        e.preventDefault();
+        initialX = !isTouchDevide() ? e.clientx : touches[0].
+        clientx;
+        initialy = !isTouchDevide() ? e.clienty : touches[0].
+        clienty;
+
+        moveElement = true;
+    });
+
+
+    draggableElem.addEventListener(events[deviceType].move,
+        (e) => {
+            if(moveElement) {
+                e.preventDefault();
+                let newx = !isTouchDevide() ? e.clientx : e.touches
+                [0].clientx;
+                let newy = !isTouchDevide() ? e.clienty : e.touches
+                [0].clienty;
+
+                draggableElem.style.top = 
+                draggableElem.offsetTop - (initialy - newy) + 'px';
+                draggableElem.style.left = 
+                draggableElem.offsetLeft - (initialx - newx) + 'px';
+                initialX = newx;
+                initialy = newy;
+            }
+        });
+
+
+    draggableElem.addEventListener(
+        events[deviceType].up,
+        (stopMovement = (e) => {
+            moveElement = false
+        })
+    );
+
+
+    draggableElem.addEventListener('mouseleave',
+        stopMovement);
+
+    draggableElem.addEventListener(events[deviceType].up,
+        (e) => {
+            moveElement = false;
+        }
+    );
+        
+
+
+function populatePrintOptions() {
+    const imageDataArr = document.getElementById('imageDataArr').value.slice(1, -1).split(', ').map(item => item.replace(/'/g, '')).filter(item => item); 
+    const printImagesContainer = document.getElementById('print-images-container');
+    printImagesContainer.innerHTML = ''; 
+
+    imageDataArr.forEach((imageData, index) => {
+        const imageNumber = index + 1; 
+        const optionDiv = document.createElement('div');
+        optionDiv.classList.add('print-option');
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = `print-checkbox-${imageNumber}`;
+        checkbox.value = imageNumber;
+
+        const label = document.createElement('label');
+        label.htmlFor = `print-checkbox-${imageNumber}`;
+        label.innerText = `${imageNumber}`;
+
+        optionDiv.appendChild(checkbox);
+        optionDiv.appendChild(label);
+
+        printImagesContainer.appendChild(optionDiv);
+    });
+}
 
 
 
 
+function printImages() {
+    const checkedCheckboxes = document.querySelectorAll('#print-images-container input[type="checkbox"]:checked');
+    const imageDataArr = document.getElementById('imageDataArr').value.slice(1, -1).split(', ').map(item => item.replace(/'/g, ''));
+
+    if (checkedCheckboxes.length === 0) {
+        alert("Please select at least one image to print.");
+        return;
+    }
+
+    const printWindow = window.open('');
+    printWindow.document.write('<html><head><title>Print Images</title>');
+    printWindow.document.write('<style>');
+    printWindow.document.write(`
+        body, html {
+            margin: 0;
+            padding: 0;
+        }
+        img {
+            max-width: 100%;
+            height: 100%;
+            page-break-inside: avoid;
+        }
+        @media print {
+            img {
+                max-width: 100%;
+                height: 100%;
+            }
+        }
+    `);
+    printWindow.document.write('</style></head><body>');
+
+    checkedCheckboxes.forEach((checkbox, index) => {
+        if (index > 0) {
+            printWindow.document.write('<div style="page-break-before: always;"></div>');
+        }
+        
+        const imageIndex = parseInt(checkbox.value, 10) - 1;
+        const imageData = imageDataArr[imageIndex];
+        const image = new Image();
+        image.src = `data:image/jpeg;base64,${imageData}`;
+
+        printWindow.document.write(image.outerHTML);
+    });
+
+    printWindow.document.write('</body></html>');
+    printWindow.document.close();
+    printWindow.print();
+
+    closePrintPopup();
+}
 
 
-
-
-
-
-
-
-
-
-// function printImage() {
-//     let imageUrl = document.getElementById('selectedImage').src;
-//     document.getElementById('printImage').src = imageUrl;
-//     document.getElementById('printPopup').style.display = 'block';
-//     window.print();
-//     document.getElementById('printPopup').style.display = 'none';
-// }
-
-// function displayPrintImagePopup() {
-//     let imageUrl = document.getElementById('selectedImage').src;
-//     document.getElementById('printableImage').src = imageUrl;
-//     document.getElementById('printImagePopup').style.display = 'block';
-// }
-
-// function closePrintImagePopup() {
-//     document.getElementById('printImagePopup').style.display = 'none';
-// }
-
-// function displayPrintOptionsPopup() {
-//     document.getElementById('printOptionsPopup').style.display = 'block';
-// }
-
-// function closePrintOptionsPopup() {
-//     document.getElementById('printOptionsPopup').style.display = 'none';
-// }
-
-// function printSelectedImages() {
-//     let checkboxes = document.getElementsByName('imagesToPrint');
-//     let selectedIndexes = [];
-
-//     checkboxes.forEach(checkbox => {
-//         if (checkbox.checked) {
-//             selectedIndexes.push(checkbox.value);
-//         }
-//     });
-
-//     let specificIndexesInput = document.getElementById('specificIndexes').value;
-//     let specificIndexes = specificIndexesInput.split(',').map(index => index.trim());
-
-//     let allIndexes = selectedIndexes.concat(specificIndexes);
-
-//     allIndexes.forEach(index => {
-//         let imageUrl = document.getElementById('selectedImage').src;
-//         window.open(imageUrl, '_blank');
-//     });
-
-//     closePrintOptionsPopup();
-// }

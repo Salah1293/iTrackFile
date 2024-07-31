@@ -10,24 +10,27 @@
     <section class="hero-section text-center">
       <div class="container container--narrow">
         <div class="hero-section__box">
-          <h2>Search for <span>Batches</span></h2>
+          <h2>Global <span>Search</span></h2>
         </div>
 
         <div class="hero-section__search">
           <form class="form" action="{% url 'generalResults' %}" method="get">
             <div class="form__field">
-              <label for="formInput#search">Search By Batches</label>
+              <label for="formInput#search">Global Search</label>
               <input class="input input--text" id="formInput#search" type="text" name="text"
-                placeholder="Search by Batch" />
+                placeholder="Global Search" />
             </div>
-            <input class="btn btn--sub btn--lg" type="submit" value="Search" name="query"/>
+
+            <input class="btn btn--sub btn--lg" type="submit" value="Search" />
           </form>
         </div>
       </div>
     </section>
     <!-- Search Result: BatchList -->
     <section class="batchList">
-
+      <div class="hero-section__box" style="display: flex; align-items: center; justify-content: center;">
+        <h2>Sectional <span>Search</span></h2>
+      </div>
         <div class="container">  
           <div class="button-container">  
           <div class="column">
@@ -63,7 +66,7 @@
               <button type="button" class="btn btn-secondary">Destruction Orders</button>
             </a>              
             <a href="{% url 'historicIndexCardsSearch' %}">
-              <button type="button" class="btn btn-secondary">Hisoric Index Cards</button>
+              <button type="button" class="btn btn-secondary">Historic Index Cards</button>
             </a>
             <a href="{% url 'historicOrderBooksSearch' %}">
               <button type="button" class="btn btn-secondary">Historic Order Books</button>

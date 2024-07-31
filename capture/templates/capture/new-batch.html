@@ -10,51 +10,39 @@
             <a class="backButton" href="{% url 'capture' %}"><i class="im im-angle-left"><</i></a>
             <br>
         
-            <form class="form" method="POST">
+            <form class="form" method="POST" action="{% url 'newBatch' %}" onsubmit="console.log('Form is being submitted');">
                 {% csrf_token %}
-                <!-- Input:Text -->
                 <div class="form__field">
-                    <label for="formInput#job">Job</label>
-                    <select class="input input--text" id="formInput#job" name="job">
-                        <option value="option1">Option 1</option>
-                        <option value="option2">Option 2</option>
-                        <option value="option3">Option 3</option>
+                    {% if user_role == 'hr_manager' or user_role == 'hr_staff' %}
+                    <label id="formLabel" for="formInput#job">Job</label>
+                    <select class="input input--text" id="formInput#job" name="job"> 
+                        <option value="HR">HR</option>
                     </select>
+                    {% endif %}     
+                    {% if user_role != 'hr_manager' and user_role != 'hr_staff' %}
+                    <label id="formLabel" for="formInput#job">Job</label>
+                    <select class="input input--text" id="formInput#job" name="job"> 
+                        <option value="" selected disabled>Choose Section</option>                
+                        <option value="Historic Index Cards">Historic Index Cards</option>
+                        <option value="Historic Order Books">Historic Order Books</option>
+                    </select>
+                        {% endif %}
                 </div>
-                
-
-                <!-- Input:Text -->
+                  
                 <div class="form__field">
-                    <label for="formInput#text">Name</label>
-                    <input class="input input--text" id="formInput#text" type="text" name="text"
-                        placeholder="Enter text" />
-                </div>
-
-                <!-- Input:Text -->
-                <div class="form__field">
-                    <label for="formInput#text">Date</label>
-                    <input class="input input--text" id="formInput#text" type="date" name="text"
-                        placeholder="Enter text" />
-                </div>
-
-                <!-- Input:Text -->
-                <div class="form__field">
-                    <label for="formInput#text">Time</label>
-                    <input class="input input--text" id="formInput#text" type="text" name="text"
-                        placeholder="Enter text" />
+                    <label id="formLabel" for="formInput#text">Name</label>
+                    <input class="input input--text" id="formInput#text" type="text" name="name"
+                        placeholder="Enter Name" />
                 </div>
 
-                <!-- Input:Text -->
                 <div class="form__field">
-                    <label for="formInput#text">Description</label>
-                    <input class="input input--text" id="formInput#text" type="text" name="text"
-                        placeholder="Enter text" />
-                </div>
-                <a href="{% url 'updateBatch' %}">
-                <button class="btn btn--sub btn--lg  my-md" type="submit" value="Ok" />
-                </a>
-                <a href="{% url 'landingBatches' %}">
-                <button class="btn btn--sub btn--lg  my-md" type="submit" value="Canel" />
+                    <label id="formLabel" for="formInput#text">Description</label>
+                    <input class="input input--text" id="formInput#text" type="text" name="description"
+                        placeholder="Enter Description" />
+                </div>    
+                <button class="btn btn--sub btn--lg  my-md" type="submit" >Create</button>
+                <a href="{% url 'capture' %}">
+                <button class="btn btn--sub btn--lg  my-md" type="button" >Cancel</button>
                 </a>
             </form>
         </div>

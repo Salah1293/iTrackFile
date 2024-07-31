@@ -1,4 +1,5 @@
 from django.db import models
+# from django.contrib.auth.models import User
 
 
 
@@ -942,3 +943,4 @@ class ImageRecsNotToImport1(models.Model):
     class Meta:
         managed = False
         db_table = 'IMAGE_RECS_NOT_TO_IMPORT_1'
+

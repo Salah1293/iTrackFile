@@ -6,18 +6,18 @@
     <section id="batchy" class="batchList">
         <div class="container">
             <div class="column">
+                <!-- <p>the searched key is: {{query}}</p> -->
 
-              <select id="table-selector">
-                    <option value="" selected disabled>Select Table</option>
-                    {% for table_name, results in all_results.items %}
-                        {% if results %}
-                        <option value="{{ table_name }}" onclick="loadTableResults('{{ table_name }}')">{{ table_name }}</option>
-                        {% endif %}
-                    {% endfor %}
-                </select>
-
-                <div id="table-results-container">
-                    
+                <div>
+                    <form method="GET" action="{% url 'sectionResults' %}" >
+                        {% csrf_token %}
+                        <input type="hidden" value="{{query}}" name="query">
+                        <div>
+                        {% for table_name, result in all_results.items %}
+                                <button class="btn btn--sub btn--lg  my-md" type="submit" name="table_name" value="{{table_name}}">{{ table_name }}</button>
+                        {% endfor %}
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

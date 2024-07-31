@@ -28,10 +28,9 @@
             </thead>
             <tbody>
               <div class="table-body">
-                {% with data=criminalCases|default:tableData %}
-              {% for element in data %}
-              <tr onclick="redirectToSingleImage('{{element.docid}}', '{{ all_ids|join:',' }}')">
-                  <td>{% if element.docindex1 %}{{ element.docindex1 }}{% endif %}</td>
+              {% for element in section_result %}
+              <tr onclick="redirectToSingleImage('{{ section }}', '{{ element.docid }}', '{{ all_ids|join:',' }}')">
+                <td>{% if element.docindex1 %}{{ element.docindex1 }}{% endif %}</td>
                   <td>{% if element.docindex2 %}{{ element.docindex2 }}{% endif %}</td>
                   <td>{% if element.docindex3 %}{{ element.docindex3 }}{% endif %}</td>
                   <td>{% if element.docindex4 %}{{ element.docindex4 }}{% endif %}</td>
@@ -39,7 +38,6 @@
                  <td>{% if element.createdate %}{{ element.createdate }}{% endif %}</td>
                 </tr>
               {% endfor %}
-              {% endwith %}
             </div> 
             </tbody>
         </table>
@@ -50,7 +48,7 @@
           </div>
             
     </section>
-    {% include 'pagination.html' with queryset=criminalCases custom_range=custom_range %}
+    {% include 'pagination.html' with queryset=section_result custom_range=custom_range %}
 </main>
 
 <script src="{% static 'js/results.js' %}"></script>

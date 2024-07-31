@@ -448,21 +448,7 @@ img {
   margin-right: 1rem;
 }
 
-/* 
-.singleBatch__preview {
-  height: 50vh;
-  object-fit: cover;
-  object-position: top center;
-  margin-bottom: 3rem;
-  border-radius: 0.7rem;
-} */
 
-.singleBatch__preview {
-  max-width: 100%; 
-  height: auto; 
-  width: 100%; 
-  border-radius: 0.7rem;
-}
 
 
 
@@ -877,53 +863,6 @@ img {
 }
 
 
-/* #selectedImage {
-  width: 900px;
-  height: 600px;
-  object-fit: contain;
-  border-radius: 0.7rem;
-} */
-
-
-/* #selectedImage {
-  max-width: 100%;   
-  max-height: 100%;  
-  width: 800px;      
-  height: 600px;     
-  object-fit: contain;  
-  border-radius: 0.7rem;
-}
-
-
-#selectedImage.zoomed {
-  cursor: grab;
-  transition: transform 0.3s ease-in-out;
-}
-
-#selectedImage.zoomed.grabbing {
-  cursor: grabbing;
-}  */
-
-#selectedImage {
-  max-width: 100%;
-  max-height: 100%;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  border-radius: 0.7rem;
-}
-
-#selectedImage.zoomed {
-  cursor: grab;
-  transition: transform 0.3s ease-in-out;
-}
-
-#selectedImage.zoomed.grabbing {
-  cursor: grabbing;
-}
-
-
-
 .scrollable-image {
   height: 90px;
   width: 90px;
@@ -936,19 +875,6 @@ img {
 }
 
 
-
-/* .image-container {
-  position: relative;
-  overflow: hidden; 
-} */
-
-.image-container {
-  position: relative;
-  overflow: hidden; 
-  width: 100%;
-  max-width: 900px; 
-  height: 800px; 
-}
 
 .image-wrapper {
   max-width: 100%;
@@ -976,7 +902,7 @@ img {
   font-size: 18px;
 }
 
-/* Style for the Reset button */
+
 .image-controls #resetBtn {
   background-color: #f44336; 
   color: #ffffff;
@@ -986,6 +912,8 @@ img {
  #table-container {
   overflow-y: auto;
   max-height: 450px;
+  margin-top: 4px;
+  position: relative;
   
 }
 
@@ -994,13 +922,14 @@ img {
   border-collapse: collapse;
   margin: 20px 0;
   border-radius: 10px;
+  position: relative;
 }
 
 #my-styled-table th,
 #my-styled-table td {
   padding: 8px;
   white-space: nowrap; 
-  font-size: 13px;
+  font-size: 18px;
   color: black;
   font-weight: 500;
   text-align: center;
@@ -1014,7 +943,7 @@ img {
   text-align: left;
   position: sticky; 
   top: 0; 
-  z-index: 1;
+  z-index: 2;
   border-radius: 10px 10px 0 0;
   text-align: center; 
 
@@ -1028,6 +957,44 @@ img {
   border-bottom-left-radius: 10px; 
   border-bottom-right-radius: 10px; 
 } 
+
+#my-styled-table tbody tr:hover {
+  cursor: pointer;
+  background-color: #f0f0f0;
+}
+
+#my-styled-table .table-body {
+  display: table-row-group; 
+}
+
+.table-row {
+  position: relative;
+}
+
+.delete-col {
+  position: sticky;
+  right: 0;
+  color: white;
+  z-index: 1;
+}
+
+.deletebtn {
+  /* display: block;
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+  cursor: pointer;
+  text-align: center; */
+  position: sticky; 
+  right: 0;
+  z-index: 1; 
+}
+
+
+#my-styled-table {
+  overflow-x: auto;
+}
+
 
 
 #result{
@@ -1139,7 +1106,296 @@ img {
   justify-content: center;
 }
 
-#warningMessage{
-  text-align: center;
+/* 
+#selectedImage {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 2rem;
+  border: 8px solid  var(--color-sub);
+} */
+
+
+#buttonsContainer{
+  margin-bottom: 8px;
+  margin-top: 10px;
+  /* align-items: center; */
+}
+
+#spanButton {
   background-color: var(--color-sub);
+  color: white;
+  padding: 5px 10px;
+  font-size: 12px;
+  border-radius: 5px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+#viewContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  max-width: 100%;
+  margin: 0 auto; 
+}
+
+#singleSelectedImage {
+  text-align: center;  
+}
+
+
+
+
+
+.prevImageBtn,
+    .nextImageBtn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        border: none;
+        padding: 10px;
+        font-size: 20px;
+        cursor: pointer;
+        z-index: 1000;
+    }
+
+    .prevImageBtn {
+        left: 10px;
+        /* background-color: red; */
+    }
+
+    .nextImageBtn {
+        right: 10px;
+        /* background-color: blue; */
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* .singleBatch__preview {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 1rem;  
+} */
+
+/* .singleBatch__preview {
+  height: 50vh;
+  object-fit: cover;
+  object-position: top center;
+  margin-bottom: 3rem;
+  border-radius: 0.7rem;
+} */
+
+/* .singleBatch__preview {
+  max-width: 100%; 
+  height: auto; 
+  width: 100%; 
+  border-radius: 0.7rem;
+}
+ */
+
+
+
+/* .image-container {
+  position: relative;
+  overflow: hidden; 
+} */
+
+.image-container {
+  position: relative;
+  overflow: hidden; 
+  width: 100%;
+  max-width: 900px; 
+  height: 800px; 
+
+}
+
+.back-link {
+  margin-right: auto;
+  color: var(--color-sub);
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;  
+}
+
+/* #selectedImage.zoomed {
+  cursor: grab;
+  transition: transform 0.3s ease-in-out;
+}
+
+#selectedImage.zoomed.grabbing {
+  cursor: grabbing;
+} */
+
+#batchy{
+  margin-top: 25px;
+  
+}
+
+
+.popup{
+  width: 400px;
+  height: 600px;
+  background-color: rgba(255, 255, 255, 0.5);
+  position: absolute;
+  border-radius: 10px;
+  top: -150%;
+  left: 50%;
+  opacity: 0;
+  margin-top: 70px;
+  transform: translate(-50%,-50%) scale(1.25);
+  text-align: center;
+  padding: 0 30px 30px;
+  box-shadow: 2px 2px 5px 5px rgba(0, 0, 0, 0.15);
+  transition: top 0ms ease-in-out 200ms,
+              opacity 200ms ease-in-out 0ms,
+              transform 20ms ease-in-out 0ms;
+}
+
+.popup.active{
+  top: 50%;
+  opacity: 1;
+  transform: translate(-50%,-50%) scale(1);
+  transition: top 0ms ease-in-out 0ms,
+              opacity 200ms ease-in-out 0ms,
+              transform 20ms ease-in-out 0ms;
+}
+
+.popup .close-btn{
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  width: 15px;
+  height: 15px;
+  background: var(--color-sub); 
+  color: white;
+  text-align: center;
+  line-height: 16px;
+  border-radius: 15px;
+  cursor: pointer;
+}
+
+.popup .form h2{
+  text-align: center;
+  counter-reset: var(--color-sub); 
+  margin: 10px 0px 20px;
+  font-size: 25px;
+}
+
+.popup .form .form-element {
+  margin: 15px 0px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.popup .form .form-element label{
+  font-size: 14px;
+  color: rgb(147, 139, 139);
+  font-weight: bold;
+
+  flex: 1; 
+  margin-right: 10px;
+}
+
+.popup .form .form-element input[name='field'],
+.popup .form .form-element select,
+.popup .form .form-element textarea
+{
+  margin-top: 5px;
+  display: block;
+  width: 100%;
+  padding: 10px;
+  outline: none;
+  border: 1px solid #aaa;
+  border-radius: 5px;
+  box-shadow: 2px 2px 5px 5px rgba(0, 0, 0, 0.15);
+  background-color: rgba(255, 255, 255, 0.5);
+
+  flex: 5;
+}
+
+
+.popup .form .form-element select{
+  width: 100%;
+
+}
+
+
+
+
+.delete-popup{
+  width: 400px;
+  height: 200px;
+  background-color: rgba(255, 255, 255, 1);
+  position: absolute;
+  border-radius: 10px;
+  top: -150%;
+  left: 50%;
+  opacity: 0;
+  margin-top: 70px;
+  transform: translate(-50%,-50%) scale(1.25);
+  text-align: center;
+  padding: 0 30px 30px;
+  box-shadow: 2px 2px 5px 5px rgba(0, 0, 0, 0.15);
+  transition: top 0ms ease-in-out 200ms,
+              opacity 200ms ease-in-out 0ms,
+              transform 20ms ease-in-out 0ms;
+}
+
+.delete-popup.active{
+  top: 50%;
+  opacity: 1;
+  transform: translate(-50%,-50%) scale(1);
+  transition: top 0ms ease-in-out 0ms,
+              opacity 200ms ease-in-out 0ms,
+              transform 20ms ease-in-out 0ms;
+}
+
+.delete-popup .close-btn{
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  width: 15px;
+  height: 15px;
+  background: var(--color-sub); 
+  color: white;
+  text-align: center;
+  line-height: 16px;
+  border-radius: 15px;
+  cursor: pointer;
+}
+
+#delete-popup #delete-form h2{
+  text-align: center;
+  counter-reset: var(--color-sub); 
+  margin: 10px 0px 20px;
+  font-size: 25px;
+  color: black;
+}
+
+#delete-popup #delete-form p{
+  color: black;
+  font-weight: 400;
+}
+
+.heading-man{
+  color: var(--color-sub); 
 }

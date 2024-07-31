@@ -9,8 +9,8 @@
         <p>Hello User, Welcome Back!</p>
       </div>
 
-      <form action="#" class="form auth__form">
-        <!-- Input:Email -->
+      <form method="POST" action="{% url 'login' %}" class="form auth__form">
+        {% csrf_token %}
         <div class="form__field">
           <label for="formInput#text">Username </label>
           <input

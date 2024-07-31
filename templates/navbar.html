@@ -13,11 +13,16 @@
           <div class="toggle-menu__lines"></div>
         </label>
         <ul class="header__menu">
+          {% if request.user.is_authenticated %}
+          <li class="header__menuItem"><a href="{% url 'managing' %}">Admin</a></li>
           <li class="header__menuItem"><a href="{% url 'capture' %}">Capture</a></li>
-          <!-- <li class="header__menuItem"><a href="{% url 'incompleteBatch' %}">Incomplete Batches</a></li> -->
-          <li class="header__menuItem"><a href="{% url 'landingBatches' %}">Search</a></li>          
+          <li class="header__menuItem"><a href="{% url 'landingBatches' %}">Search</a></li>
+          <li class="header__menuItem"><a href="{% url 'help' %}">Help</a></li>
+          <li class="header__menuItem"><a href="{% url 'logout' %}" class="btn btn--sub">Logout</a></li>
+          {% else %}
           <li class="header__menuItem"><a href="{% url 'help' %}">Help</a></li>
           <li class="header__menuItem"><a href="{% url 'login' %}" class="btn btn--sub">Login</a></li>
+          {% endif %}
         </ul>
       </nav>
     </div>

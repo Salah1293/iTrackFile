@@ -1,40 +1,39 @@
 
+
 {% extends 'main.html' %}
 {% load static %}
 {% block content %}
 
-<!-- Main Section -->
-<main class="batches">
-   
-    <!-- Search Result: BatchList -->
+
+<main class="batches">  
     <section id="batchy" class="batchList">
       <div class="container">  
         <div class="column">
           <div id="table-title-container">
-          <h2 id="tableName">LAW & CHANCERY</h2>
-          </div>
-         
+            <h2 id="tableName">LAW & CHANCERY</h2>
+            </div>
+            
           <div id="table-container" class="table-container">
-          <table id="my-styled-table" class="table table-striped my-styled-table" style="width:100%">
+            <div class="table-wrapper">
+            <table id="my-styled-table" class="table table-striped my-styled-table" style="width:100%">
             <thead>
                 <tr>
-                    <th>Date</th>
-                    <th>LAW/CHANCERY#</th>
-                    <th>Document Creation Date</th>
-                    <th>Document ID</th>
+                  <th>Date</th>
+                  <th>LAW/CHANCERY#</th>
+                  <th>Document Creation Date</th>
+                  <th>Document ID</th>
+                  </tr> 
             </thead>    
             <tbody>
-              <div class="table-body">
-                {% with data=lawChancery|default:tableData %}              
-              {% for element in data %}
-              <tr onclick="redirectToSingleImage('{{element.docid}}', '{{ all_ids|join:',' }}')">
-                  <td>{% if element.docindex1 %}{{ element.docindex1 }}{% endif %}</td>
+              <div class="table-body">              
+              {% for element in section_result %}
+              <tr onclick="redirectToSingleImage('{{ section }}', '{{ element.docid }}', '{{ all_ids|join:',' }}')">
+                <td>{% if element.docindex1 %}{{ element.docindex1 }}{% endif %}</td>
                   <td>{% if element.docindex2 %}{{ element.docindex2 }}{% endif %}</td>
                   <td>{% if element.createdate %}{{ element.createdate }}{% endif %}</td>
                   <td>{% if element.docid %}{{ element.docid }}{% endif %}</td>
                 </tr>
                 {% endfor %}
-                {% endwith %}
               </div>
             </tbody>
         </table>
@@ -45,9 +44,9 @@
           
         </div>     
     </section>
-    {% include 'pagination.html' with queryset=lawChancery custom_range=custom_range %}
+    {% include 'pagination.html' with queryset=section_result custom_range=custom_range %}
 </main>
 
-<script src="{% static 'js/scripts.js' %}"></script>
+<script src="{% static 'js/results.js' %}"></script>
 
 {% endblock content %}

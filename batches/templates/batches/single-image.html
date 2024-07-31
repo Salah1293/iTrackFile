@@ -19,7 +19,7 @@
             {% if last_doc != None %}
             <span id="spanButton" class="lastBtn" data-item-id="{{ last_doc }}">Last</span> 
             {% endif %}  
-            <span id="spanButton" onclick="displayPrintImagePopup()">Print</span>
+            <span id="spanButton" class="printbtn" onclick="showPrintPopup()">Print</span>
             <span id="spanButton" onclick="rotateImage()">Rotate</span>
             <span id="spanButton" onclick="resetTransform()">Reset</span>
             <span id="spanButton" class="editbtn">Edit</span>             
@@ -29,34 +29,43 @@
           <div id="singleSelectedImage" class="image-container">
             {% if image_data %}
             <input type="hidden" id="imageDataArr" value="{{ image_data }}">
+            <input type="hidden" id="section" value="{{ section }}">
+
                 <img id="selectedImage" class="singleBatch__preview" src="data:image/jpeg;base64,{{ image_data.0 }}" alt="Image">
+                
                 {% if image_data|length > 1 %}   
-                <p id="imageIndexParagraph" class="image-index" >{{ ccurrent_index|default:1 }} of {{ image_data_length }}</p>
+
                 <button class="prevImageBtn" style="display: none;" onclick="navigateImage(-1)">❮</button>
                 <button class="nextImageBtn" onclick="navigateImage(1)">❯</button>
                 <input type="hidden" id="imageDataLength" value="{{ image_data_length }}">
                 <input type="hidden" id="currentImageIndex" value="0">
                 {% endif %}
             {% else %}
-                <p>No images available.</p>
+                <p>No images available</p>
             {% endif %}
          </div>
 
-          <div class="popup" id="popup">
+          <div class="popup" id="draggableForm">
+            <div id="drag-handle">
             <div class="close-btn">&times;</div>
           <form  method="POST">
-            <h2>Update Info</h2>
+            <h2 >Update Info</h2>
             {% csrf_token %}
-            <div class="form-element">
+            <div class="scrollable-fields">
               {% for field in form %}
-              <label>{{field.label}}</label>
-              {{field}}
-              {% endfor %}      
+              <div class="form-element">
+                <label >{{ field.label }}</label>
+                {{ field }}
+              </div>
+              {% endfor %}
             </div>
             <br>
             <button name="edit" id="spanButton" class="cls" type="submit">Update</button> 
+            <button id="spanButton" class="cancel-btn" type="button">Cancel</button>
           </form>
-        </div>
+           </div>
+           </div>
+
         <div class="delete-popup" id="delete-popup">
           <div class="close-btn">&times;</div>
           <form  method="POST">
@@ -69,51 +78,21 @@
           </form>
         </div>  
 
-
-
-
-        <div id="printImagePopup" class="popup-print">
-          <div class="popup-content">
-              <span class="close-btn" onclick="closePrintImagePopup()">&times;</span>           
-              <div class="print-icon" onclick="printImage()">
-                <i class="fas fa-print"></i>
-              </div>            
-              <div class="image-container">
-                  <img id="printableImage" src="" alt="Printable Image">              
-              </div>
+      <div class="print-popup" id="print-popup">
+          <div class="close-btn" onclick="closePrintPopup()">&times;</div>
+          <h2>Select Images to Print</h2>
+          <div id="print-images-container">
+              <!-- <textarea id="imageIndices" ></textarea> -->
           </div>
-      </div>
-
-
-
-<div id="printOptionsPopup" class="popup-print" style="display: none;">
-  <div class="popup-content">
-      <span class="close-btn" onclick="closePrintOptionsPopup()">&times;</span>
-      
-      {% if image_data|length > 1 %}
-        <div class="print-options">
-          <input type="checkbox" id="printCurrentImage" checked>current image
-          <input type="checkbox" id="printAllImages">all images
+          <input type="hidden" id="imageDataArr" value="{{ image_data }}">
           <br>
-          <button onclick="printSelectedImages()">Print</button>
-        </div>
-      {% endif %}
-      
-      <div class="image-container">
-        <img id="printableImage" src="" alt="Printable Image">
+          <button id="spanButton" class="cls" type="button" onclick="printImages()">Print</button>
+          <button id="spanButton" class="cancel-btn" type="button" onclick="closePrintPopup()">Cancel</button>
       </div>
-  </div>
-</div>
-      
 
-        <div id="printPopup" class="popup" style="display: none;">
-          <img id="printImage" class="singleBatch__preview" src="" alt="Image for printing">
-        </div>
+    </div>
 
-      </div>
   </main>
-
-
   <script src="{% static 'js/single-image.js' %}"></script>
 
 {% endblock content %}

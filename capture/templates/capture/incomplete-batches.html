@@ -1,0 +1,53 @@
+
+
+{% extends 'main.html' %}
+{% load static %}
+{% block content %}
+
+
+<main class="batches">  
+    <section id="batchy" class="batchList">
+      <div class="container">  
+        <div class="column">
+          <div id="table-title-container">
+            <h2 id="tableName">Incomplete Batches</h2>
+          </div>
+          <div id="table-container" class="table-container">  
+            <table id="my-styled-table" class="table table-striped my-styled-table" >
+            <thead>
+                <tr>
+                  <th>Batch Name</th>
+                  <th>Operator Provided Date</th>
+                  <th>Batch Description</th>
+                  <th>Job Name</th>
+                  <th>Batch ID</th>
+                  <th>Batch Created Date</th>
+                    </tr>
+            </thead>    
+            <tbody>
+              <div class="table-body">   
+              {% for element in incomplete_batches %}
+                <!-- <tr onclick="redirectToSingleImage('{{element.docid}}', '{{ all_ids|join:',' }}')"> -->
+                  <td>{{element.name}}</td>
+                    <td>{{element.jobstart}}</td>
+                    <td>{{element.description}}</td>
+                    <td>{{element.description}}</td>
+                    <td>{{element.batchid}}</td>
+                    <td>{{element.jobstart}}</td>
+                </tr>
+                {% endfor %}
+              </div>
+            </tbody>
+        </table>
+        </div>
+        <br>
+        <p id="result">Result : <span id="resultCount">{{ resultCount }}</span> row{{ resultCount|pluralize:'s'}}</p>
+      </div>
+          </div>        
+    </section>
+    <!-- {% include 'pagination.html' with queryset=section_result custom_range=custom_range %} -->
+</main>
+
+<script src="{% static 'js/results.js' %}"></script>
+
+{% endblock content %}

@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect
 from .models import *
 from django.db.models import Q, Value
-# from django.db.models.functions import Cast
 from .utils import *
 from .forms import *
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
@@ -13,8 +12,13 @@ import base64
 import io
 from PIL import Image
 from django.http import JsonResponse
-from django.db import connection
-from django.core.cache import cache
+from django.template.loader import render_to_string
+from users.decorators import *
+from users.decorators import roles_required 
+from django.contrib.auth.decorators import login_required
+from django.contrib.messages import error
+from users.models import PvdmUsers1, Role
+
 
 
 # Create your views here.
@@ -22,157 +26,102 @@ from django.core.cache import cache
 
 
 
+# @login_required
+# @roles_required('admin', 'hr_manager', 'hr_staff', 'general_staff', 'historic_staff')
+def landingBatches (request):
+    if not request.user.is_authenticated:
+        error(request, "You do not have permission to view this page.")
+        return redirect('login')
+
+    return render(request , 'batches/landing-page.html')
 
 #general search
+@login_required
+@roles_required('admin', 'hr_manager', 'hr_staff', 'general_staff', 'historic_staff')
 def general_search(request):
     
     query = request.GET.get('text', '')
 
+    if not query:
+        return render(request, 'batches/landing-page.html', {'query': query})
+    
+    all_results = generate_all_results(query)
 
-
-    # cached_results = cache.get(query)
-    # if cached_results:
-    #     return cached_results
-
-    criminal_query = (Q(docindex1=query) | Q(docindex3=query) |
-                        Q(docindex6=query) | Q(docindex7=query) |
-                        Q(docindex10=query))
-    
-    indictments_query = (Q(docindex1=query) | Q(docindex2=query) |
-                        Q(docindex3=query) | Q(docindex4=query) |
-                        Q(docindex5=query) | Q(docindex6=query) |
-                        Q(docindex7=query))
-    
-    concealed_weapons_query = (Q(docindex1=query) | Q(docindex3=query) |
-                        Q(docindex4=query) | Q(docindex7=query) |
-                        Q(docindex8=query) | Q(docindex9=query) |
-                        Q(docindex10=query))
-    
-    historic_order_books_query = (Q(docindex1=query) | Q(docindex2=query) |
-                        Q(docindex3=query))
-    
-    historic_index_cards_query = (Q(docindex1=query) | Q(docindex2=query) |
-                        Q(docindex3=query) | Q(docindex5=query) |
-                        Q(docindex6=query) | Q(docindex8=query))
-    
-    destruction_orders_query = (Q(docindex1=query))
-    
-    bond_books_query = (Q(docindex1=query) | Q(docindex2=query))
-    
-    civil_query = (Q(docindex1=query) | Q(docindex3=query) |
-                        Q(docindex6=query) | Q(docindex7=query) |
-                        Q(docindex8=query) |  Q(docindex11=query) |
-                        Q(docindex12=query))
-    
-    criminal_juvenile_query = (Q(docindex1=query) | Q(docindex3=query) |
-                        Q(docindex6=query) | Q(docindex7=query) |
-                        Q(docindex11=query) | Q(docindex12=query))
-    
-    adoption_query = (Q(docindex1=query) | Q(docindex3=query) |
-                        Q(docindex6=query) | Q(docindex7=query) |
-                        Q(docindex8=query))
-    
-    hr_query = (Q(docindex1=query) | Q(docindex2=query) |
-                        Q(docindex3=query) | Q(docindex4=query))
-    
-    law_chancery_query = (Q(docindex1=query) | Q(docindex2=query))
-    
-    criminal_cases_query = (Q(docindex1=query) | Q(docindex2=query) |
-                        Q(docindex3=query) | Q(docindex4=query))
-    
-    clerk_orders_query = (Q(docindex1=query) | Q(docindex3=query) |
-                        Q(docindex4=query) | Q(docindex6=query) |
-                        Q(docindex7=query))
-    
-    charters_query = (Q(docindex1=query) | Q(docindex2=query))
-
-
-    criminal_results = PvdmDocs11.objects.filter(criminal_query).annotate(table_name=Value('PvdmDocs11', output_field=models.CharField()))
-    indictments_results = PvdmDocs110.objects.filter(indictments_query).annotate(table_name=Value('PvdmDocs110', output_field=models.CharField()))
-    concealed_weapons_results = PvdmDocs112.objects.filter(concealed_weapons_query).annotate(table_name=Value('PvdmDocs112', output_field=models.CharField()))
-    historic_order_books_results = PvdmDocs113.objects.filter(historic_order_books_query).annotate(table_name=Value('PvdmDocs113', output_field=models.CharField()))
-    historic_index_cards_results = PvdmDocs114.objects.filter(historic_index_cards_query).annotate(table_name=Value('PvdmDocs114', output_field=models.CharField()))
-    destruction_orders_results = PvdmDocs115.objects.filter(destruction_orders_query).annotate(table_name=Value('PvdmDocs115', output_field=models.CharField()))
-    bond_books_results = PvdmDocs116.objects.filter(bond_books_query).annotate(table_name=Value('PvdmDocs116', output_field=models.CharField()))
-    civil_results = PvdmDocs12.objects.filter(civil_query).annotate(table_name=Value('PvdmDocs12', output_field=models.CharField()))
-    criminal_juvenile_results = PvdmDocs13.objects.filter(criminal_juvenile_query).annotate(table_name=Value('PvdmDocs13', output_field=models.CharField()))
-    adoption_results = PvdmDocs14.objects.filter(adoption_query).annotate(table_name=Value('PvdmDocs14', output_field=models.CharField()))
-    hr_results = PvdmDocs15.objects.filter(hr_query).annotate(table_name=Value('PvdmDocs15', output_field=models.CharField()))
-    law_chancery_results = PvdmDocs16.objects.filter(law_chancery_query).annotate(table_name=Value('PvdmDocs16', output_field=models.CharField()))
-    criminal_cases_results = PvdmDocs17.objects.filter(criminal_cases_query).annotate(table_name=Value('PvdmDocs17', output_field=models.CharField()))
-    clerk_orders_results = PvdmDocs18.objects.filter(clerk_orders_query).annotate(table_name=Value('PvdmDocs18', output_field=models.CharField()))
-    charters_results = PvdmDocs19.objects.filter(charters_query).annotate(table_name=Value('PvdmDocs19', output_field=models.CharField()))
-
-
-    all_results = {
-        'Criminal': criminal_results,
-        'Indictments': indictments_results,
-        'Concealed Weapons': concealed_weapons_results,
-        'Historic Order Books': historic_order_books_results,
-        'Historic Index Cards': historic_index_cards_results,
-        'Destruction Orders': destruction_orders_results,
-        'Bond Books': bond_books_results,
-        'Civil': civil_results,
-        'Criminal Juvenile': criminal_juvenile_results,
-        'Adoption': adoption_results,
-        'HR': hr_results,
-        'Law Chancery': law_chancery_results,
-        'Criminal Cases': criminal_cases_results,
-        'Clerk Orders': clerk_orders_results,
-        'Charters': charters_results,
-    }
-
-    # cache.set(query, all_results, timeout=3600)
-
-    print('all results:', all_results)
-    # print(str(criminal_results.query))
-
-
- 
+   
     context = {'query' : query, 'all_results' : all_results}
     return render(request, 'batches/general-results.html', context)
 
 
+#display results for individual court section
+@login_required
+@roles_required('admin', 'hr_manager', 'hr_staff', 'general_staff', 'historic_staff')
+def view_section_results(request):
+    chosen_section = request.GET.get('table_name')
+    query = request.GET.get('query')
 
-def updateBatch (request):
 
-    return render(request , 'batches/update-batch.html')
+    section = get_section_name(chosen_section)
 
-def incompleteBatch (request):
-    civil = PvdmDocs12.objects.all()
-    context = {'civil':civil}
+    if chosen_section and query:
+        all_results = generate_all_results(query, chosen_section)
 
-    return render(request , 'batches/incomplete-batches.html', context)
+        section_result = None
+        for result in all_results.values():
+            if result:
+                section_result = result
+                break
 
+
+        if not section_result:
+            return render(request, 'batches/general-results.html')
+
+        
+
+        resultCount = section_result.count() if query else 0
+
+  
+        custom_range, section_result = paginate(request, section_result)
+
+
+        all_ids = []
+        for obj in section_result.object_list:
+            all_ids.append(obj.docid)
+
+
+        template_name = f"batches/{chosen_section.lower().replace(' ', '-')}-results.html"
+
+
+        context = {'section_result': section_result,
+                    'custom_range': custom_range,
+                   'all_ids': all_ids,
+                   'resultCount': resultCount,
+                   'section': section
+                   }
+
+        return render(request, template_name, context)
+
+
+    else:
+        return render(request, 'batches/general-results.html')
+    
+
+
+@login_required
 def fillingBatch (request):
 
     return render(request , 'batches/filling-batch.html')
 
-def landingBatches (request):
 
-    return render(request , 'batches/landing-page.html')
-
-# def singleBatch (request):
-
-#     return render(request , 'batches/single-batch.html')
-
-def newBatch (request):
-
-    return render(request , 'batches/new-batch.html')
-
-def scannerSetting (request):
-
-    return render(request , 'batches/scanner-setting.html')
-
-def capture (request):
-
-    return render(request , 'batches/capture.html')
 
 #criminal search
+@login_required
+@roles_required('admin', 'hr_manager', 'hr_staff', 'general_staff', 'historic_staff')
 def criminalSearch(request):
     return createForm(request, 'batches/criminal-search.html', CriminalForm)
 
 #criminal display resylts
+@login_required
+@roles_required('admin', 'hr_manager', 'hr_staff', 'general_staff', 'historic_staff')
 def criminalResults (request):
 
     form = CriminalForm()
@@ -202,27 +151,33 @@ def criminalResults (request):
             resultCount = criminal.count() if query else 0
 
             custom_range, criminal = paginate(request, criminal)
+
+            all_ids = criminal.object_list.values_list('docid', flat=True)
+
                     
-            context = {'form': form, 'criminal': criminal,
+            context = {'section_result': criminal,
                        'resultCount' : resultCount,
-                         'custom_range' : custom_range}
+                         'custom_range' : custom_range,
+                         'all_ids': all_ids,
+                         'section': 'criminal'}
             return render(request, 'batches/criminal-results.html', context)
 
-    context={'form' : form, 'criminal' : PvdmDocs11.objects.none(), 'resultCount' : 0}    
+    context={'section_result' : PvdmDocs11.objects.none(), 'resultCount' : 0}    
     return redirect('criminalResults')
 
 
-#display images for criminal
-def display_results_criminal(request, pk):
-    return singleImageView(request, pk, PvdmDocs11, PvdmObjs11, UpdateCriminal)
 
 
 #civil search
+@login_required
+@roles_required('admin', 'hr_manager', 'hr_staff', 'general_staff', 'historic_staff')
 def civilSearch (request):
     return createForm(request, 'batches/civil-search.html', CivilForm)
 
 
 #civil display resylts
+@login_required
+@roles_required('admin', 'hr_manager', 'hr_staff', 'general_staff', 'historic_staff')
 def civilResults (request):
     form = CivilForm()
 
@@ -251,12 +206,6 @@ def civilResults (request):
                 query &= (Q(docindex12=first_name) | Q(docindex7=first_name) |
                           Q(docindex17=first_name))
                 
-            # if last_name and not (case_number or start_date or end_date or first_name):
-            #     query &= (Q(docindex11=last_name) | Q(docindex6=last_name))
-
-            # if first_name and not (case_number or start_date or end_date or last_name):
-            #     query &= (Q(docindex12=first_name) | Q(docindex7=first_name))
-            
 
 
             civil = PvdmDocs12.objects.filter(query) if query else PvdmDocs12.objects.none()
@@ -265,30 +214,34 @@ def civilResults (request):
 
             custom_range, civil = paginate(request, civil)
 
-            #     civil = PvdmDocs12.objects.none()
+            all_ids = civil.object_list.values_list('docid', flat=True)
 
-            context = {'form': form, 'civil': civil,
+
+            context = {'section_result': civil,
                         'resultCount' : resultCount,
-                         'custom_range' : custom_range}
+                         'custom_range' : custom_range,
+                         'all_ids': all_ids,
+                         'section': 'civil'}
             return render(request, 'batches/civil-results.html', context)
         
     
-    context={'form' : form, 'civil' : PvdmDocs12.objects.none(), 'resultCount' : 0}    
+    context={'section_result' : PvdmDocs12.objects.none(), 'resultCount' : 0}    
     return redirect('civilResults')
 
 
 
-#display images for civil
-def display_results_civil(request, pk):
-    return singleImageView(request, pk, PvdmDocs12, PvdmObjs12, UpdateCivil)
 
 
 #criminal cases search
+@login_required
+@roles_required('admin', 'hr_manager', 'hr_staff', 'general_staff', 'historic_staff')
 def criminalCasesSearch (request):
     return createForm(request, 'batches/criminal-cases-search.html', CriminalCasesForm)
 
 
 #criminal cases display results
+@login_required
+@roles_required('admin', 'hr_manager', 'hr_staff', 'general_staff', 'historic_staff')
 def criminalCasesResults(request):
     form = CriminalCasesForm()
     if request.method == "GET":
@@ -319,28 +272,34 @@ def criminalCasesResults(request):
 
             custom_range, criminalCases = paginate(request, criminalCases)
 
-            context = {'form': form, 'criminalCases': criminalCases,
+            all_ids = criminalCases.object_list.values_list('docid', flat=True)
+
+
+            context = {'section_result': criminalCases,
                         'resultCount' : resultCount,
-                         'custom_range' : custom_range}
+                         'custom_range' : custom_range,
+                         'all_ids': all_ids,
+                         'section': 'criminal-cases'}
             return render(request, 'batches/criminal-cases-results.html', context)
         
     
-    context={'form' : form, 'criminalCases' : PvdmDocs17.objects.none(), 'resultCount' : 0}    
+    context={'section_result' : PvdmDocs17.objects.none(), 'resultCount' : 0}    
     return redirect('criminalCasesResults')
         
 
 
-#display images for criminal cases
-def display_results_criminal_cases(request, pk):
-    return singleImageView(request, pk, PvdmDocs17, PvdmObjs17, UpdateCriminalCases)
 
 
 #criminal junevile search
+@login_required
+@roles_required('admin', 'hr_manager', 'hr_staff', 'general_staff', 'historic_staff')
 def criminalJuvenileSearch (request):
     return createForm(request, 'batches/criminal-juvenile-Search.html', CriminalJuvenileForm)
 
 
 #criminal junevile display results
+@login_required
+@roles_required('admin', 'hr_manager', 'hr_staff', 'general_staff', 'historic_staff')
 def criminalJuvenileResults (request):
     form = CriminalJuvenileForm()
     if request.method == 'GET':
@@ -371,28 +330,34 @@ def criminalJuvenileResults (request):
 
             custom_range, ciminalJuvenile = paginate(request, ciminalJuvenile)
 
-            context = {'form' : form,'ciminalJuvenile' : ciminalJuvenile,
+            all_ids = ciminalJuvenile.object_list.values_list('docid', flat=True)
+
+
+            context = {'section_result' : ciminalJuvenile,
                         'resultCount' : resultCount,
-                         'custom_range' : custom_range}
+                         'custom_range' : custom_range,
+                         'all_ids': all_ids,
+                         'section': 'criminal-juvenile'}
             return render(request, 'batches/criminal-juvenile-results.html', context)
         
     
-    context={'form' : form, 'ciminalJuvenile' : PvdmDocs13.objects.none(), 'resultCount' : 0}    
+    context={'section_result' : PvdmDocs13.objects.none(), 'resultCount' : 0}    
     return redirect('criminalJuvenileResults')
 
 
-#display images for ciminal Juvenile
-def display_results_ciminal_Juvenile(request, pk):
-    return singleImageView(request, pk, PvdmDocs17, PvdmObjs17, UpdateCriminalJuvenile)
 
 
    
 #historic index cards search
+@login_required
+@roles_required('admin', 'hr_manager', 'hr_staff', 'general_staff', 'historic_staff')
 def historicIndexCardsSearch (request):
     return createForm(request, 'batches/hisoric-index-cards-search.html', HistoricIndexCardsForm)
 
 
 #historic index cards display results
+@login_required
+@roles_required('admin', 'hr_manager', 'hr_staff', 'general_staff', 'historic_staff')
 def historicIndexCardsResults(request):
     form = HistoricIndexCardsForm()
     if request.method == 'GET':
@@ -412,45 +377,57 @@ def historicIndexCardsResults(request):
 
             historicIndexCards = PvdmDocs114.objects.filter(query) if query else PvdmDocs114.objects.none()
 
+
             resultCount = historicIndexCards.count() if query else 0
 
             custom_range, historicIndexCards = paginate(request, historicIndexCards)
 
-            context = {'form' : form, 'historicIndexCards': historicIndexCards, 
+
+
+            all_ids = historicIndexCards.object_list.values_list('docid', flat=True)
+
+
+            context = {'section_result': historicIndexCards, 
                        'resultCount' : resultCount,
-                         'custom_range' : custom_range}
+                         'custom_range' : custom_range,
+                         'all_ids': all_ids,
+                         'section': 'historic-index-cards'}
             return render(request, 'batches/historic-index-cards-results.html', context)
         
 
-    context = {'form' : form, 'historicIndexCards' : PvdmDocs114.objects.none(), 'resultCount' : 0}
+    context = {'section_result' : PvdmDocs114.objects.none(), 'resultCount' : 0}
     return redirect('hitoricIndexCardsResults')
 
 
 
-#display images for historic index cards
-def display_results_historic_index_cards(request, pk):
-    return singleImageView(request, pk, PvdmDocs114, PvdmObjs114, UpdateHistoricIndexCards)
-
 
 #historic order books search
+@login_required
+@roles_required('admin', 'hr_manager', 'hr_staff', 'general_staff', 'historic_staff')
 def historicOrderBooksSearch (request):
     return createForm(request, 'batches/historic-order-books-Search.html', HistoricOrderBooksForm)
 
 
 #historic order books display results
+@login_required
+@roles_required('admin', 'hr_manager', 'hr_staff', 'general_staff', 'historic_staff')
 def historicOrderBooksResults(request):
     form = HistoricOrderBooksForm()
     
     if request.method == 'GET':
         form = HistoricOrderBooksForm(request.GET)
         if form.is_valid():
+            book_type = form.cleaned_data.get('docindex1', '')
             year = form.cleaned_data.get('docindex2', '')
 
 
             query = Q()
 
+
+            if book_type:
+                query &= Q(docindex1=book_type)
             if year:
-                query &= Q(docindex1=year)
+                query &= Q(docindex2=year)
 
 
             historicOrderBooks = PvdmDocs113.objects.filter(query) if query else PvdmDocs113.objects.none()
@@ -459,26 +436,32 @@ def historicOrderBooksResults(request):
 
             custom_range, historicOrderBooks = paginate(request, historicOrderBooks)
 
-            context = {'form' : form, 'historicOrderBooks' : historicOrderBooks,
+            all_ids = historicOrderBooks.object_list.values_list('docid', flat=True)
+
+
+            context = {'section_result' : historicOrderBooks,
                         'resultCount' : resultCount,
-                         'custom_range' : custom_range}
+                         'custom_range' : custom_range,
+                         'all_ids': all_ids,
+                         'section': 'historic-order-books'}
             return render(request, 'batches/historic-order-books-results.html', context)
 
-    context = {'form' : form, 'historicOrderBooks' : PvdmDocs113.objects.none(), 'resultCount' : 0}
+    context = {'section_result' : PvdmDocs113.objects.none(), 'resultCount' : 0}
     return redirect('historicOrderBooks')
 
 
-#display images for historic order books
-def display_results_historic_order_books(request, pk):
-    return singleImageView(request, pk, PvdmDocs114, PvdmObjs114, UpdateHistoricOrderBooks)
 
 
-
-#he search
+#hr search
+@login_required
+@roles_required('hr_manager', 'hr_staff', 'it_manager')
 def hrSearch (request):
     return createForm(request, 'batches/hr-search.html', HrForm)
 
+
 #hr display results
+@login_required
+@roles_required('admin', 'hr_manager' , 'hr_staff')
 def hrResults(request):
 
     form = HrForm()
@@ -500,32 +483,54 @@ def hrResults(request):
                 query &= Q(docindex3=ein)
 
 
+            try:
+                login_user = PvdmUsers1.objects.get(user=request.user)
+                login_user_role = login_user.role.name
+
+                if login_user_role == 'hr_manager':
+                    query &= Q(docindex6__in=['Medical', 'Personnel']) | Q(docindex6 = None)
+
+                elif login_user_role == 'hr_staff':
+                    query &= Q(docindex6__in='Personnel') | Q(docindex6 = None)
+
+            except PvdmUsers1.DoesNotExist:
+                query = Q(pk=-1)
+
+
+
             hr = PvdmDocs15.objects.filter(query) if query else PvdmDocs15.objects.none()
 
             resultCount = hr.count() if query else 0
 
             custom_range, hr = paginate(request, hr)
 
-            context = {'form' : form, 'hr' : hr,
+            all_ids = hr.object_list.values_list('docid', flat=True)
+            
+
+
+            context = {'section_result' : hr,
                         'resultCount' : resultCount,
-                         'custom_range' : custom_range}
+                         'custom_range' : custom_range,
+                         'all_ids': all_ids,
+                         'section': 'hr'}
             return render(request, 'batches/hr-results.html', context)
         
 
-    context = {'form' : form, 'hr' : PvdmDocs15.objects.none(), 'resultCount' : 0}
+    context = {'section_result' : PvdmDocs15.objects.none(), 'resultCount' : 0}
     return render(request, 'batches/hr-results.html', context)
 
 
-#display images for hr
-def display_results_hr(request, pk):
-    return singleImageView(request, pk, PvdmDocs14, PvdmObjs14, UpdateHr)
 
 
 #bond books search
+@login_required
+@roles_required('admin', 'hr_manager', 'hr_staff', 'general_staff', 'historic_staff')
 def bondBooksSearch(request):
     return createForm(request, 'batches/bond-books-search.html', BondBooksForm)
 
 #bond books display results
+@login_required
+@roles_required('admin', 'hr_manager', 'hr_staff', 'general_staff', 'historic_staff')
 def bondBooksResults(request):
 
     form = BondBooksForm()
@@ -552,37 +557,39 @@ def bondBooksResults(request):
 
             resultCount = bondBooks.count() if query else 0
 
-
             custom_range, bondBooks = paginate(request, bondBooks)
 
+          
+
             all_ids = bondBooks.object_list.values_list('docid', flat=True)
+            
 
         
-            context = {'bondBooks' : bondBooks,
+            context = {'section_result' : bondBooks,
                         'resultCount' : resultCount,
                          'custom_range' : custom_range,
-                         'all_ids': all_ids
-                         }
+                         'all_ids': all_ids,
+                         'section': 'bond'}
             return render(request, 'batches/bond-books-results.html', context)
         
         
         
 
-    context = {'bondBooks' : bondBooks, 'resultCount' : resultCount}
+    context = {'section_result' : PvdmDocs116.objects.none(), 'resultCount' : resultCount}
     return render(request, 'batches/bond-books-results.html', context)
     
 
-#display images for bond books
-def display_results_bond_books(request, pk):
-    return singleImageView(request, pk, PvdmDocs116, PvdmObjs116, UpdateBondBooks)
-
 
 #charters search
+@login_required
+@roles_required('admin', 'hr_manager', 'hr_staff', 'general_staff', 'historic_staff')
 def chartersSearch(request):
     return createForm(request, 'batches/charters-search.html', ChartersForm)
 
 
 #charters display results
+@login_required
+@roles_required('admin', 'hr_manager', 'hr_staff', 'general_staff', 'historic_staff')
 def chartersResults(request):
     form = ChartersForm()
     if request.method == 'GET':
@@ -609,30 +616,34 @@ def chartersResults(request):
 
             custom_range, charters = paginate(request, charters)
 
-            context = {'form' : form, 'charters' : charters,
+            all_ids = charters.object_list.values_list('docid', flat=True)
+
+
+            context = {'section_result' : charters,
                         'resultCount' : resultCount,
-                         'custom_range' : custom_range}
+                         'custom_range' : custom_range,
+                         'all_ids': all_ids,
+                         'section': 'charters'}
             return render(request, 'batches/charters-results.html', context)
         
 
-    context = {'form' : form, 'charters' : PvdmDocs19.objects.none(), 'resultCount' : 0}
+    context = {'section_result' : PvdmDocs19.objects.none(), 'resultCount' : 0}
     return render(request, 'batches/charters-results.html', context)
 
 
 
 
-#display images for charters
-def display_results_charters(request, pk):
-    return singleImageView(request, pk, PvdmDocs19, PvdmObjs19, UpdateCharters)
-
-
 
 #concealed weapons search
+@login_required
+@roles_required('admin', 'hr_manager', 'hr_staff', 'general_staff', 'historic_staff')
 def ConcealedWeaponsSearch(request):
     return createForm(request, 'batches/concealed-weapons-search.html', ConcealedWeaponsForm)
 
 
 #concealed weapons display results
+@login_required
+@roles_required('admin', 'hr_manager', 'hr_staff', 'general_staff', 'historic_staff')
 def ConcealedWeaponsResults(request):
 
     form = ConcealedWeaponsForm()
@@ -663,28 +674,33 @@ def ConcealedWeaponsResults(request):
 
             custom_range, concealedWeapons = paginate(request, concealedWeapons)
 
-            context = {'form' : form, 'concealedWeapons' : concealedWeapons,
+            all_ids = concealedWeapons.object_list.values_list('docid', flat=True)
+
+
+            context = {'section_result' : concealedWeapons,
                         'resultCount' : resultCount,
-                         'custom_range' : custom_range}
+                         'custom_range' : custom_range,
+                         'all_ids': all_ids,
+                         'section': 'concealed-weapons'}
             return render(request, 'batches/concealed-weapons-results.html', context)
         
 
-    context = {'form' : form, 'concealedWeapons' : PvdmDocs112.objects.none(), 'resultCount' : 0}
+    context = {'section_result' : PvdmDocs112.objects.none(), 'resultCount' : 0}
     return render(request, 'batches/concealed-weapons-results.html', context)
 
 
 
-#display images for concealed Weapons
-def display_results_concealed_Weapons(request, pk):
-    return singleImageView(request, pk, PvdmDocs112, PvdmObjs112, UpdateConcealedWeapons)
-
 
 #indictmenys search
+@login_required
+@roles_required('admin', 'hr_manager', 'hr_staff', 'general_staff', 'historic_staff')
 def indictmentsSearch(request):
     return createForm(request, 'batches/indictments-search.html', IndictmentsForm)
 
 
 #indictmenys display results
+@login_required
+@roles_required('admin', 'hr_manager', 'hr_staff', 'general_staff', 'historic_staff')
 def indictmentsResults(request):
     form = IndictmentsForm()
     if request.method == 'GET':
@@ -711,27 +727,32 @@ def indictmentsResults(request):
 
             custom_range, indictments = paginate(request, indictments)
 
-            context = {'form' : form, 'indictments' : indictments,
+            all_ids = indictments.object_list.values_list('docid', flat=True)
+
+
+            context = {'section_result' : indictments,
                         'resultCount' : resultCount,
-                         'custom_range' : custom_range}
+                         'custom_range' : custom_range,
+                         'all_ids': all_ids,
+                         'section': 'indictments'}
             return render(request, 'batches/indictments-results.html', context)
         
-    context = {'form' : form, 'indictments' : PvdmDocs110.objects.none(), 'resultCount' : 0}
+    context = {'section_result' : PvdmDocs110.objects.none(), 'resultCount' : 0}
     return render(request, 'batches/indictments-results.html', context)
 
 
 
-#display images for indictments
-def display_results_indictments(request, pk):
-    return singleImageView(request, pk, PvdmDocs110, PvdmObjs110, UpdateIndictments)
-
 
 #law&chancery search
+@login_required
+@roles_required('admin', 'hr_manager', 'hr_staff', 'general_staff', 'historic_staff')
 def lawChancerySearch(request):
     return createForm(request, 'batches/law-chancery-search.html', LawChanceryForm)
 
 
-#bond law&chancery display results
+#law&chancery display results
+@login_required
+@roles_required('admin', 'hr_manager', 'hr_staff', 'general_staff', 'historic_staff')
 def lawChanceryResults(request):
     form = LawChanceryForm()
     if request.method == 'GET':
@@ -755,27 +776,33 @@ def lawChanceryResults(request):
 
             custom_range, lawChancery = paginate(request, lawChancery)
 
-            context = {'form' : form, 'lawChancery' : lawChancery,
+            all_ids = lawChancery.object_list.values_list('docid', flat=True)
+
+
+            context = {'section_result' : lawChancery,
                         'resultCount' : resultCount,
-                         'custom_range' : custom_range}
+                         'custom_range' : custom_range,
+                         'all_ids': all_ids,
+                         'section': 'law-chancery'}
             return render(request, 'batches/law-chancery-results.html', context)
         
-    context = {'form' : form, 'lawChancery' : PvdmDocs16.objects.none(), 'resultCount' : 0}
+    context = {'section_result' : PvdmDocs16.objects.none(), 'resultCount' : 0}
     return render(request, 'batches/law-chancery-results.html', context)
 
 
 
-#display images for law chancery
-def display_results_law_chancery(request, pk):
-    return singleImageView(request, pk, PvdmDocs16, PvdmObjs16, UpdateLawChancery)
 
 
 #destruction orders search
+@login_required
+@roles_required('admin', 'hr_manager', 'hr_staff', 'general_staff', 'historic_staff')
 def destructionOrdersSearch(request):
     return createForm(request, 'batches/destruction-orders-search.html', DestructionOrdersForm)
 
 
 #destruction orders display results
+@login_required
+@roles_required('admin', 'hr_manager', 'hr_staff', 'general_staff', 'historic_staff')
 def destructionOrdersResults(request):
     form = DestructionOrdersForm()
     if request.method == 'GET':
@@ -799,27 +826,32 @@ def destructionOrdersResults(request):
 
             custom_range, destructionOrders = paginate(request, destructionOrders)
 
-            context = {'form' : form, 'destructionOrders' : destructionOrders,
+            all_ids = destructionOrders.object_list.values_list('docid', flat=True)
+
+
+            context = {'section_result' : destructionOrders,
                         'resultCount' : resultCount,
-                         'custom_range' : custom_range}
+                         'custom_range' : custom_range,
+                         'all_ids': all_ids,
+                         'section': 'destruction-orders'}
             return render(request, 'batches/destruction-orders-results.html', context)
         
-    context = {'form' : form, 'lawChancery' : PvdmDocs115.objects.none(), 'resultCount' : 0}
+    context = {'section_result' : PvdmDocs115.objects.none(), 'resultCount' : 0}
     return render(request, 'batches/destruction-orders-results.html', context)
 
 
 
-#display images for destruction orders
-def display_results_destruction_orders(request, pk):
-    return singleImageView(request, pk, PvdmDocs115, PvdmObjs115, UpdateDestructionOrders)
-
 
 #adoption search
+@login_required
+@roles_required('admin', 'hr_manager', 'hr_staff', 'general_staff', 'historic_staff')
 def adoptionSearch(request):
     return createForm(request, 'batches/adoption-search.html', AdoptionForm)
 
 
 #adoption display results
+@login_required
+@roles_required('admin', 'hr_manager', 'hr_staff', 'general_staff', 'historic_staff')
 def adoptionResults(request):
     form = AdoptionForm()
     if request.method == 'GET':
@@ -852,27 +884,32 @@ def adoptionResults(request):
 
             custom_range, adoption = paginate(request, adoption)
 
-            context = {'form' : form, 'adoption' : adoption,
+            all_ids = adoption.object_list.values_list('docid', flat=True)
+
+
+            context = {'section_result' : adoption,
                         'resultCount' : resultCount,
-                         'custom_range' : custom_range}
+                         'custom_range' : custom_range,
+                         'all_ids': all_ids,
+                         'section': 'adoption'}
             return render(request, 'batches/adoption-results.html', context)
         
-    context = {'form' : form, 'lawChancery' : PvdmDocs14.objects.none(), 'resultCount' : 0}
+    context = {'section_result' : PvdmDocs14.objects.none(), 'resultCount' : 0}
     return render(request, 'batches/adoption-results.html', context)
 
 
 
-#display images for adoption
-def display_results_adoption(request, pk):
-    return singleImageView(request, pk, PvdmDocs14, PvdmObjs14, UpdateAdoption)
-
 
 #clerk orders search
+@login_required
+@roles_required('admin', 'hr_manager', 'hr_staff', 'general_staff', 'historic_staff')
 def clerkOrdersSearch(request):
     return createForm(request, 'batches/clerk-orders-search.html', ClerkOrdersForm)
 
 
 #clerk orders display results
+@login_required
+@roles_required('admin', 'hr_manager', 'hr_staff', 'general_staff', 'historic_staff')
 def clerkOrdersResults(request):
     form = ClerkOrdersForm()
     if request.method == 'GET':
@@ -920,15 +957,46 @@ def clerkOrdersResults(request):
 
             custom_range, clerkOrder = paginate(request, clerkOrder)
 
-            context = {'form' : form, 'clerkOrder' : clerkOrder,
+            all_ids = clerkOrder.object_list.values_list('docid', flat=True)
+
+
+            context = {'section_result' : clerkOrder,
                         'resultCount' : resultCount,
-                         'custom_range' : custom_range}
+                         'custom_range' : custom_range,
+                         'all_ids': all_ids,
+                         'section': 'clerk-orders'}
             return render(request, 'batches/clerk-orders-results.html', context)
         
-    context = {'form' : form, 'lawChancery' : PvdmDocs18.objects.none(), 'resultCount' : 0}
+    context = {'section_result' : PvdmDocs18.objects.none(), 'resultCount' : 0}
     return render(request, 'batches/clerk-orders-results.html', context)
 
 
-#display images for clerk orders
-def display_results_clerk_orders(request, pk):
-    return singleImageView(request, pk, PvdmDocs18, PvdmObjs18, UpdateClerkOrders)
+
+
+def single_image_view(request, section, pk):
+   
+    model_mapping = {
+        'bond': (PvdmDocs116, PvdmObjs116, UpdateBondBooks),
+        'criminal': (PvdmDocs11, PvdmObjs11, UpdateCriminal),
+        'civil': (PvdmDocs12, PvdmObjs12, UpdateCivil),
+        'criminal-cases': (PvdmDocs17, PvdmObjs17, UpdateCriminalCases),
+        'criminal-juvenile': (PvdmDocs13, PvdmObjs13, UpdateCriminalJuvenile),
+        'historic-index-cards': (PvdmDocs114, PvdmObjs114, UpdateHistoricIndexCards),
+        'historic-order-books': (PvdmDocs113, PvdmObjs113, UpdateHistoricOrderBooks),
+        'hr': (PvdmDocs15, PvdmObjs15, UpdateHr),
+        'charters': (PvdmDocs19, PvdmObjs19, UpdateCharters),
+        'concealed-weapons': (PvdmDocs112, PvdmObjs112, UpdateConcealedWeapons),
+        'indictments': (PvdmDocs110, PvdmObjs110, UpdateIndictments),
+        'law-chancery': (PvdmDocs16, PvdmObjs16, UpdateLawChancery),
+        'destruction-orders': (PvdmDocs115, PvdmObjs115, UpdateDestructionOrders),
+        'adoption': (PvdmDocs14, PvdmObjs14, UpdateAdoption),
+        'clerk-orders': (PvdmDocs18, PvdmObjs18, UpdateClerkOrders),
+    }
+
+    if section not in model_mapping:
+        raise ValueError("Invalid section")
+
+    doc_model, obj_model, card_form = model_mapping[section]
+
+
+    return singleImageView(request, pk, doc_model, obj_model, card_form, section)
