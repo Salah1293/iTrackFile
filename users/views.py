@@ -67,6 +67,44 @@ def logoutUser(request):
 
 
 @login_required
+def update_user_self(request):
+    login_user = get_object_or_404(PvdmUsers1, username=request.user)
+    user = login_user.user
+
+    if request.method == 'POST':
+        form = UserUpdateSelfForm(request.POST, instance=login_user)
+        if form.is_valid():
+            try:      
+                if (form.cleaned_data.get('password') or
+                     form.cleaned_data.get('username') or
+                     form.cleaned_data.get('fullname') or
+                     form.cleaned_data.get('email')):
+                    new_password = form.cleaned_data.get('password')
+                    login_user.username = form.cleaned_data.get('username')
+                    login_user.fullname = form.cleaned_data.get('fullname')
+                    login_user.email = form.cleaned_data.get('email')
+                    login_user.password = new_password
+                    user.set_password(new_password)
+
+
+                user.save()
+                login_user.save()
+                form.save()
+
+                return redirect('managing')
+            except IntegrityError:
+                messages.error(request, 'An error happens while updating.')
+        else:
+            messages.error(request, 'Form is mot Valid.')
+
+    else:
+        form = UserUpdateSelfForm(instance=login_user)
+
+
+    return render(request, 'users/update-profile.html', {'form': form})
+
+
+@login_required
 @roles_required('admin')
 def user_list(request):
     users = PvdmUsers1.objects.filter(isdeleted=False)
@@ -172,22 +210,20 @@ def myUser(request):
 
 
 
-# @login_required
-# def update_profile_self(request):
-#     user = request.user.pvdmusers1 
+@login_required
+@roles_required('admin')
+def reset_user_password(request, user_id):
+    try:
+        pvdm_user = PvdmUsers1.objects.get(pk=user_id)     
+        user = pvdm_user.user
+        new_password = pvdm_user.username
+        pvdm_user.password = pvdm_user.username
+        user.set_password(new_password)
+        user.save()
+        pvdm_user.save()
 
-#     if request.method == 'POST':
-#         form = UserSelfUpdateForm(request.POST, instance=user)
-#         if form.is_valid():
-#             form.save()
-#             messages.success(request, 'Your profile has been updated.')
-#             return redirect('landingBatches') 
-#         else:
-#             messages.error(request, 'Please correct the errors below.')
-#     else:
-#         form = UserSelfUpdateForm(instance=user)
+        messages.success(request, f"Password for {pvdm_user.username} has been reset to the username.")
+    except PvdmUsers1.DoesNotExist:
+        messages.error(request, 'User does not exist.')
 
-#     context = {
-#         'form': form
-#     }
-#     return render(request, 'users/update-profile.html', context)
+    return redirect('userList')

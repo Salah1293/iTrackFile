@@ -123,6 +123,27 @@ class HistoricIndexCardsForm(ModelForm):
 
 #classForm of historic order book
 class HistoricOrderBooksForm(ModelForm):
+
+    BOOK_TYPE_CHOICES = [
+    ('bond_book_1', 'Bond Book 1'),
+    ('court_order_superior', 'Court Order Superior'),
+    ('court_quarterly_sessions', 'Court Quarterly Sessions'),
+    ('estray_book', 'Estray Book'),
+    ('land_causes_1', 'Land Causes 1'),
+    ('land_causes_2', 'Land Causes 2'),
+    ('land_records_long_standing', 'Land Records Long Standing'),
+    ('minute_book', 'Minute Book'),
+    ('ordinary_bond_book', 'Ordinary Bond Book'),
+    ('quite_rents', 'Quite Rents'),
+    ('reg_free_negroes_val_2', 'Reg Free Negroes Val 2'),
+    ('reg_free_negroes_val_3', 'Reg Free Negroes Val 3'),
+    ('roads', 'Roads'),
+    ('surveys', 'Surveys'),
+]
+    
+    docindex1 = forms.ChoiceField(choices=BOOK_TYPE_CHOICES, required=True)
+
+
     class Meta:
         model = PvdmDocs113
         fields = ['docindex1', 'docindex2']
@@ -137,7 +158,9 @@ class HistoricOrderBooksForm(ModelForm):
 
         for name, field in self.fields.items():
             field.widget.attrs.update({'class' : 'input', 'autocomplete' : 'off'})
- 
+        self.fields['docindex1'].label = 'Book Type'
+
+
             
 #classForm of hr
 class HrForm(ModelForm):

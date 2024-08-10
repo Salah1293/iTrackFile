@@ -1,3 +1,4 @@
+import io
 from django.forms import ValidationError
 
 from iTrackFiles.settings import BASE_DIR
@@ -237,3 +238,24 @@ def save_image_names_to_database(docid, uploaded_images, section_name, image_cou
         trashdatetime=None,
         totalbytes=0
     )
+
+
+
+def convert_image_to_jpg(image):
+    img = Image.open(image)
+    images = []
+
+    
+    while True:
+        print("while started")
+        buffer = io.BytesIO()
+        img.convert('RGB').save(buffer, format='JPEG')
+        buffer.seek(0)
+        images.append(buffer.read())
+
+        try:
+            img.seek(img.tell() + 1)  
+        except EOFError:
+            break  
+
+    return images

@@ -9,5 +9,6 @@ urlpatterns =[
     path('new-batch/', views.new_batch, name="newBatch"),
     path('', views.capture, name="capture"),
     path('incomplete-batch/', views.incompleteBatch, name="incompleteBatch"),
+    path('delete-image/', views.delete_image, name='delete_image'),
 
 ]

@@ -13,6 +13,7 @@ urlpatterns =[
     path('create_user/', views.create_user, name='createUser'),
     path('update-user/<int:user_id>/', views.update_user, name='updateUser'),
     path('delete-user/<int:user_id>/', views.delete_user, name='deleteUser'),
-    # path('update-profile/', views.update_profile_self, name='update_profile_self'),
+    path('update-user/', views.update_user_self, name='updateUser'),
+    path('user/reset-password/<int:user_id>/', views.reset_user_password, name='resetUserPassword'),
 
 ]

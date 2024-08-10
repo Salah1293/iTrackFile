@@ -77,30 +77,45 @@ def create_batch(request):
 
 
 
-
-
 @login_required
 @csrf_exempt
 def upload_images(request):
-    print('triggered')
-
+    print('Triggered################################')
+    username = os.getlogin()
+    print("username+++", username)
     uploaded_file_urls = []
     if request.method == 'POST' and request.FILES.getlist('images'):
         images = request.FILES.getlist('images')
-        fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT))
+        fs = FileSystemStorage(location=settings.MEDIA_ROOT)
+
         for image in images:
-            filename = fs.save(image.name, image)
-            uploaded_file_urls.append(fs.url(filename))
-        
+            try:
+                if image.name.lower().endswith('.tif'):
+                    print('images is tiff')
+                    image_contents = convert_image_to_jpg(image)
+                    print('convert_image_to_jpg')
+                    base_filename = os.path.splitext(image.name)[0]
+                    
+                    for i, img_content in enumerate(image_contents):
+                        filename = f"{base_filename}_page_{i+1}.jpg"
+                        fs.save(filename, ContentFile(img_content))
+                        uploaded_file_urls.append(fs.url(filename))
+                else:
+                    filename = image.name
+                    fs.save(filename, image)
+                    uploaded_file_urls.append(fs.url(filename))
+
+            except Exception as e:
+                print(f"Error saving file {image.name}: {e}")
+
         if 'uploaded_images' not in request.session:
             request.session['uploaded_images'] = []
         request.session['uploaded_images'].extend(uploaded_file_urls)
 
-
         if 'image_count' not in request.session:
             request.session['image_count'] = 0
         request.session['image_count'] += len(images)
-
+        # print('len is:', )
 
     return JsonResponse({'uploaded_images': uploaded_file_urls})
 
@@ -109,20 +124,35 @@ def upload_images(request):
 @login_required
 @csrf_exempt
 def upload_scanned_images(request):
-    folder_path = 'D:\\Pics\\egypt\\egypt' 
+    # folder_path = 'D:\\Pics\\egypt\\egypt' 
+    # uploaded_file_urls = []
+    # print('triggered')
+
+    username = os.getlogin()
+    print("username________________", username )
+    # folder_path = f'C:\\Users\\{username}\\Documents\\Scanned Documents' 
+    folder_path = f'C:\\Users\\{username}\\Downloads\\pics' 
+    print("folder_path________________", folder_path )
     uploaded_file_urls = []
     print('triggered')
+    print('dirs are:',os.listdir(folder_path))
     
+    print(f"Checking folder path: {folder_path}")
     if not os.path.exists(folder_path):
+        print(f"Folder does not exist: {folder_path}")
         return JsonResponse({'error': 'Scanned images folder does not exist'}, status=400)
     
+    print(f"Folder exists: {folder_path}")
     for filename in os.listdir(folder_path):
-        if filename.endswith(('.png', '.jpg', '.jpeg', '.tif')):
+        print(f"Found file: {filename}")
+        if filename.strip().lower().endswith(('.png', '.jpg', '.jpeg', '.tif', '.tiff')):
             file_path = os.path.join(folder_path, filename)
+            print(f"Processing file: {file_path}")
             fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT))
             saved_filename = fs.save(filename, open(file_path, 'rb'))
             uploaded_file_urls.append(fs.url(saved_filename))
             os.remove(file_path)
+            print(f"Saved and removed file: {file_path}")
     
     if 'uploaded_images' not in request.session:
         request.session['uploaded_images'] = []
@@ -131,8 +161,39 @@ def upload_scanned_images(request):
     if 'image_count' not in request.session:
         request.session['image_count'] = 0
     request.session['image_count'] += len(uploaded_file_urls)
+    print('images length in the session is:', request.session['image_count'])
 
     return JsonResponse({'uploaded_images': uploaded_file_urls})
+
+
+@login_required
+@csrf_exempt
+def delete_image(request):
+    if request.method == 'POST':
+        print("Received POST request")
+        print("Request data:", request.POST)
+        image_url = request.POST.get('deleteUrl')
+        print("image_url:", image_url)
+        image_url = request.POST.get('deleteUrl')
+        uploaded_images = request.session.get('uploaded_images', [])
+
+        if image_url in uploaded_images:
+            uploaded_images.remove(image_url)
+            request.session['uploaded_images'] = uploaded_images
+
+            image_path = os.path.join(settings.MEDIA_ROOT, image_url.lstrip('/'))
+            try:
+                if os.path.exists(image_path):
+                    os.remove(image_path)
+            except Exception as e:
+                print(f"Error deleting image {image_path}: {e}")
+
+            return JsonResponse({'success': True, 'uploaded_images': uploaded_images})
+
+        return JsonResponse({'success': False, 'error': 'Image not found in session'}, status=400)
+
+    return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=400)
+
 
 
 

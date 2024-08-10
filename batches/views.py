@@ -417,8 +417,12 @@ def historicOrderBooksResults(request):
     if request.method == 'GET':
         form = HistoricOrderBooksForm(request.GET)
         if form.is_valid():
-            book_type = form.cleaned_data.get('docindex1', '')
+            book_type_label = form.cleaned_data.get('docindex1', '')
             year = form.cleaned_data.get('docindex2', '')
+
+            BOOK_TYPE_CHOICES = dict(HistoricOrderBooksForm.BOOK_TYPE_CHOICES)
+
+            book_type = BOOK_TYPE_CHOICES.get(book_type_label, '')
 
 
             query = Q()

@@ -46,6 +46,13 @@ class UserUpdateForm(forms.ModelForm):
 
 
 
+class UserUpdateSelfForm(forms.ModelForm):
+    class Meta:
+        model = PvdmUsers1
+        fields = ['username', 'fullname', 'email', 'password']
+
+
+
 
 # class UserSelfUpdateForm(forms.ModelForm):
 #     class Meta:
