@@ -23,16 +23,8 @@ def loginUser(request):
         return redirect('landingBatches')
     
     if request.method == 'POST':
-        print(request.POST)
-
-
-
         username = request.POST['username'].lower()
         password = request.POST['password']
-
-
-        print("Username entered:", username)
-        print("Password entered:", password)
 
         try:
             user = User.objects.get(username=username)
@@ -46,15 +38,12 @@ def loginUser(request):
 
 
         user = authenticate(request, username=username, password=password)
-        print("Authenticated user:", user)
 
         if user is not None:
             login(request, user)
-            print("User logged in successfully")
             return redirect(request.GET.get('next', 'landingBatches'))
         else:
             messages.error(request, 'Username or password is incorrect')
-            print("Authentication failed")
 
     return render(request, 'users/login.html')
 
@@ -182,12 +171,6 @@ def update_user(request, user_id):
 
 
 
-def myAdmin(request):
-
-    return render(request, 'users/admin.html')
-
-
-
 
 @login_required(login_url='login')
 def managing(request):
@@ -203,10 +186,6 @@ def help_app(request):
 
     return render(request, 'users/help.html')
 
-
-def myUser(request):
-
-    return render(request, 'users/user.html')
 
 
 

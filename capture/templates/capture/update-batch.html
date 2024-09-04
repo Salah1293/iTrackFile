@@ -1,0 +1,131 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block content %}
+<main class="singleBatch my-md">
+  <div class="container">
+    <div class="layout">
+      <div
+        class="column column--1of3"
+        style=" flex: 1; padding-left: 10px; max-height: 550px; overflow-y: scroll; border-radius: 0.7rem;" >
+        <div
+          class="scrollable-images"id="scrollableImages"
+           style="border-radius: 0.7rem; border: 2px solid #070226">
+           {% for single_image in image_data %}
+            <img src="data:image/jpeg;base64,{{ single_image }}" class="scrollable-image" alt="image" onclick="displayImage(this)">
+           {% endfor %}
+        </div>
+      </div>
+
+      <div class="column column--1of3" style="flex: 6; padding: 0 10px">
+        <div class="image-container">
+          <div class="image-wrapper">
+            <img id="selectedImage" class="singleBatch__preview" alt="batch title" />
+          </div>
+          <div class="image-controls" >
+            <button id="zoomInBtn"><i class="fas fa-search-plus"></i></button>
+            <button id="zoomOutBtn"><i class="fas fa-search-minus"></i></button>
+            <button id="rotateBtn"><i class="fas fa-undo"></i></button>
+            <button id="resetBtn"><i class="fas fa-undo"></i> Reset</button>
+            <button id="deleteBtn"><i class="fas fa-trash"></i> Delete</button>
+          </div>  
+        </div>
+      </div>
+
+      <div class="column column--1of3" style="flex: 1; padding-right: 10px">
+        <div class="content-box">
+          <div class="formWrapper">
+
+            <form id="uploadForm" class="form" method="POST" enctype="multipart/form-data">
+              {% csrf_token %}
+              <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+              <input type="hidden" name="batch_id" value="{{batchid}}">
+              <input type="hidden" name="job_id" value="{{jobid}}">
+              <input type="file" name="images" id="imageInput" multiple style="display: none;">
+              <div class="button-container" style="display: flex; align-items: center;">
+                <button id="importButton" class="btn btn--sub btn--md my-md" type="button" disabled>Import</button>
+                <button id="scanButton" class="btn btn--sub btn--md my-md" type="button" onclick="submitScanForm()" disabled>Scan</button>
+              </div>
+            </form>
+           <form class="form" method="POST" action="{% url 'update-batches' batchid %}">
+              {% csrf_token %}
+              <input type="hidden" name="batch_id" value="{{batchid}}">
+              <input type="hidden" name="job_id" value="{{jobid}}">
+              <div class="button-container">
+              <div class="form-wrapper">
+                <div class="form-fields-container" style="display: flex; flex-wrap: wrap; overflow-y: auto; max-height: 420px;">
+          {% for field, value in new_dict.items %}
+          {% if field == 'Document Type' %}
+            <div class="form__field">
+              <label style="color: black; font-size: 16px;" id="capture-label" for="formInput#{{ field }}">{{ field }}</label>
+              <select class="input input--text" id="formInput#{{ field }}" name="{{ field }}" required>
+                <option value="">Select Document Type</option>
+                {% if user_role == 'hr_manager' %}
+                <option value="Medical" {% if value == 'Medical' %}selected{% endif %}>Medical</option>
+                <option value="Personnel" {% if value == 'Personnel' %}selected{% endif %}>Personnel</option>
+                {% endif %}
+                {% if user_role == 'hr_staff' %}
+                <option value="Personnel" {% if value == 'Personnel' %}selected{% endif %}>Personnel</option>                
+                {% endif %}
+              </select>
+            </div>          
+          {% elif field == 'Employment Type' %}
+            <div class="form__field">
+              <label style="color: black; font-size: 16px;" id="capture-label" for="formInput#{{ field }}">{{ field }}</label>
+              <select class="input input--text" id="formInput#{{ field }}" name="{{ field }}" required>
+                <option value="">Select Employment Type</option>
+                <option value="Attached" {% if value == 'Attached' %}selected{% endif %}>Attached</option>
+                <option value="Court Intern" {% if value == 'Court Intern' %}selected{% endif %}>Court Intern</option>
+                <option value="Judicial Intern" {% if value == 'Judicial Intern' %}selected{% endif %}>Judicial Intern</option>
+                <option value="LT" {% if value == 'LT' %}selected{% endif %}>LT</option>
+                <option value="Merit" {% if value == 'Merit' %}selected{% endif %}>Merit</option>
+                <option value="Volunteer" {% if value == 'Volunteer' %}selected{% endif %}>Volunteer</option>
+              
+              </select>
+            </div>
+            {% elif field == 'Book Type' %}
+            <div class="form__field">
+              <label style="color: black; font-size: 16px;" id="capture-label" for="formInput#{{ field }}">{{ field }}</label>
+              <select class="input input--text" id="formInput#{{ field }}" name="{{ field }}" required>
+                <option value="">Select Book Type</option>
+                <option value="Bond Book 1" {% if value == 'Bond Book 1' %}selected{% endif %}>Bond Book 1</option>
+                <option value="Court Order Superior" {% if value == 'Court Order Superior' %}selected{% endif %}>Court Order Superior</option>
+                <option value="Court Quarterly Sessions" {% if value == 'Court Quarterly Sessions' %}selected{% endif %}>Court Quarterly Sessions</option>
+                <option value="Estray Book" {% if value == 'Estray Book' %}selected{% endif %}>Estray Book</option>
+                <option value="Land Causes 1" {% if value == 'Land Causes 1' %}selected{% endif %}>Land Causes 1</option>
+                <option value="Land Causes 2" {% if value == 'Land Causes 2' %}selected{% endif %}>Land Causes 2</option>
+                <option value="Land Records Long Standing" {% if value == 'Land Records Long Standing' %}selected{% endif %}>Land Records Long Standing</option>
+                <option value="Minute Book" {% if value == 'Minute Book' %}selected{% endif %}>Minute Book</option>
+                <option value="Ordinary Bond Book" {% if value == 'Ordinary Bond Book' %}selected{% endif %}>Ordinary Bond Book</option>
+                <option value="Quite Rents" {% if value == 'Quite Rents' %}selected{% endif %}>Quite Rents</option>
+                <option value="Reg Free Negroes Val 2" {% if value == 'Reg Free Negroes Val 2' %}selected{% endif %}>Reg Free Negroes Val 2</option>
+                <option value="Reg Free Negroes Val 3" {% if value == 'Reg Free Negroes Val 3' %}selected{% endif %}>Reg Free Negroes Val 3</option>
+                <option value="Roads" {% if value == 'Roads' %}selected{% endif %}>Roads</option>
+                <option value="Surveys" {% if value == 'Surveys' %}selected{% endif %}>Surveys</option>
+              
+              </select>
+            </div>
+          {% else %}
+            <div class="form__field">
+              <label style="color: black; font-size: 16px;" id="capture-label" for="formInput#{{ field }}">{{ field }}</label>
+              <input class="input input--text" id="formInput#{{ field }}" type="text" name="{{ field }}" placeholder="Enter {{ field }}" value="{{value}}" />          
+            </div>
+          {% endif %}
+         {% endfor %}
+                </div>
+              </div>
+                <div  class="complete-button" style="display: flex; align-items: center;">
+                  <input name="complete" class="btn btn--sub btn--md my-md" type="submit" value="Complete"/>
+                  <span style="margin-left: 10px;"></span>
+                  <input name="incomplete" class="btn btn--sub btn--md my-md" type="submit" value="InComplete"/>
+                </div>
+          </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+  </script>
+  <script src="{% static 'js/update-batch.js' %}"></script>
+</main>
+{% endblock %}

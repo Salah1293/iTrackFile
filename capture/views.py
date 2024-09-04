@@ -1,4 +1,4 @@
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import *
 from .utils import*
@@ -6,6 +6,9 @@ from django.utils import timezone
 from users.decorators import roles_required 
 from django.contrib.auth.decorators import login_required
 from users.models import PvdmUsers1
+from batches.models import *
+from django.forms.models import model_to_dict
+
 
 # Create your views here.
 
@@ -25,44 +28,54 @@ def create_batch(request):
             user_role = login_user.role.name
         except PvdmUsers1.DoesNotExist:
             user_role = None
-        
-        save_form_data(job_id, form_data, status, batch_id)
-        
-        section_name = PvcapJob1.objects.filter(jobid=job_id).values_list('name', flat=True).first()
+        try:
 
-        dg_id = create_path(section_name)
-        
-        if section_name in ['HR', 'Historic Order Books', 'Historic Index Cards']:
-            docid = save_field_data(form_data, job_id, dg_id)
-        else:
-            docid = None
-        
-        if docid is None:
-            return JsonResponse({'error': 'Failed to save field data'}, status=400)
-        
-        uploaded_images = request.session.get('uploaded_images', [])
-        print('uploaded images are:', upload_images)
-        image_count = len(uploaded_images)
-        
-        if not uploaded_images:
-            return JsonResponse({'error': 'No uploaded images found'}, status=400)
-        
-        save_image_names_to_database(docid, uploaded_images, section_name, image_count, batch_id, dg_id)
-
-        for image_url in uploaded_images:
-            image_path = os.path.join(settings.MEDIA_ROOT, image_url.lstrip('/media/'))
-            try:
-                if os.path.exists(image_path):
-                    os.remove(image_path)
-            except Exception as e:
-                print(f"Error deleting image {image_path}: {e}")
+            save_form_data(job_id, form_data, status, batch_id)
             
-        
-        
-        request.session.pop('uploaded_images', None)
-        request.session.pop('image_count', None)
+            section_name = PvcapJob1.objects.filter(jobid=job_id).values_list('name', flat=True).first()
 
+            dg_id = create_path(section_name)
+            
+            if section_name in ['HR', 'Historic Order Books', 'Historic Index Cards']:
+                docid = save_field_data(form_data, job_id, dg_id, batch_id)
+            else:
+                docid = None
+            
+            if docid is None:
+                return JsonResponse({'error': 'Failed to save field data'}, status=400)
+            
+            uploaded_images = request.session.get('uploaded_images', [])
+            image_count = len(uploaded_images)
+            
+            if not uploaded_images:
+                return JsonResponse({'error': 'No uploaded images found'}, status=400)
+            
+            save_image_names_to_database(docid, uploaded_images, section_name, image_count, batch_id, dg_id)
+
+            for image_url in uploaded_images:
+                image_path = os.path.join(settings.MEDIA_ROOT, image_url.lstrip('/media/'))
+                try:
+                    if os.path.exists(image_path):
+                        os.remove(image_path)
+                except Exception as e:
+                    print(f"Error deleting image {image_path}: {e}")
+                
+            
+
+            delete_images(uploaded_images)
+            
+            request.session.pop('uploaded_images', None)
+            request.session.pop('image_count', None)
+
+        except Exception as e:
+            uploaded_images = request.session.get('uploaded_images', [])
+            delete_images(uploaded_images)
+            request.session.pop('uploaded_images', None)
+            request.session.pop('image_count', None)
+            return JsonResponse({'error': str(e)}, status=400)
         
+
+    
         return redirect('newBatch')
     
     context = {
@@ -80,9 +93,7 @@ def create_batch(request):
 @login_required
 @csrf_exempt
 def upload_images(request):
-    print('Triggered################################')
     username = os.getlogin()
-    print("username+++", username)
     uploaded_file_urls = []
     if request.method == 'POST' and request.FILES.getlist('images'):
         images = request.FILES.getlist('images')
@@ -91,9 +102,7 @@ def upload_images(request):
         for image in images:
             try:
                 if image.name.lower().endswith('.tif'):
-                    print('images is tiff')
                     image_contents = convert_image_to_jpg(image)
-                    print('convert_image_to_jpg')
                     base_filename = os.path.splitext(image.name)[0]
                     
                     for i, img_content in enumerate(image_contents):
@@ -115,7 +124,6 @@ def upload_images(request):
         if 'image_count' not in request.session:
             request.session['image_count'] = 0
         request.session['image_count'] += len(images)
-        # print('len is:', )
 
     return JsonResponse({'uploaded_images': uploaded_file_urls})
 
@@ -124,36 +132,31 @@ def upload_images(request):
 @login_required
 @csrf_exempt
 def upload_scanned_images(request):
-    # folder_path = 'D:\\Pics\\egypt\\egypt' 
-    # uploaded_file_urls = []
-    # print('triggered')
-
     username = os.getlogin()
-    print("username________________", username )
-    # folder_path = f'C:\\Users\\{username}\\Documents\\Scanned Documents' 
-    folder_path = f'C:\\Users\\{username}\\Downloads\\pics' 
-    print("folder_path________________", folder_path )
+    folder_path = f'C:\\iTrackFiles Scan' 
     uploaded_file_urls = []
-    print('triggered')
-    print('dirs are:',os.listdir(folder_path))
     
-    print(f"Checking folder path: {folder_path}")
     if not os.path.exists(folder_path):
-        print(f"Folder does not exist: {folder_path}")
         return JsonResponse({'error': 'Scanned images folder does not exist'}, status=400)
     
-    print(f"Folder exists: {folder_path}")
     for filename in os.listdir(folder_path):
-        print(f"Found file: {filename}")
         if filename.strip().lower().endswith(('.png', '.jpg', '.jpeg', '.tif', '.tiff')):
             file_path = os.path.join(folder_path, filename)
-            print(f"Processing file: {file_path}")
             fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT))
-            saved_filename = fs.save(filename, open(file_path, 'rb'))
-            uploaded_file_urls.append(fs.url(saved_filename))
-            os.remove(file_path)
-            print(f"Saved and removed file: {file_path}")
-    
+            
+            if filename.lower().endswith(('.tif', '.tiff')):
+                with open(file_path, 'rb') as image_file:
+                    image_contents = convert_image_to_jpg(image_file)
+                    base_filename = os.path.splitext(filename)[0]
+                    
+                    for i, img_content in enumerate(image_contents):
+                        saved_filename = f"{base_filename}_page_{i+1}.jpg"
+                        fs.save(saved_filename, ContentFile(img_content))
+                        uploaded_file_urls.append(fs.url(saved_filename))
+            else:
+                saved_filename = fs.save(filename, open(file_path, 'rb'))
+                uploaded_file_urls.append(fs.url(saved_filename))
+
     if 'uploaded_images' not in request.session:
         request.session['uploaded_images'] = []
     request.session['uploaded_images'].extend(uploaded_file_urls)
@@ -161,19 +164,17 @@ def upload_scanned_images(request):
     if 'image_count' not in request.session:
         request.session['image_count'] = 0
     request.session['image_count'] += len(uploaded_file_urls)
-    print('images length in the session is:', request.session['image_count'])
 
     return JsonResponse({'uploaded_images': uploaded_file_urls})
+
+
 
 
 @login_required
 @csrf_exempt
 def delete_image(request):
     if request.method == 'POST':
-        print("Received POST request")
-        print("Request data:", request.POST)
         image_url = request.POST.get('deleteUrl')
-        print("image_url:", image_url)
         image_url = request.POST.get('deleteUrl')
         uploaded_images = request.session.get('uploaded_images', [])
 
@@ -196,7 +197,8 @@ def delete_image(request):
 
 
 
-
+@login_required
+@roles_required('hr_staff', 'hr_manager', 'historic_staff')
 def capture(request):
     return render(request, 'capture/capture.html')
 
@@ -237,7 +239,7 @@ def new_batch(request):
                 userdate=date,  
                 description=description,
                 jobid=job_id,
-                path='no where',
+                path='handled',
                 isdeleted=False,
                 isnew=True,
                 retainstats=0,
@@ -250,7 +252,6 @@ def new_batch(request):
                 lastupdate=timezone.now(),
                 userid=login_user_id
             )
-            print('created')
         except Exception as e:
             return render(request, 'capture/new-batch.html', {'error': 'Error creating batch'})
 
@@ -270,6 +271,7 @@ def new_batch(request):
     try:
         login_user = PvdmUsers1.objects.get(user=request.user)
         user_role = login_user.role.name
+
     except PvdmUsers1.DoesNotExist:
         user_role = None
 
@@ -284,7 +286,7 @@ def new_batch(request):
 
 
 @login_required
-def incompleteBatch (request):
+def incomplete_batch_list (request):
 
     login_user = PvdmUsers1.objects.get(user=request.user).userid
     
@@ -298,3 +300,39 @@ def incompleteBatch (request):
 
 
     return render(request , 'capture/incomplete-batches.html', context)
+
+
+@login_required
+@csrf_exempt
+def update_batch(request, pk):
+
+    login_user = PvdmUsers1.objects.get(user=request.user)
+    user_role = login_user.role.name
+    batch = PvcapBatch1.objects.get(pk=pk)
+    batchid = batch.batchid
+    jobid = batch.jobid
+    new_dict = fields_conversion(batchid, jobid)
+
+    image_data = view_image(jobid, batchid)
+
+    if request.method == 'POST':
+       
+        batchid = request.POST.get('batch_id', batchid)
+        jobid = request.POST.get('job_id', jobid)
+        status = 'complete' if 'complete' in request.POST else 'incomplete' 
+        updated_dict = {field: request.POST.get(field, value) for field, value in new_dict.items()}
+        
+        update_docs(jobid, updated_dict, batchid, status)
+        if not jobid:
+            return HttpResponse("Job ID is missing or invalid", status=400)
+
+        return redirect('newBatch')
+    
+    context = {'new_dict': new_dict,
+        'batchid': batchid,
+        'jobid': jobid,
+        'image_data': image_data,
+        'user_role': user_role,
+        }
+    
+    return render(request, 'capture/update-batch.html', context)

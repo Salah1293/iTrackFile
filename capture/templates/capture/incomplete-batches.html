@@ -27,8 +27,8 @@
             <tbody>
               <div class="table-body">   
               {% for element in incomplete_batches %}
-                <!-- <tr onclick="redirectToSingleImage('{{element.docid}}', '{{ all_ids|join:',' }}')"> -->
-                  <td>{{element.name}}</td>
+              <tr onclick=window.location.href="{% url 'update-batches' element.batchid %}">
+                <td>{{element.name}}</td>
                     <td>{{element.jobstart}}</td>
                     <td>{{element.description}}</td>
                     <td>{{element.description}}</td>

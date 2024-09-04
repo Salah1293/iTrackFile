@@ -11,7 +11,7 @@
           class="scrollable-images"id="scrollableImages"
            style="border-radius: 0.7rem; border: 2px solid #070226">
            {% for image_url in uploaded_images %}
-            <img src="{{ image_url }}" class="scrollable-image" alt="image">
+            <img src="{{ image_url }}" class="scrollable-image" alt="image" onclick="displayImage(this)">
            {% endfor %}
         </div>
       </div>
@@ -19,11 +19,7 @@
       <div class="column column--1of3" style="flex: 6; padding: 0 10px">
         <div class="image-container">
           <div class="image-wrapper">
-            <img
-              id="selectedImage"
-              class="singleBatch__preview"
-              alt="batch title"
-            />
+            <img id="selectedImage" class="singleBatch__preview" alt="batch title"/>
           </div>
           <div class="image-controls" >
             <button id="zoomInBtn"><i class="fas fa-search-plus"></i></button>

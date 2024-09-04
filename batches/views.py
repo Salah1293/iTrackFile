@@ -26,8 +26,8 @@ from users.models import PvdmUsers1, Role
 
 
 
-# @login_required
-# @roles_required('admin', 'hr_manager', 'hr_staff', 'general_staff', 'historic_staff')
+@login_required
+@roles_required('admin', 'hr_manager', 'hr_staff', 'general_staff', 'historic_staff')
 def landingBatches (request):
     if not request.user.is_authenticated:
         error(request, "You do not have permission to view this page.")

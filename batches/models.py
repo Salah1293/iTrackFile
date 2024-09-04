@@ -135,6 +135,8 @@ class PvdmDocs113(models.Model):
     destlistid = models.IntegerField(db_column='DESTLISTID', blank=True, null=True)  # Field name made lowercase.
     wftriggerdatetime = models.DateTimeField(db_column='WFTRIGGERDATETIME', blank=True, null=True)  # Field name made lowercase.
     ocrstatus = models.SmallIntegerField(db_column='OCRSTATUS', blank=True, null=True)  # Field name made lowercase.
+    batchid = models.IntegerField(db_column='BATCHID', blank=True, null=True)
+
 
     class Meta:
         managed = False
@@ -170,6 +172,7 @@ class PvdmDocs114(models.Model):
     docindex11 = models.CharField(db_column='DOCINDEX11', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
     docindex12 = models.CharField(db_column='DOCINDEX12', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
     ocrstatus = models.SmallIntegerField(db_column='OCRSTATUS', blank=True, null=True)  # Field name made lowercase.
+    batchid = models.IntegerField(db_column='BATCHID', blank=True, null=True)
 
     class Meta:
         managed = False
@@ -389,6 +392,8 @@ class PvdmDocs15(models.Model):
     docindex6 = models.CharField(db_column='DOCINDEX6', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
     wftriggerdatetime = models.DateTimeField(db_column='WFTRIGGERDATETIME', blank=True, null=True)  # Field name made lowercase.
     ocrstatus = models.SmallIntegerField(db_column='OCRSTATUS', blank=True, null=True)  # Field name made lowercase.
+    batchid = models.IntegerField(db_column='BATCHID', blank=True, null=True)
+
 
     class Meta:
         managed = False
@@ -690,9 +695,9 @@ class PvdmObjs12(models.Model):
     trashuserid = models.IntegerField(db_column='TRASHUSERID', blank=True, null=True)  # Field name made lowercase.
     trashdatetime = models.DateTimeField(db_column='TRASHDATETIME', blank=True, null=True)  # Field name made lowercase.
     totalbytes = models.FloatField(db_column='TOTALBYTES', blank=True, null=True)  # Field name made lowercase.
-
+    batchid = models.IntegerField(db_column='BATCHID', blank=True, null=True)
     class Meta:
-        managed = False
+        managed = True
         db_table = 'PVDM_OBJS_1_2'
 
 

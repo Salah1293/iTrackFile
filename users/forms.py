@@ -51,14 +51,3 @@ class UserUpdateSelfForm(forms.ModelForm):
         model = PvdmUsers1
         fields = ['username', 'fullname', 'email', 'password']
 
-
-
-
-# class UserSelfUpdateForm(forms.ModelForm):
-#     class Meta:
-#         model = PvdmUsers1
-#         fields = ['username', 'fullname', 'email', 'password']  
-
-#     def __init__(self, *args, **kwargs):
-#         super().__init__(*args, **kwargs)
-#         self.fields['password'].required = False

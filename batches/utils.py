@@ -141,7 +141,6 @@ def view_image(pk, obj_model):
                     path = os.path.join(dg_query.path + dg_query.origdgname + '/IMG1/00000/', filename + '.TIF')
                 else:
                     path = os.path.join(dg_query.path, filename)
-                print('path is:', path)
                 try:
                     with Image.open(path) as img:
                         output = io.BytesIO()
@@ -182,12 +181,12 @@ def navigate_image(ids_list, current_id):
 
 
 def extract_filenames_base(filelist):
-    if "Images" in filelist:
+    if '<PATH>' in filelist:
+        return extract_filenames_path_pattern(filelist)
+    elif "Images" in filelist:
         return extract_filenames_extension_pattern(filelist)
     elif len(filelist) % 8 == 0 and all(char.isdigit() for char in filelist):
         return extract_filenames_byts_pattern(filelist)
-    elif '<PATH>' in filelist:
-        return extract_filenames_path_pattern(filelist)
     else:
         raise ValueError("Filelist does not match any known pattern")
 

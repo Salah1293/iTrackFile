@@ -19,7 +19,7 @@
                         <option value="HR">HR</option>
                     </select>
                     {% endif %}     
-                    {% if user_role != 'hr_manager' and user_role != 'hr_staff' %}
+                    {% if user_role == 'historic_staff' %}
                     <label id="formLabel" for="formInput#job">Job</label>
                     <select class="input input--text" id="formInput#job" name="job"> 
                         <option value="" selected disabled>Choose Section</option>                
