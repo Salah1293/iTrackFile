@@ -21,6 +21,9 @@ from django.core.files.storage import default_storage
 from PIL import Image
 from urllib.parse import unquote
 
+
+########################### CREATE BATCHES ###################################
+# RETRIVE FILDS NAME FROM CAPTURE FORM TABLE ALLED INDEX1
 def get_job_data(job_id):
     fields = PvcapIndex1.objects.filter(
         jobid=job_id).values_list('fieldname', flat=True)
@@ -30,7 +33,7 @@ def get_job_data(job_id):
     fields = [field for field in fields if field != 'Date']
     return fields, index_ids, job_id
 
-
+# SAVE VALUE USER ENTRED IN INDEX TABLE
 def save_form_data(job_id, form_data, status, batch_id):
 
     fields_with_index_ids = PvcapIndex1.objects.filter(
@@ -65,27 +68,28 @@ def save_form_data(job_id, form_data, status, batch_id):
         batch.iscomplete = False
     batch.save()
 
-
+# CcOUNT EXPORT FOLDER TO MAKE THE NUMBER INCREMENRED
 def count_export_folders(base_path):
     folders = [d for d in os.listdir(
         base_path) if os.path.isdir(os.path.join(base_path, d))]
     export_folders = [f for f in folders if f.startswith('Export')]
     return len(export_folders)
 
-
+# CREATE PATH
 def create_path(section_name):
     if section_name == 'HR':
-        # base_path = 'E:\\PVDocs\\Monitored Import Path\\HR\\'
-        base_path = 'E:\\Projects\\iTrackFiles collection\\images'
+        base_path = 'E:\\PVDocs\\Monitored Import Path\\HR\\'
+        # base_path = 'E:\\Projects\\iTrackFiles collection\\images'
     elif section_name == 'Historic Order Books':
-        # base_path = 'E:\\PVDocs\\Monitored Import Path\\HistoricOrderBooks\\'
-        base_path = 'E:\\Projects\\iTrackFiles collection\\images'
+        base_path = 'E:\\PVDocs\\Monitored Import Path\\HistoricOrderBooks\\'
+        # base_path = 'E:\\Projects\\iTrackFiles collection\\images'
     elif section_name == 'Historic Index Cards':
-        # base_path = 'E:\\PVDocs\\Monitored Import Path\\HistoricIndexCards\\'
-       base_path = 'E:\\Projects\\iTrackFiles collection\\images'
+        base_path = 'E:\\PVDocs\\Monitored Import Path\\HistoricIndexCards\\'
+       # base_path = 'E:\Projects\iTrackFiles collection\images'
     else:
         print("Invalid section name:", section_name)
-        return 
+        return
+
 
     export_count = count_export_folders(base_path)
     new_folder = f'Export{export_count + 1}'
@@ -111,7 +115,7 @@ def create_path(section_name):
 
     return dg_entry.dgid
 
-
+# EVERY COLUMN REALTED TO FIELD LABEL
 def map_fields_to_columns(job_id):
     section_name = PvcapJob1.objects.get(jobid=job_id).name
     field_to_column_mapping = {
@@ -121,7 +125,7 @@ def map_fields_to_columns(job_id):
     }
     return field_to_column_mapping.get(section_name, {})
 
-
+# SAVE COMPLE OR INCOMPLES VALUES IN DOCS TABLE
 def save_field_data(form_data, job_id, dg_id, batch_id):
     section_name = PvcapJob1.objects.filter(
         jobid=job_id).values_list('name', flat=True).first()
@@ -167,7 +171,7 @@ def save_field_data(form_data, job_id, dg_id, batch_id):
     except ValidationError as ve:
         return None
 
-
+#SAVE IMAGE NAME IN OBJ
 def save_image_names_to_database(docid, uploaded_images, section_name, image_count, batch_id, dg_id):
 
     if section_name == 'HR':
@@ -230,7 +234,7 @@ def save_image_names_to_database(docid, uploaded_images, section_name, image_cou
         totalbytes=0
     )
 
-
+# CONVERT TIFF OR ANY EXTENTION TO JPEG
 def convert_image_to_jpg(image):
     img = Image.open(image)
     images = []
@@ -248,7 +252,18 @@ def convert_image_to_jpg(image):
 
     return images
 
-
+# DELETE IMAGES FROM MEDIA AFTER WE CLICKED COMPLETE OR INCOMPLTE
+def delete_images(image_urls):
+    for image_url in image_urls:
+        image_path = os.path.join(settings.MEDIA_ROOT, image_url.lstrip('/'))
+        try:
+            if os.path.exists(image_path):
+                os.remove(image_path)
+        except Exception as e:
+            print(f"Error deleting image {image_path}: {e}")
+            
+#################################UPDATE BATCHES(EDIT INCOMPLETE BATCHES######################################################
+#RETRIVE OLD DATA FROM INCOMPLTE TO FULLFILLED FOR USER TO COMPLE FROM DOCS TABLE
 def fields_conversion(batchid, jobid):
 
     job_name = PvcapJob1.objects.get(jobid=jobid).name
@@ -286,7 +301,7 @@ def fields_conversion(batchid, jobid):
     return new_dict
 
 
-# view image
+# view image THAT WE SAVED IN INCOMPLETE BATCHES WE ENTERED LAST TIME( SAME LOGIC AS SERACH)
 def view_image(jobid, batchid):
 
     job_name = PvcapJob1.objects.get(jobid=jobid).name
@@ -376,7 +391,7 @@ def extract_filenames_path_pattern(filelist):
     pattern = re.compile(r'<PATH>(.*?)</PATH>')
     return pattern.findall(filelist)
 
-
+# UPDATE DATA IN DOCS TABLE
 def update_docs(job_id, updated_dict, batchid, status):
 
     section_name = PvcapJob1.objects.get(jobid=job_id).name
@@ -433,12 +448,3 @@ def update_docs(job_id, updated_dict, batchid, status):
 
 
 
-
-def delete_images(image_urls):
-    for image_url in image_urls:
-        image_path = os.path.join(settings.MEDIA_ROOT, image_url.lstrip('/'))
-        try:
-            if os.path.exists(image_path):
-                os.remove(image_path)
-        except Exception as e:
-            print(f"Error deleting image {image_path}: {e}")

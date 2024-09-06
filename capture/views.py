@@ -10,9 +10,7 @@ from batches.models import *
 from django.forms.models import model_to_dict
 
 
-# Create your views here.
-
-
+# Create your BATCH ALL CYCLE INCLUDING HELPER FUNCTIONS AFTER IT IS COMPLETED IT REMOVE IMAGED IN MEDIS AND IMAGES URL IN SESSIONS.
 @login_required
 @csrf_exempt
 def create_batch(request):
@@ -89,7 +87,7 @@ def create_batch(request):
 
 
 
-
+# SERVER UPLOAD IMAGE AND SAVE PHYICAL IMAGES IN MEDIA DIRCTORY AND IMAGES URL IN SESSIONS in settings(media url= '')
 @login_required
 @csrf_exempt
 def upload_images(request):
@@ -127,13 +125,13 @@ def upload_images(request):
 
     return JsonResponse({'uploaded_images': uploaded_file_urls})
 
-
-
+# accesss folder path dir and get images to media dir and save images url in session then delete images from folder path
 @login_required
 @csrf_exempt
 def upload_scanned_images(request):
     username = os.getlogin()
-    folder_path = f'C:\\iTrackFiles Scan' 
+    # folder_path = f'C:\\iTrackFilesScan' 
+    folder_path = f'C:\\Users\\{username}\\Downloads\\pics' 
     uploaded_file_urls = []
     
     if not os.path.exists(folder_path):
@@ -153,10 +151,12 @@ def upload_scanned_images(request):
                         saved_filename = f"{base_filename}_page_{i+1}.jpg"
                         fs.save(saved_filename, ContentFile(img_content))
                         uploaded_file_urls.append(fs.url(saved_filename))
+                        
             else:
                 saved_filename = fs.save(filename, open(file_path, 'rb'))
                 uploaded_file_urls.append(fs.url(saved_filename))
-
+            os.remove(file_path)
+            print("removeddddddddddddddd")
     if 'uploaded_images' not in request.session:
         request.session['uploaded_images'] = []
     request.session['uploaded_images'].extend(uploaded_file_urls)
@@ -169,7 +169,7 @@ def upload_scanned_images(request):
 
 
 
-
+# delete images from media amd url in session
 @login_required
 @csrf_exempt
 def delete_image(request):
@@ -196,14 +196,14 @@ def delete_image(request):
     return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=400)
 
 
-
+# render capture page
 @login_required
 @roles_required('hr_staff', 'hr_manager', 'historic_staff')
 def capture(request):
     return render(request, 'capture/capture.html')
 
 
-#function to create batch type
+#function to create batch type ( HR, HIstoric index or orderbook) page
 @login_required
 def new_batch(request):
 
@@ -284,7 +284,7 @@ def new_batch(request):
 
 
 
-
+# render incomplete batches
 @login_required
 def incomplete_batch_list (request):
 
@@ -301,7 +301,7 @@ def incomplete_batch_list (request):
 
     return render(request , 'capture/incomplete-batches.html', context)
 
-
+# work when we click on one of the rows of incomplete batch
 @login_required
 @csrf_exempt
 def update_batch(request, pk):

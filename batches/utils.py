@@ -14,8 +14,7 @@ from PIL import Image
 import re
 
 
-
-#pagination super class
+# pagination super class
 def paginate(request, query):
     page = request.GET.get('page')
     result = 50
@@ -29,7 +28,6 @@ def paginate(request, query):
     except EmptyPage:
         page = paginator.num_pages
         query = paginator.page(page)
-
 
     leftIndex = (int(page) - 4)
 
@@ -46,37 +44,39 @@ def paginate(request, query):
     return custom_range, query
 
 
-#factory method for form creation
+# factory method for form creation for intial search THAT SERVERSES ALL SECTIONS
 def createForm(request, template, classFrom):
     form = classFrom()
-    context = {'form' : form}
+    context = {'form': form}
     return render(request, template, context)
 
 
-#factory method for card search
-def createSearch(request, form, params, model_class, template):
-    if request.method == 'GET':
-        form = form()
-        if form.is_valid():
-            query = Q()
-            for param, field in params.items():
-                value = form.cleaned_data.get(param, '')
-                if value:
-                    query &= Q(**{field:value})
+# # factory method for card search
+# def createSearch(request, form, params, model_class, template):
+#     if request.method == 'GET':
+#         form = form()
+#         if form.is_valid():
+#             query = Q()
+#             for param, field in params.items():
+#                 value = form.cleaned_data.get(param, '')
+#                 if value:
+#                     query &= Q(**{field: value})
 
-                results = model_class.objects.filter(query) if query else model_class.objects.none()
-                result_count = results.count() if query else 0
-                custom_range, results = paginate(request, results)
-                context = {'form':form, 'results': results,
-                            'result_count':result_count, 'custom_range':custom_range}
-                return render(request, template, context)
-    context = {'from': form, 'results':model_class.objects.none(), result_count:0}
-    return redirect(template)
+#                 results = model_class.objects.filter(
+#                     query) if query else model_class.objects.none()
+#                 result_count = results.count() if query else 0
+#                 custom_range, results = paginate(request, results)
+#                 context = {'form': form, 'results': results,
+#                            'result_count': result_count, 'custom_range': custom_range}
+#                 return render(request, template, context)
+#     context = {'from': form, 'results': model_class.objects.none(),
+#                result_count: 0}
+#     return redirect(template)
 
 
-#display images
+# display images contains evrey thing in page except priynt Rotat and reset mmade by js as they are styling manner
 def singleImageView(request, pk, doc_model, obj_model, card_form, section):
-
+    # contains id for all rows displayed
     ids = request.GET.get('ids', '')
     ids_list = ids.split(',') if ids else []
 
@@ -91,8 +91,7 @@ def singleImageView(request, pk, doc_model, obj_model, card_form, section):
     first_doc, last_doc, next_doc, prev_doc = navigate_image(ids_list, pk)
     deleted = delete_document(request, pk, ids_list, doc_model, obj_model)
 
- 
-    if deleted:    
+    if deleted:
         if next_doc:
             pk = next_doc
         elif prev_doc:
@@ -104,12 +103,10 @@ def singleImageView(request, pk, doc_model, obj_model, card_form, section):
         first_doc, last_doc, next_doc, prev_doc = navigate_image(ids_list, pk)
         form = edit_document(request, pk, doc_model, card_form)
 
-
-
     context = {
         'image_data': image_data,
         'image_data_length': len(image_data),
-        'ids_list':ids_list,
+        'ids_list': ids_list,
         'pk': pk,
         'form': form,
         'first_doc': first_doc,
@@ -118,13 +115,12 @@ def singleImageView(request, pk, doc_model, obj_model, card_form, section):
         'prev_doc': prev_doc,
         'previous_page_url': previous_page_url,
         'section': section
-        }
+    }
 
     return render(request, 'batches/single-image.html', context)
 
 
-
-#view image
+# view image FOR THE PREVIOUS FUNCTION
 def view_image(pk, obj_model):
     images = obj_model.objects.filter(docid=pk)
     images_data = []
@@ -134,37 +130,40 @@ def view_image(pk, obj_model):
         dg_query = PvdmDg1.objects.filter(dgid=dg_id).first()
         if dg_query:
             filelist = image.filelist
+            print("before extract ++++++++++++++++")
             filenames = extract_filenames_base(filelist)
-            
+            print("filenames--------------", filenames)
+
             for filename in filenames:
                 if filename.isdigit() and len(filename) == 8:
-                    path = os.path.join(dg_query.path + dg_query.origdgname + '/IMG1/00000/', filename + '.TIF')
+                    path = os.path.join(
+                        dg_query.path + dg_query.origdgname + '/IMG1/00000/', filename + '.TIF')
                 else:
                     path = os.path.join(dg_query.path, filename)
+                print('path is:', path)
                 try:
                     with Image.open(path) as img:
                         output = io.BytesIO()
                         img.convert("RGB").save(output, format="JPEG")
-                        image_data = base64.b64encode(output.getvalue()).decode('utf-8')
+                        image_data = base64.b64encode(
+                            output.getvalue()).decode('utf-8')
                         images_data.append(image_data)
                 except FileNotFoundError:
-                    pass 
+                    pass
 
-    
     return images_data
 
 
-#navigate images
+# navigate images FOR ICONS LAST PREVIOUS AND NEXT
 def navigate_image(ids_list, current_id):
     try:
         index = ids_list.index(current_id)
     except ValueError:
         return None, None, None, None
 
-    
     first_id = ids_list[0] if ids_list else None
     last_id = ids_list[-1] if ids_list else None
-    
+
     if index == 0:
         prev_id = None
     else:
@@ -174,29 +173,31 @@ def navigate_image(ids_list, current_id):
         next_id = None
     else:
         next_id = ids_list[index + 1]
-    
+
     return first_id, last_id, next_id, prev_id
 
-
-
-
+# BASE FUNCTION THAT HAS CONDITIONS FOR EACH IMAGE PATTERN PATHES FUNCTIONS
 def extract_filenames_base(filelist):
-    if '<PATH>' in filelist:
-        return extract_filenames_path_pattern(filelist)
-    elif "Images" in filelist:
-        return extract_filenames_extension_pattern(filelist)
-    elif len(filelist) % 8 == 0 and all(char.isdigit() for char in filelist):
+    if len(filelist) % 8 == 0 and all(char.isdigit() for char in filelist):
         return extract_filenames_byts_pattern(filelist)
+    
+    elif '<PATH>' in filelist:
+        print("fireee=====================")
+        return extract_filenames_path_pattern(filelist)
+    
+    elif "Images" in filelist:
+        print("images--------")
+        return extract_filenames_extension_pattern(filelist)
+
     else:
         raise ValueError("Filelist does not match any known pattern")
 
-
-
+# SERVE PATTERN FOR 0000001
 def extract_filenames_byts_pattern(filelist):
     filenames = [filelist[i:i+8] for i in range(0, len(filelist), 8)]
     return filenames
 
-
+# SERVE PATTERN IMAGES/0/0/0/0001.TIF
 def extract_filenames_extension_pattern(filelist):
     filenames = []
     current_filename = ''
@@ -204,24 +205,24 @@ def extract_filenames_extension_pattern(filelist):
 
     for char in filelist:
         current_filename += char
-        
+
         if current_filename.endswith(pattern_prefix):
             image_filename = current_filename[:-len(pattern_prefix)].strip()
-            if image_filename:  
+            if image_filename:
                 filenames.append(image_filename)
             current_filename = pattern_prefix
-    
+
     if current_filename and current_filename != pattern_prefix:
         filenames.append(current_filename.strip())
-    
+
     return filenames
 
-
+#SERVE PATH PATEREN
 def extract_filenames_path_pattern(filelist):
     pattern = re.compile(r'<PATH>(.*?)</PATH>')
     return pattern.findall(filelist)
 
-
+# EDIT FUNCTIONS
 def edit_document(request, pk, doc_model, card_form):
     form = None
     if request.method == 'POST':
@@ -238,7 +239,7 @@ def edit_document(request, pk, doc_model, card_form):
         form = card_form(instance=data)
     return form
 
-#delete document
+# delete document
 def delete_document(request, pk, ids_list, doc_model, obj_model):
     if request.method == 'POST':
         if 'delete' in request.POST:
@@ -253,13 +254,8 @@ def delete_document(request, pk, ids_list, doc_model, obj_model):
                 return True
     return False
 
-
-
-
-
-
-
-def generate_all_results(query, chosen_section= None):
+# SERVE GENERAL SERACH
+def generate_all_results(query, chosen_section=None):
 
     criminal = None
     indictments = None
@@ -276,55 +272,53 @@ def generate_all_results(query, chosen_section= None):
     clerkOrders = None
     charters = None
 
-
     criminal_query = (Q(docindex1=query) | Q(docindex3=query) |
-                        Q(docindex6=query) | Q(docindex7=query) |
-                        Q(docindex10=query))
-    
-    indictments_query = (Q(docindex1=query) | Q(docindex2=query) |
-                        Q(docindex3=query) | Q(docindex4=query) |
-                        Q(docindex5=query) | Q(docindex6=query) |
-                        Q(docindex7=query))
-    
-    concealed_weapons_query = (Q(docindex1=query) | Q(docindex3=query) |
-                        Q(docindex4=query) | Q(docindex7=query) |
-                        Q(docindex8=query) | Q(docindex9=query) |
-                        Q(docindex10=query))
-    
-    historic_order_books_query = (Q(docindex1=query) | Q(docindex2=query) |
-                        Q(docindex3=query))
-    
-    historic_index_cards_query = (Q(docindex1=query) | Q(docindex2=query) |
-                        Q(docindex3=query) | Q(docindex5=query) |
-                        Q(docindex6=query) | Q(docindex8=query))
-    
-    destruction_orders_query = (Q(docindex1=query))
-    
-    bond_books_query = (Q(docindex1=query) | Q(docindex2=query))
-    
-    civil_query = (Q(docindex1=query) | Q(docindex3=query) |
-                        Q(docindex6=query) | Q(docindex7=query) |
-                        Q(docindex8=query) |  Q(docindex11=query) |
-                        Q(docindex12=query))
-    
-    criminal_juvenile_query = (Q(docindex1=query) | Q(docindex3=query) |
-                        Q(docindex6=query) | Q(docindex7=query) |
-                        Q(docindex11=query) | Q(docindex12=query))
-    
-    adoption_query = (Q(docindex1=query) | Q(docindex3=query) |
-                        Q(docindex6=query) | Q(docindex7=query) |
-                        Q(docindex8=query))
+                      Q(docindex6=query) | Q(docindex7=query) |
+                      Q(docindex10=query))
 
-    
+    indictments_query = (Q(docindex1=query) | Q(docindex2=query) |
+                         Q(docindex3=query) | Q(docindex4=query) |
+                         Q(docindex5=query) | Q(docindex6=query) |
+                         Q(docindex7=query))
+
+    concealed_weapons_query = (Q(docindex1=query) | Q(docindex3=query) |
+                               Q(docindex4=query) | Q(docindex7=query) |
+                               Q(docindex8=query) | Q(docindex9=query) |
+                               Q(docindex10=query))
+
+    historic_order_books_query = (Q(docindex1=query) | Q(docindex2=query) |
+                                  Q(docindex3=query))
+
+    historic_index_cards_query = (Q(docindex1=query) | Q(docindex2=query) |
+                                  Q(docindex3=query) | Q(docindex5=query) |
+                                  Q(docindex6=query) | Q(docindex8=query))
+
+    destruction_orders_query = (Q(docindex1=query))
+
+    bond_books_query = (Q(docindex1=query) | Q(docindex2=query))
+
+    civil_query = (Q(docindex1=query) | Q(docindex3=query) |
+                   Q(docindex6=query) | Q(docindex7=query) |
+                   Q(docindex8=query) | Q(docindex11=query) |
+                   Q(docindex12=query))
+
+    criminal_juvenile_query = (Q(docindex1=query) | Q(docindex3=query) |
+                               Q(docindex6=query) | Q(docindex7=query) |
+                               Q(docindex11=query) | Q(docindex12=query))
+
+    adoption_query = (Q(docindex1=query) | Q(docindex3=query) |
+                      Q(docindex6=query) | Q(docindex7=query) |
+                      Q(docindex8=query))
+
     law_chancery_query = (Q(docindex1=query) | Q(docindex2=query))
-    
+
     criminal_cases_query = (Q(docindex1=query) | Q(docindex2=query) |
-                        Q(docindex3=query) | Q(docindex4=query))
-    
+                            Q(docindex3=query) | Q(docindex4=query))
+
     clerk_orders_query = (Q(docindex1=query) | Q(docindex3=query) |
-                        Q(docindex4=query) | Q(docindex6=query) |
-                        Q(docindex7=query))
-    
+                          Q(docindex4=query) | Q(docindex6=query) |
+                          Q(docindex7=query))
+
     charters_query = (Q(docindex1=query) | Q(docindex2=query))
 
     all_results = {}
@@ -335,22 +329,27 @@ def generate_all_results(query, chosen_section= None):
         elif chosen_section == 'Indictments':
             indictments = PvdmDocs110.objects.filter(indictments_query)
         elif chosen_section == 'Concealed Weapons':
-            concealedWeapons = PvdmDocs112.objects.filter(concealed_weapons_query)
+            concealedWeapons = PvdmDocs112.objects.filter(
+                concealed_weapons_query)
         elif chosen_section == 'Historic Order Books':
-            historicOrderBooks = PvdmDocs113.objects.filter(historic_order_books_query)
+            historicOrderBooks = PvdmDocs113.objects.filter(
+                historic_order_books_query)
         elif chosen_section == 'Historic Index Cards':
-            historicIndexCards = PvdmDocs114.objects.filter(historic_index_cards_query)
+            historicIndexCards = PvdmDocs114.objects.filter(
+                historic_index_cards_query)
         elif chosen_section == 'Destruction Orders':
-            destructionOrders = PvdmDocs115.objects.filter(destruction_orders_query)
+            destructionOrders = PvdmDocs115.objects.filter(
+                destruction_orders_query)
         elif chosen_section == 'Bond Books':
             bondBooks = PvdmDocs116.objects.filter(bond_books_query)
         elif chosen_section == 'Civil':
             civil = PvdmDocs12.objects.filter(civil_query)
         elif chosen_section == 'Criminal Juvenile':
-            criminalJuvenile = PvdmDocs13.objects.filter(criminal_juvenile_query)
+            criminalJuvenile = PvdmDocs13.objects.filter(
+                criminal_juvenile_query)
         elif chosen_section == 'Adoption':
             adoption = PvdmDocs14.objects.filter(adoption_query)
-    
+
         elif chosen_section == 'Law Chancery':
             lawChancery = PvdmDocs16.objects.filter(law_chancery_query)
         elif chosen_section == 'Criminal Cases':
@@ -364,9 +363,12 @@ def generate_all_results(query, chosen_section= None):
         criminal = PvdmDocs11.objects.filter(criminal_query)
         indictments = PvdmDocs110.objects.filter(indictments_query)
         concealedWeapons = PvdmDocs112.objects.filter(concealed_weapons_query)
-        historicOrderBooks = PvdmDocs113.objects.filter(historic_order_books_query)
-        historicIndexCards = PvdmDocs114.objects.filter(historic_index_cards_query)
-        destructionOrders = PvdmDocs115.objects.filter(destruction_orders_query)
+        historicOrderBooks = PvdmDocs113.objects.filter(
+            historic_order_books_query)
+        historicIndexCards = PvdmDocs114.objects.filter(
+            historic_index_cards_query)
+        destructionOrders = PvdmDocs115.objects.filter(
+            destruction_orders_query)
         bondBooks = PvdmDocs116.objects.filter(bond_books_query)
         civil = PvdmDocs12.objects.filter(civil_query)
         criminalJuvenile = PvdmDocs13.objects.filter(criminal_juvenile_query)
@@ -375,8 +377,6 @@ def generate_all_results(query, chosen_section= None):
         criminalCases = PvdmDocs17.objects.filter(criminal_cases_query)
         clerkOrders = PvdmDocs18.objects.filter(clerk_orders_query)
         charters = PvdmDocs19.objects.filter(charters_query)
-
-
 
     all_results = {
         'Criminal': criminal,
@@ -397,14 +397,12 @@ def generate_all_results(query, chosen_section= None):
 
     all_results = {key: value for key, value in all_results.items() if value}
 
-
     return all_results
 
-
-
+# GET TABLE NAME THAT HAS THE KEYWORD THAT THE USER USED FOR SERRCH
 def get_section_name(chosen_section):
 
-     model_mapping = {
+    model_mapping = {
         'Criminal': 'criminal',
         'Indictments': 'indictments',
         'Concealed Weapons': 'concealed-weapons',
@@ -415,11 +413,11 @@ def get_section_name(chosen_section):
         'Civil': 'civil',
         'Criminal Juvenile': 'criminal-juvenile',
         'Adoption': 'adoption',
-        'HR': 'hr',
+        # 'HR': 'hr',
         'Law Chancery': 'law-chancery',
         'Criminal Cases': 'criminal-cases',
         'Clerk Orders': 'clerk-orders',
         'Charters': 'charters'
     }
-     
-     return model_mapping.get(chosen_section, None)
+
+    return model_mapping.get(chosen_section, None)

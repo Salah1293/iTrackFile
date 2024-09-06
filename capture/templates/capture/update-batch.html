@@ -46,7 +46,7 @@
                 <button id="scanButton" class="btn btn--sub btn--md my-md" type="button" onclick="submitScanForm()" disabled>Scan</button>
               </div>
             </form>
-           <form class="form" method="POST" action="{% url 'update-batches' batchid %}">
+           <form class="form" method="POST" action="{% url 'updateBatches' batchid %}">
               {% csrf_token %}
               <input type="hidden" name="batch_id" value="{{batchid}}">
               <input type="hidden" name="job_id" value="{{jobid}}">

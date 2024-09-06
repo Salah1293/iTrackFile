@@ -10,6 +10,6 @@ urlpatterns =[
     path('', views.capture, name="capture"),
     path('incomplete-batch/', views.incomplete_batch_list, name="incompleteBatch"),
     path('delete-image/', views.delete_image, name='delete_image'),
-    path('update-batches/<str:pk>/', views.update_batch, name='update-batches'),
+    path('update-batches/<str:pk>/', views.update_batch, name='updateBatches'),
 
 ]

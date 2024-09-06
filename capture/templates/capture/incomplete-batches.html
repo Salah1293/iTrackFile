@@ -27,7 +27,7 @@
             <tbody>
               <div class="table-body">   
               {% for element in incomplete_batches %}
-              <tr onclick=window.location.href="{% url 'update-batches' element.batchid %}">
+              <tr onclick=window.location.href="{% url 'updateBatches' element.batchid %}">
                 <td>{{element.name}}</td>
                     <td>{{element.jobstart}}</td>
                     <td>{{element.description}}</td>
