@@ -472,7 +472,7 @@ def hrResults(request):
                         docindex6=None)
 
                 elif login_user_role == 'hr_staff':
-                    query &= Q(docindex6__in='Personnel') | Q(docindex6=None)
+                    query &= Q(docindex6__in=['Personnel']) | Q(docindex6=None)
 
             except PvdmUsers1.DoesNotExist:
                 query = Q(pk=-1)

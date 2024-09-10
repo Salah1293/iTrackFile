@@ -138,7 +138,7 @@ def upload_scanned_images(request):
         return JsonResponse({'error': 'Scanned images folder does not exist'}, status=400)
     
     for filename in os.listdir(folder_path):
-        if filename.strip().lower().endswith(('.png', '.jpg', '.jpeg', '.tif', '.tiff')):
+        if filename.strip().lower().endswith(('.png', '.PNG','.jpg', '.jpeg', '.tif', '.tiff')):
             file_path = os.path.join(folder_path, filename)
             fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT))
             
