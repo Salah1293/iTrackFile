@@ -52,6 +52,9 @@ class PvcapIndexvalue1(models.Model):
     class Meta:
         managed = False
         db_table = 'PVCAP_INDEXVALUE_1'
+        indexes = [
+            models.Index(fields=['bundleid']),  
+        ]
 
 
 class PvcapIndex1(models.Model):

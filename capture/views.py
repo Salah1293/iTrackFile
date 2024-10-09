@@ -401,13 +401,6 @@ def update_batch(request, pk):
 
 
 
-
-
-
-
-
-
-
     bundles = PvcapBundle.objects.filter(batchid=batchid)
     first_bundle = bundles.first() if bundles.exists() else None
     bundleid = first_bundle.bundleid
