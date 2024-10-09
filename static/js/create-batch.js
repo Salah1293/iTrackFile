@@ -1,9 +1,155 @@
+// function createBundle() {
+//     var selectedImage = document.getElementById('selectedImage');
+//     var form = document.getElementById('myform');
+    
+//     // Check if form exists
+//     if (!form) {
+//         console.error("Form not found.");
+//         return;
+//     }
+
+//     // Check if selected image exists
+//     if (!selectedImage || !selectedImage.src) {
+//         console.error("No image selected or #selectedImage not found.");
+//         return;
+//     }
+
+//     var currentImage = selectedImage.src;
+//     console.log("Image displayed is:", currentImage);
+
+//     var imageName = currentImage.split('/').pop();
+
+//     // Collect form data
+//     var formData = new FormData(form); 
+//     formData.append('imageName', imageName); 
+
+//     // Send data to the backend view
+//     fetch('/capture/create-batch/', {  
+//         method: 'POST',
+//         body: formData,
+//         headers: {
+//             'X-CSRFToken': getCookie('csrftoken')
+//         }
+//     })
+//     .then(response => response.json())
+//     .then(data => {
+//         if (data.success) {
+//             console.log('Success:', data.message);
+            
+//             // Clear form
+//             form.reset();
+//             // selectedImage.src = '';  
+//         } else {
+//             console.error('Error:', data.error);
+//         }
+//     })
+//     .catch((error) => {
+//         console.error('Error:', error);
+//     });
+// }
+
+
+
+function createBundle() {
+    var selectedImage = document.getElementById('selectedImage');
+    var form = document.getElementById('myform');
+
+    // Check if form exists
+    if (!form) {
+        console.error("Form not found.");
+        return;
+    }
+
+    // Check if selected image exists
+    if (!selectedImage || !selectedImage.src) {
+        console.error("No image selected or #selectedImage not found.");
+        return;
+    }
+
+    var currentImage = selectedImage.src;
+    console.log("Image displayed is:", currentImage);
+    console.log("form data is:", form);
+
+    // Extract the image file name from the URL
+    var imageName = currentImage.split('/').pop();
+
+    // Collect form data
+    var formData = new FormData(form);  // Create FormData object from form element
+    formData.append('imageName', imageName);  // Add the image name to the form data
+    console.log("form data is:", formData);
+
+    for (var pair of formData.entries()) {
+        console.log(pair[0]+ ': ' + pair[1]);
+    }
+
+
+    console.log('Sending form data to /capture/create-batch/');
+
+    // Fetch function to send the data to the backend view
+    fetch('/capture/create-bundle/', {  
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken')  // Add CSRF token to the headers
+        }
+    })
+    // console.log('ajx sent successfully')
+    .then(response => {
+        console.log('Response received:', response);
+        if (response.ok) {
+            return response.json();  // Parse the response as JSON if successful
+        } else {
+            return response.text().then(text => {  // Get response text for error details
+                throw new Error('Server error: ' + response.status + ' - ' + text);
+            });
+        }
+    })
+    .then(data => {
+        if (data.success) {
+            console.log('Success:', data.message);
+            form.reset();  // Reset the form upon success
+            // Optional: Clear the selected image if desired
+            // selectedImage.src = '';  
+        } else {
+            console.error('Error:', data.error);
+        }
+    })
+    .catch((error) => {
+        console.error('Error:', error);  // Catch network or other unexpected errors
+    });
+}
+
+
+
+
+
+
+// Helper function to get CSRF token (Django-specific)
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+
+
 
 
 $(document).ready(function () {
     $('#importButton').on('click', function () {
         $('#imageInput').click();
     });
+
+
 
     $('#imageInput').on('change', function () {
         console.log('fired!')
@@ -65,9 +211,11 @@ $(document).ready(function () {
         }
     });
 
+   
 
     function displayImages(images) {
         images.forEach(function (imageUrl, index) {
+            console.log("fired")
             // Check if the image already exists to avoid duplication
             if (!$("img[src='" + imageUrl + "']").length) {
                 const imgElement = `<img src="${imageUrl}" class="scrollable-image" alt="image ${index + 1}" onclick="displayImage(this)">`;

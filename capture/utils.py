@@ -1,6 +1,7 @@
 import base64
 import io
 import re
+import shutil
 from django.forms import ValidationError, model_to_dict
 from iTrackFiles.settings import BASE_DIR
 from .models import *
@@ -34,10 +35,11 @@ def get_job_data(job_id):
     return fields, index_ids, job_id
 
 # SAVE VALUE USER ENTRED IN INDEX TABLE
-def save_form_data(job_id, form_data, status, batch_id):
+def save_form_data(job_id, form_data, batch_id, status=None):
 
     fields_with_index_ids = PvcapIndex1.objects.filter(
         jobid=job_id).values_list('indexid', 'fieldname')
+    
     index_id_map = {fieldname: indexid for indexid,
                     fieldname in fields_with_index_ids}
 
@@ -50,23 +52,20 @@ def save_form_data(job_id, form_data, status, batch_id):
                 indexid=index_id,
                 value=value,
                 batchid=batch_id,
-                documentid=0,
+                bundleid=0,
                 detailsetid=None,
                 confidence=None,
                 rowindex=None
             )
 
-    saved_values = PvcapIndexvalue1.objects.filter(
-        jobid=job_id, batchid=batch_id)
-   
-
     batch = PvcapBatch1.objects.get(batchid=batch_id)
 
-    if status == 'complete':
-        batch.iscomplete = True
-    elif status == 'incomplete':
-        batch.iscomplete = False
-    batch.save()
+    if status is not None:
+        if status == 'complete':
+            batch.iscomplete = True
+        elif status == 'incomplete':
+            batch.iscomplete = False
+        batch.save()
 
 # CcOUNT EXPORT FOLDER TO MAKE THE NUMBER INCREMENRED
 def count_export_folders(base_path):
@@ -78,16 +77,15 @@ def count_export_folders(base_path):
 # CREATE PATH
 def create_path(section_name):
     if section_name == 'HR':
-        base_path = 'E:\\PVDocs\\Monitored Import Path\\HR\\'
-        # base_path = 'E:\\Projects\\iTrackFiles collection\\images'
+        # base_path = 'E:\\PVDocs\\Monitored Import Path\\HR\\'
+        base_path = 'E:\\Projects\\iTrackFiles collections\\images'
     elif section_name == 'Historic Order Books':
-        base_path = 'E:\\PVDocs\\Monitored Import Path\\HistoricOrderBooks\\'
-        # base_path = 'E:\\Projects\\iTrackFiles collection\\images'
+        # base_path = 'E:\\PVDocs\\Monitored Import Path\\HistoricOrderBooks\\'
+        base_path = 'E:\\Projects\\iTrackFiles collections\\images'
     elif section_name == 'Historic Index Cards':
-        base_path = 'E:\\PVDocs\\Monitored Import Path\\HistoricIndexCards\\'
-       # base_path = 'E:\Projects\iTrackFiles collection\images'
+        # base_path = 'E:\\PVDocs\\Monitored Import Path\\HistoricIndexCards\\'
+       base_path = 'E:\\Projects\\iTrackFiles collections\\images'
     else:
-        print("Invalid section name:", section_name)
         return
 
 
@@ -144,6 +142,8 @@ def save_field_data(form_data, job_id, dg_id, batch_id):
     instance = table_model()
     instance.jobid = job_id
 
+
+
     if section_name in ['HR', 'Historic Order Books', 'Historic Index Cards']:
         instance.createdate = datetime.now()
         instance.dupeid = 0
@@ -168,8 +168,9 @@ def save_field_data(form_data, job_id, dg_id, batch_id):
         instance.save()
         return instance.docid
 
-    except ValidationError as ve:
+    except ValidationError as e:
         return None
+
 
 #SAVE IMAGE NAME IN OBJ
 def save_image_names_to_database(docid, uploaded_images, section_name, image_count, batch_id, dg_id):
@@ -181,7 +182,6 @@ def save_image_names_to_database(docid, uploaded_images, section_name, image_cou
     elif section_name == 'Historic Index Cards':
         table_model = PvdmObjs114
     else:
-        print("Invalid section name:", section_name)
         return
 
     dg_path = PvdmDg1.objects.get(dgid=dg_id).path
@@ -234,6 +234,8 @@ def save_image_names_to_database(docid, uploaded_images, section_name, image_cou
         totalbytes=0
     )
 
+
+
 # CONVERT TIFF OR ANY EXTENTION TO JPEG
 def convert_image_to_jpg(image):
     img = Image.open(image)
@@ -252,199 +254,420 @@ def convert_image_to_jpg(image):
 
     return images
 
-# DELETE IMAGES FROM MEDIA AFTER WE CLICKED COMPLETE OR INCOMPLTE
-def delete_images(image_urls):
-    for image_url in image_urls:
-        image_path = os.path.join(settings.MEDIA_ROOT, image_url.lstrip('/'))
-        try:
-            if os.path.exists(image_path):
-                os.remove(image_path)
-        except Exception as e:
-            print(f"Error deleting image {image_path}: {e}")
-            
-#################################UPDATE BATCHES(EDIT INCOMPLETE BATCHES######################################################
-#RETRIVE OLD DATA FROM INCOMPLTE TO FULLFILLED FOR USER TO COMPLE FROM DOCS TABLE
-def fields_conversion(batchid, jobid):
+# DELETE BATCH DIR FROM MEDIA AFTER WE CLICKED COMPLETE OR INCOMPLTE
+def delete_batch(batch_id):
+    media_root = settings.MEDIA_ROOT
+    batch_dir = os.path.join(media_root, f'batch_{batch_id}')  
 
-    job_name = PvcapJob1.objects.get(jobid=jobid).name
-    field_to_column_mapping = {
-        'HR': {'Last Name': 'docindex1', 'First Name': 'docindex2', 'EIN': 'docindex3', 'Employment Type': 'docindex4', 'Document Type': 'docindex6'},
-        'Historic Order Books': {'Book Type': 'docindex1', 'Year': 'docindex2', 'Page A': 'docindex3', 'Page B': 'docindex4'},
-        'Historic Index Cards': {'Last Name': 'docindex1', 'First Name': 'docindex2', 'Subject': 'docindex3', 'Record Source': 'docindex4', 'Book Record': 'docindex5', 'Page': 'docindex6', 'Date': 'docindex7', 'Comments': 'docindex8', 'Instrument': 'docindex9', 'Status': 'docindex10', 'Owner': 'docindex11', 'Dates before 1753': 'docindex12'}
-    }
+    try:
+        if os.path.exists(batch_dir) and os.path.isdir(batch_dir):
+            shutil.rmtree(batch_dir) 
+        else:
+            print(f"Batch directory {batch_dir} does not exist.")
+    except Exception as e:
+        print(f"Error deleting batch directory {batch_dir}: {e}")
 
-    if job_name == 'HR':
-        doc_model = PvdmDocs15
-    elif job_name == 'Historic Order Books':
-        doc_model = PvdmDocs113
-    elif job_name == 'Historic Index Cards':
-        doc_model = PvdmDocs114
+
+def get_client_ip(request):
+    """
+    Get the client's IP address from the request object.
+    """
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
     else:
-        print("Invalid section name:", job_name)
-        return
-
-    obj = doc_model.objects.get(batchid=batchid)
-    second_dict = model_to_dict(obj)
-
-    first_dict = field_to_column_mapping.get(job_name)
-
-    new_dict = {}
-    for key, value in first_dict.items():
-        if value in second_dict:
-            new_dict[key] = second_dict.get(
-                value, '') if second_dict.get(value) is not None else ''
-            
-
-    if 'Date' in new_dict:
-        del new_dict['Date']
-
-    return new_dict
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
 
 
-# view image THAT WE SAVED IN INCOMPLETE BATCHES WE ENTERED LAST TIME( SAME LOGIC AS SERACH)
-def view_image(jobid, batchid):
 
-    job_name = PvcapJob1.objects.get(jobid=jobid).name
+#function to move images to created bundle dir
+def save_bundle_images(batchid, bundleid, uploaded_images=None, image_name=None):
+    batch_dir = os.path.join(settings.MEDIA_ROOT, f'batch_{batchid}')
+    os.makedirs(batch_dir, exist_ok=True)  
 
-    if job_name == 'HR':
-        obj_model = PvdmObjs15
-        doc_model = PvdmDocs15
-    elif job_name == 'Historic Order Books':
-        obj_model = PvdmObjs113
-        doc_model = PvdmDocs113
-    elif job_name == 'Historic Index Cards':
-        obj_model = PvdmObjs114
-        doc_model = PvdmDocs114
-    else:
-        print("Invalid section name:", job_name)
-        return
+    bundle_dir = os.path.join(batch_dir, f'bundle_{bundleid}')
+    os.makedirs(bundle_dir, exist_ok=True)
 
-    docid = doc_model.objects.get(batchid=batchid).docid
+    if uploaded_images:
+        for img in uploaded_images:
+            img_name = os.path.basename(img)
+            original_image_path = os.path.join(settings.MEDIA_ROOT, img.lstrip('/')) 
+            batch_image_path = os.path.join(batch_dir, img_name)  
 
-    images = obj_model.objects.filter(docid=docid)
-    images_data = []
+            try:
+                if os.path.exists(original_image_path):
+                    shutil.move(original_image_path, batch_image_path)
+            except Exception as e:
+                continue  
 
-    for image in images:
-        dg_id = image.dgid
-        dg_query = PvdmDg1.objects.filter(dgid=dg_id).first()
-        if dg_query:
-            filelist = image.filelist
-            filenames = extract_filenames_base(filelist)
+    for img in os.listdir(batch_dir):
+        img_path = os.path.join(batch_dir, img)
+        if os.path.isfile(img_path):  
+            bundle_image_path = os.path.join(bundle_dir, img)  
 
-            for filename in filenames:
-                if filename.isdigit() and len(filename) == 8:
-                    path = os.path.join(
-                        dg_query.path + dg_query.origdgname + '/IMG1/00000/', filename + '.TIF')
-                else:
-                    path = os.path.join(dg_query.path, filename)
+            if image_name:
+                if img.lower() == image_name.lower():
+                    break
+
                 try:
-                    with Image.open(path) as img:
-                        output = io.BytesIO()
-                        img.convert("RGB").save(output, format="JPEG")
-                        image_data = base64.b64encode(
-                            output.getvalue()).decode('utf-8')
-                        images_data.append(image_data)
-                except FileNotFoundError:
-                    pass
-
-    return images_data
-
-
-def extract_filenames_base(filelist):
-    if '<PATH>' in filelist:
-        return extract_filenames_path_pattern(filelist)
-    elif "Images" in filelist:
-        return extract_filenames_extension_pattern(filelist)
-    elif len(filelist) % 8 == 0 and all(char.isdigit() for char in filelist):
-        return extract_filenames_byts_pattern(filelist)
-
-    else:
-        raise ValueError("Filelist does not match any known pattern")
+                    if os.path.exists(img_path):
+                        shutil.move(img_path, bundle_image_path)
+                except Exception as e:
+                    print(f"Exception moving image {img} to bundle dir: {e}")
+            else:
+                try:
+                    if os.path.exists(img_path):
+                        shutil.move(img_path, bundle_image_path)
+                except Exception as e:
+                    print(f"Exception moving image {img} to bundle dir: {e}")
 
 
-def extract_filenames_byts_pattern(filelist):
-    filenames = [filelist[i:i+8] for i in range(0, len(filelist), 8)]
-    return filenames
 
 
-def extract_filenames_extension_pattern(filelist):
-    filenames = []
-    current_filename = ''
-    pattern_prefix = 'Images'
+#function to save bundle data to PvcapIndexvalue1 table
+def save_bundle_form_data(job_id, form_data, batch_id, bundleid):
 
-    for char in filelist:
-        current_filename += char
+    fields_with_index_ids = PvcapIndex1.objects.filter(
+        jobid=job_id).values_list('indexid', 'fieldname')
+        
+    index_id_map = {fieldname: indexid for indexid,
+                    fieldname in fields_with_index_ids}
+    
+    for fieldname, value in form_data.items():
+        if fieldname in index_id_map:
+            index_id = index_id_map[fieldname]
 
-        if current_filename.endswith(pattern_prefix):
-            image_filename = current_filename[:-len(pattern_prefix)].strip()
-            if image_filename:
-                filenames.append(image_filename)
-            current_filename = pattern_prefix
+            PvcapIndexvalue1.objects.create(
+                jobid=job_id,
+                indexid=index_id,
+                value=value,
+                batchid=batch_id,
+                bundleid=bundleid,
+                detailsetid=None,
+                confidence=None,
+                rowindex=None
+            )
 
-    if current_filename and current_filename != pattern_prefix:
-        filenames.append(current_filename.strip())
-
-    return filenames
 
 
-def extract_filenames_path_pattern(filelist):
-    pattern = re.compile(r'<PATH>(.*?)</PATH>')
-    return pattern.findall(filelist)
 
-# UPDATE DATA IN DOCS TABLE
-def update_docs(job_id, updated_dict, batchid, status):
+#function to create last bundle
+def create_last_bundle(batch_id, job_id, form_data):
+    try:
+        bundle = PvcapBundle.objects.create(
+            batchid=batch_id,
+            createdate=datetime.now()
+        )
+    except Exception as e:
+        print('exception is:', e)
+    images_list = []
+    for filename in os.listdir(settings.MEDIA_ROOT):
+        file_path = os.path.join(settings.MEDIA_ROOT, filename)
+        if os.path.isfile(file_path):
+            image_name = os.path.basename(file_path)
+            images_list.append(f'/{image_name}')
 
-    section_name = PvcapJob1.objects.get(jobid=job_id).name
+        
+    save_bundle_images(batch_id, bundle.bundleid, images_list)
+
+    save_bundle_form_data(job_id, form_data, batch_id, bundle.bundleid)       
+
+
+#funtion to save images names to OBJ table
+def save_bundle_image_names_to_database(docid, section_name, batch_id, bundle_id, dg_id):
 
     if section_name == 'HR':
-        table_model = PvdmDocs15
+        table_model = PvdmObjs15
     elif section_name == 'Historic Order Books':
-        table_model = PvdmDocs113
+        table_model = PvdmObjs113
     elif section_name == 'Historic Index Cards':
-        table_model = PvdmDocs114
+        table_model = PvdmObjs114
     else:
-        return None
+        return
 
-    column_mapping = map_fields_to_columns(job_id)
+    bundle_dir = os.path.join(settings.MEDIA_ROOT, f'batch_{batch_id}', f'bundle_{bundle_id}')
 
-    try:
-        instance = table_model.objects.get(batchid=batchid)
-    except table_model.DoesNotExist:
-        return None
+    if not os.path.exists(bundle_dir):
+        return
 
-    for fieldname, value in updated_dict.items():
-        column_name = column_mapping.get(fieldname)
+    dg_path = PvdmDg1.objects.get(dgid=dg_id).path
+    base_path = os.path.join(dg_path, 'Images', '0', '0', '0')
+    if not os.path.exists(base_path):
+        os.makedirs(base_path, exist_ok=True)
 
-        if column_name:
-            if 'date' in column_name.lower():
-                if not value:
-                    value = None
-                try:
-                    value = datetime.strptime(value, '%Y-%m-%d')
-                except ValueError as ve:
-                    value = None
-            setattr(instance, column_name.lower(), value)
+    saved_image_paths = []
+    image_count = 0  
 
-    try:
-        instance.save()  
-    except ValidationError as ve:
-        return None
+    for image_name in os.listdir(bundle_dir):
+        image_path = os.path.join(bundle_dir, image_name)
+
+        if not os.path.exists(image_path) or not image_name.lower().endswith(('.jpg', '.png', '.tif')):
+            continue  
+
+        save_path = os.path.join(base_path, image_name)
+        try:
+            with Image.open(image_path) as img:
+                img.save(save_path)
+                saved_image_paths.append(image_name)
+                image_count += 1  
+        except Exception as e:
+            print(f"Error saving image {image_name} locally: {e}")
+
+    filelist = ''.join([f"Images/0/0/0/{image_name}" for image_name in saved_image_paths])
+
+    table_model.objects.create(
+        docid=docid,
+        objtype=1,
+        hashtype=1,
+        hashinfo='',
+        filelist=filelist,
+        pages=image_count,  
+        versionnum=1,
+        versiontime=datetime.now(),
+        versioncreator='system',
+        versioncomments='',
+        dgid=dg_id,
+        trashuserid=0,
+        trashdatetime=None,
+        totalbytes=0
+    )
+
+
+
+
+    
+
+
+# def save_bundle_images_incomplete_phase(batchid, bundleid, uploaded_images=None, image_name=None):
+#     batch_dir = os.path.join(settings.MEDIA_ROOT, f'batch_{batchid}')
+#     os.makedirs(batch_dir, exist_ok=True)  
+
+#     bundle_dir = os.path.join(batch_dir, f'bundle_{bundleid}')
+#     os.makedirs(bundle_dir, exist_ok=True)
+
+#     if uploaded_images:
+#         for img in uploaded_images:
+#             img_name = os.path.basename(img)
+#             original_image_path = os.path.join(settings.MEDIA_ROOT, img.lstrip('/')) 
+#             batch_image_path = os.path.join(batch_dir, img_name)  
+
+#             try:
+#                 if os.path.exists(original_image_path):
+#                     shutil.move(original_image_path, batch_image_path)
+#             except Exception as e:
+#                 continue  
+
+#     for img in os.listdir(batch_dir):
+#         img_path = os.path.join(batch_dir, img)
+#         if os.path.isfile(img_path):  
+#             bundle_image_path = os.path.join(bundle_dir, img)  
+
+#             if image_name:
+#                 if img.lower() == image_name.lower():
+#                     break
+
+#                 try:
+#                     if os.path.exists(img_path):
+#                         shutil.move(img_path, bundle_image_path)
+#                 except Exception as e:
+#                     print(f"Exception moving image {img} to bundle dir: {e}")
+#             else:
+#                 try:
+#                     if os.path.exists(img_path):
+#                         shutil.move(img_path, bundle_image_path)
+#                 except Exception as e:
+#                     print(f"Exception moving image {img} to bundle dir: {e}")
+
+
+
+
+
+
+#################################UPDATE BATCHES(EDIT INCOMPLETE BATCHES######################################################
+
+
+# #RETRIVE OLD DATA FROM INCOMPLTE TO FULLFILLED FOR USER TO COMPLE FROM DOCS TABLE
+# def fields_conversion(batchid, jobid):
+
+#     job_name = PvcapJob1.objects.get(jobid=jobid).name
+#     field_to_column_mapping = {
+#         'HR': {'Last Name': 'docindex1', 'First Name': 'docindex2', 'EIN': 'docindex3', 'Employment Type': 'docindex4', 'Document Type': 'docindex6'},
+#         'Historic Order Books': {'Book Type': 'docindex1', 'Year': 'docindex2', 'Page A': 'docindex3', 'Page B': 'docindex4'},
+#         'Historic Index Cards': {'Last Name': 'docindex1', 'First Name': 'docindex2', 'Subject': 'docindex3', 'Record Source': 'docindex4', 'Book Record': 'docindex5', 'Page': 'docindex6', 'Date': 'docindex7', 'Comments': 'docindex8', 'Instrument': 'docindex9', 'Status': 'docindex10', 'Owner': 'docindex11', 'Dates before 1753': 'docindex12'}
+#     }
+
+#     if job_name == 'HR':
+#         doc_model = PvdmDocs15
+#     elif job_name == 'Historic Order Books':
+#         doc_model = PvdmDocs113
+#     elif job_name == 'Historic Index Cards':
+#         doc_model = PvdmDocs114
+#     else:
+#         print("Invalid section name:", job_name)
+#         return
+#     obj = doc_model.objects.get(batchid=batchid)
+#     second_dict = model_to_dict(obj)
+
+
+#     first_dict = field_to_column_mapping.get(job_name)
+
+#     new_dict = {}
+#     for key, value in first_dict.items():
+#         if value in second_dict:
+#             new_dict[key] = second_dict.get(
+#                 value, '') if second_dict.get(value) is not None else ''
+            
+
+#     if 'Date' in new_dict:
+#         del new_dict['Date']
+
+#     return new_dict
+
+
+# # view image THAT WE SAVED IN INCOMPLETE BATCHES WE ENTERED LAST TIME( SAME LOGIC AS SERACH)
+# def view_image(jobid, batchid):
+
+#     job_name = PvcapJob1.objects.get(jobid=jobid).name
+
+#     if job_name == 'HR':
+#         obj_model = PvdmObjs15
+#         doc_model = PvdmDocs15
+#     elif job_name == 'Historic Order Books':
+#         obj_model = PvdmObjs113
+#         doc_model = PvdmDocs113
+#     elif job_name == 'Historic Index Cards':
+#         obj_model = PvdmObjs114
+#         doc_model = PvdmDocs114
+#     else:
+#         return
+
+#     docid = doc_model.objects.get(batchid=batchid).docid
+
+#     images = obj_model.objects.filter(docid=docid)
+#     images_data = []
+
+#     for image in images:
+#         dg_id = image.dgid
+#         dg_query = PvdmDg1.objects.filter(dgid=dg_id).first()
+#         if dg_query:
+#             filelist = image.filelist
+#             filenames = extract_filenames_base(filelist)
+
+#             for filename in filenames:
+#                 if filename.isdigit() and len(filename) == 8:
+#                     path = os.path.join(
+#                         dg_query.path + dg_query.origdgname + '/IMG1/00000/', filename + '.TIF')
+#                 else:
+#                     path = os.path.join(dg_query.path, filename)
+#                 try:
+#                     with Image.open(path) as img:
+#                         output = io.BytesIO()
+#                         img.convert("RGB").save(output, format="JPEG")
+#                         image_data = base64.b64encode(
+#                             output.getvalue()).decode('utf-8')
+#                         images_data.append(image_data)
+#                 except FileNotFoundError:
+#                     pass
+
+#     return images_data
+
+
+# def extract_filenames_base(filelist):
+#     if '<PATH>' in filelist:
+#         return extract_filenames_path_pattern(filelist)
+#     elif "Images" in filelist:
+#         return extract_filenames_extension_pattern(filelist)
+#     elif len(filelist) % 8 == 0 and all(char.isdigit() for char in filelist):
+#         return extract_filenames_byts_pattern(filelist)
+
+#     else:
+#         raise ValueError("Filelist does not match any known pattern")
+
+
+# def extract_filenames_byts_pattern(filelist):
+#     filenames = [filelist[i:i+8] for i in range(0, len(filelist), 8)]
+#     return filenames
+
+
+# def extract_filenames_extension_pattern(filelist):
+#     filenames = []
+#     current_filename = ''
+#     pattern_prefix = 'Images'
+
+#     for char in filelist:
+#         current_filename += char
+
+#         if current_filename.endswith(pattern_prefix):
+#             image_filename = current_filename[:-len(pattern_prefix)].strip()
+#             if image_filename:
+#                 filenames.append(image_filename)
+#             current_filename = pattern_prefix
+
+#     if current_filename and current_filename != pattern_prefix:
+#         filenames.append(current_filename.strip())
+
+#     return filenames
+
+
+# def extract_filenames_path_pattern(filelist):
+#     pattern = re.compile(r'<PATH>(.*?)</PATH>')
+#     return pattern.findall(filelist)
+
+# # UPDATE DATA IN DOCS TABLE
+# def update_docs(job_id, updated_dict, batchid, status):
+
+#     section_name = PvcapJob1.objects.get(jobid=job_id).name
+
+#     if section_name == 'HR':
+#         table_model = PvdmDocs15
+#     elif section_name == 'Historic Order Books':
+#         table_model = PvdmDocs113
+#     elif section_name == 'Historic Index Cards':
+#         table_model = PvdmDocs114
+#     else:
+#         return None
+
+#     column_mapping = map_fields_to_columns(job_id)
+
+#     try:
+#         instance = table_model.objects.get(batchid=batchid)
+#     except table_model.DoesNotExist:
+#         return None
+
+#     for fieldname, value in updated_dict.items():
+#         column_name = column_mapping.get(fieldname)
+
+#         if column_name:
+#             if 'date' in column_name.lower():
+#                 if not value:
+#                     value = None
+#                 try:
+#                     value = datetime.strptime(value, '%Y-%m-%d')
+#                 except ValueError as ve:
+#                     value = None
+#             setattr(instance, column_name.lower(), value)
+
+#     try:
+#         instance.save()  
+#     except ValidationError as ve:
+#         return None
     
     
 
-    batch = PvcapBatch1.objects.get(batchid=batchid)
+#     batch = PvcapBatch1.objects.get(batchid=batchid)
 
-    if status == 'complete':
-        batch.iscomplete = True
-    elif status == 'incomplete':
-        batch.iscomplete = False
-    batch.save()
+#     if status == 'complete':
+#         batch.iscomplete = True
+#     elif status == 'incomplete':
+#         batch.iscomplete = False
+#     batch.save()
 
-    try:
-        instance.save()
+#     try:
+#         instance.save()
 
-    except ValidationError as ve:
-        return None
+#     except ValidationError as ve:
+#         return None
 
 
 

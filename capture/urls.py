@@ -11,5 +11,8 @@ urlpatterns =[
     path('incomplete-batch/', views.incomplete_batch_list, name="incompleteBatch"),
     path('delete-image/', views.delete_image, name='delete_image'),
     path('update-batches/<str:pk>/', views.update_batch, name='updateBatches'),
+    path('create-bundle/', views.create_bundle, name='create_bundle'),
+    path('submit-bundle/', views.submit_bundle, name='submit_bundle'),
+    path('bundle-data/<str:bundleid>/<str:batchid>/', views.get_bundle_data, name='get_bundle_data'),
 
 ]

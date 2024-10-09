@@ -13,6 +13,7 @@
            {% for image_url in uploaded_images %}
             <img src="{{ image_url }}" class="scrollable-image" alt="image" onclick="displayImage(this)">
            {% endfor %}
+           <input type="hidden" id="uploadedImagesData" value='{{ uploaded_images|safe }}'>
         </div>
       </div>
 
@@ -25,8 +26,9 @@
             <button id="zoomInBtn"><i class="fas fa-search-plus"></i></button>
             <button id="zoomOutBtn"><i class="fas fa-search-minus"></i></button>
             <button id="rotateBtn"><i class="fas fa-undo"></i></button>
-            <button id="resetBtn"><i class="fas fa-undo"></i> Reset</button>
-            <button id="deleteBtn"><i class="fas fa-trash"></i> Delete</button>
+            <button id="resetBtn"><i class="fas fa-undo"></i>Reset</button>
+            <button id="deleteBtn"><i class="fas fa-trash""></i>Delete</button>
+            <button id="breakBtn" onclick="createBundle()"><i ></i>Break</button>
           </div>  
         </div>
       </div>
@@ -46,7 +48,7 @@
                 <button id="scanButton" class="btn btn--sub btn--md my-md" type="button" onclick="submitScanForm()">Scan</button>
               </div>
             </form>
-           <form class="form" method="POST" action="{% url 'createBatch' %}">
+           <form id="myform" class="form" method="POST" action="{% url 'createBatch' %}">
               {% csrf_token %}
               <input type="hidden" name="batch_id" value="{{batchid}}">
               <input type="hidden" name="job_id" value="{{jobid}}">
@@ -127,6 +129,7 @@
       var scanUrl = "{% url 'upload_scanned_images' %}";
       var deleteUrl = "{% url 'delete_image' %}";
   </script>
+
   <script src="{% static 'js/create-batch.js' %}"></script>
 </main>
 {% endblock %}

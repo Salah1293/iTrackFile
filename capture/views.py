@@ -10,6 +10,7 @@ from batches.models import *
 from django.forms.models import model_to_dict
 
 
+
 # Create your BATCH ALL CYCLE INCLUDING HELPER FUNCTIONS AFTER IT IS COMPLETED IT REMOVE IMAGED IN MEDIS AND IMAGES URL IN SESSIONS.
 @login_required
 @csrf_exempt
@@ -26,48 +27,63 @@ def create_batch(request):
             user_role = login_user.role.name
         except PvdmUsers1.DoesNotExist:
             user_role = None
+
+
+        if status == 'incomplete':
+            request.session.pop('uploaded_images', None)
+            request.session.pop('image_count', None)           
+            return redirect('incompleteBatch')
+        
+
         try:
+            fields_with_index_ids = PvcapIndex1.objects.filter(
+                jobid=job_id).values_list('indexid', 'fieldname')
+            index_id_map = {fieldname: indexid for indexid,
+                    fieldname in fields_with_index_ids}
+            create_last_bundle(batch_id, job_id, form_data)
+            bundles = PvcapBundle.objects.filter(batchid=batch_id)
+            bundles_ids = [bundle.bundleid for bundle in bundles]
 
-            save_form_data(job_id, form_data, status, batch_id)
-            
-            section_name = PvcapJob1.objects.filter(jobid=job_id).values_list('name', flat=True).first()
+            bundle_data = {}
+            for bundleid in bundles_ids:
+                rows = PvcapIndexvalue1.objects.filter(bundleid=bundleid)
+                bundle_data = {row.indexid: row.value for row in rows}
+                result = {}
+                for fieldname, indexid in index_id_map.items():
+                    if fieldname != 'Date':
+                        result[fieldname] = bundle_data.get(indexid, '') 
+                section_name = PvcapJob1.objects.get(jobid=job_id).name
+                dgid = create_path(section_name)
 
-            dg_id = create_path(section_name)
-            
-            if section_name in ['HR', 'Historic Order Books', 'Historic Index Cards']:
-                docid = save_field_data(form_data, job_id, dg_id, batch_id)
-            else:
-                docid = None
-            
-            if docid is None:
-                return JsonResponse({'error': 'Failed to save field data'}, status=400)
-            
-            uploaded_images = request.session.get('uploaded_images', [])
-            image_count = len(uploaded_images)
-            
-            if not uploaded_images:
-                return JsonResponse({'error': 'No uploaded images found'}, status=400)
-            
-            save_image_names_to_database(docid, uploaded_images, section_name, image_count, batch_id, dg_id)
 
-            for image_url in uploaded_images:
-                image_path = os.path.join(settings.MEDIA_ROOT, image_url.lstrip('/media/'))
-                try:
-                    if os.path.exists(image_path):
-                        os.remove(image_path)
-                except Exception as e:
-                    print(f"Error deleting image {image_path}: {e}")
+                if section_name in ['HR', 'Historic Order Books', 'Historic Index Cards']:
+                    docid = save_field_data(result, job_id, dgid, batch_id)
+                else:
+                    docid = None
                 
-            
+                if docid is None:
+                    return JsonResponse({'error': 'Failed to save field data'}, status=400)
+                
+                save_bundle_image_names_to_database(docid, section_name, batch_id, bundleid, dgid)
 
-            delete_images(uploaded_images)
-            
+
+            batch = PvcapBatch1.objects.get(batchid=batch_id)
+
+            if status is not None:
+                if status == 'complete':
+                    batch.iscomplete = True
+                elif status == 'incomplete':
+                    batch.iscomplete = False
+                batch.save()
+
+    
+            delete_batch(batch_id)
             request.session.pop('uploaded_images', None)
             request.session.pop('image_count', None)
 
         except Exception as e:
             uploaded_images = request.session.get('uploaded_images', [])
-            delete_images(uploaded_images)
+            delete_batch(batch_id)
             request.session.pop('uploaded_images', None)
             request.session.pop('image_count', None)
             return JsonResponse({'error': str(e)}, status=400)
@@ -125,20 +141,24 @@ def upload_images(request):
 
     return JsonResponse({'uploaded_images': uploaded_file_urls})
 
+
 # accesss folder path dir and get images to media dir and save images url in session then delete images from folder path
 @login_required
 @csrf_exempt
 def upload_scanned_images(request):
+    client_ip = get_client_ip(request)
+    if not client_ip:
+        return JsonResponse({'error': 'Unable to retrieve client IP address'}, status=400)
+
     username = os.getlogin()
-    # folder_path = f'C:\\iTrackFilesScan' 
-    folder_path = f'C:\\Users\\{username}\\Downloads\\pics' 
+    folder_path = rf'C:\\Users\{username}\\Downloads\\iTrackFilesScan' 
     uploaded_file_urls = []
     
     if not os.path.exists(folder_path):
         return JsonResponse({'error': 'Scanned images folder does not exist'}, status=400)
     
     for filename in os.listdir(folder_path):
-        if filename.strip().lower().endswith(('.png', '.PNG','.jpg', '.jpeg', '.tif', '.tiff')):
+        if filename.strip().lower().endswith(('.png', '.jpg', '.jpeg', '.tif', '.tiff')):
             file_path = os.path.join(folder_path, filename)
             fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT))
             
@@ -156,7 +176,6 @@ def upload_scanned_images(request):
                 saved_filename = fs.save(filename, open(file_path, 'rb'))
                 uploaded_file_urls.append(fs.url(saved_filename))
             os.remove(file_path)
-            print("removeddddddddddddddd")
     if 'uploaded_images' not in request.session:
         request.session['uploaded_images'] = []
     request.session['uploaded_images'].extend(uploaded_file_urls)
@@ -288,18 +307,18 @@ def new_batch(request):
 @login_required
 def incomplete_batch_list (request):
 
-    login_user = PvdmUsers1.objects.get(user=request.user).userid
-    
+    login_user = PvdmUsers1.objects.get(user=request.user).userid 
     incomplete_batches = PvcapBatch1.objects.filter(iscomplete=False, userid=login_user)
-
     resultCount = incomplete_batches.count()
-
-
     context = {'incomplete_batches': incomplete_batches,
                'resultCount': resultCount}
 
-
     return render(request , 'capture/incomplete-batches.html', context)
+
+
+
+
+
 
 # work when we click on one of the rows of incomplete batch
 @login_required
@@ -311,28 +330,315 @@ def update_batch(request, pk):
     batch = PvcapBatch1.objects.get(pk=pk)
     batchid = batch.batchid
     jobid = batch.jobid
-    new_dict = fields_conversion(batchid, jobid)
 
-    image_data = view_image(jobid, batchid)
 
-    if request.method == 'POST':
-       
-        batchid = request.POST.get('batch_id', batchid)
-        jobid = request.POST.get('job_id', jobid)
-        status = 'complete' if 'complete' in request.POST else 'incomplete' 
-        updated_dict = {field: request.POST.get(field, value) for field, value in new_dict.items()}
-        
-        update_docs(jobid, updated_dict, batchid, status)
-        if not jobid:
-            return HttpResponse("Job ID is missing or invalid", status=400)
+    if 'incomplete' in request.POST:
 
-        return redirect('newBatch')
+        return redirect('incompleteBatch')
     
-    context = {'new_dict': new_dict,
+
+    if 'complete' in request.POST:
+        form_data = request.POST.dict()
+        form_data.pop('csrfmiddlewaretoken', None)
+
+        batch_id = form_data.pop('batch_id', None)
+        job_id = form_data.pop('job_id', None)
+        bundleid = form_data.pop('bundle_id', None)
+        current_image = form_data.pop('imageName', None)
+
+
+        if bundleid == 'null':
+            bundleid = None
+
+
+        images = []
+
+        if bundleid is None:
+            try:
+                bundle = PvcapBundle.objects.create(
+                    batchid=batch_id,
+                    createdate=datetime.now()
+                    )
+                bundleid = bundle.bundleid  
+            except Exception as e:
+                return JsonResponse({'error': 'Failed to create bundle'}, status=500)
+
+ 
+            
+            upload_images = request.session.get('uploaded_images')
+
+            save_bundle_images(batch_id, bundle.bundleid, upload_images, current_image)
+            save_bundle_form_data(job_id, form_data, batch_id, bundle.bundleid)
+
+            batch_dir = os.path.join(settings.MEDIA_ROOT, f'batch_{batch_id}')
+            section_name = PvcapJob1.objects.get(jobid=job_id).name
+            dgid = create_path(section_name)
+
+
+            if section_name in ['HR', 'Historic Order Books', 'Historic Index Cards']:
+                docid = save_field_data(form_data, job_id, dgid, batch_id)
+            else:
+                docid = None
+
+            if docid is None:
+                return JsonResponse({'error': 'Failed to save field data'}, status=400)
+
+            save_bundle_image_names_to_database(docid, section_name, batch_id, bundleid, dgid)
+
+            try:
+                bundle = PvcapBundle.objects.get(bundleid=bundleid)
+                bundle.submit = True 
+                bundle.save()  
+            except ObjectDoesNotExist:
+                return JsonResponse({'error': 'Bundle ID does not exist'}, status=404)
+            
+            batch = PvcapBatch1.objects.get(batchid=batchid)
+            batch.iscomplete = True
+
+            delete_batch(batch_id)
+
+            return redirect ('newBatch')
+
+
+
+
+
+
+
+
+
+
+    bundles = PvcapBundle.objects.filter(batchid=batchid)
+    first_bundle = bundles.first() if bundles.exists() else None
+    bundleid = first_bundle.bundleid
+    bundles_ids = [bundle.bundleid for bundle in bundles if bundle.submit is False]
+    bundle_count = len(bundles)
+
+    batch_dir = os.path.join(settings.MEDIA_ROOT, f'batch_{batchid}')
+
+    is_bundled = True
+
+    if os.path.exists(batch_dir):
+        images = [f for f in os.listdir(batch_dir) if os.path.isfile(os.path.join(batch_dir, f))]
+        is_bundled = False
+    else:
+        images = []
+
+
+    fields_with_index_ids = PvcapIndex1.objects.filter(jobid=jobid).values_list('indexid', 'fieldname')
+    index_id_map = {fieldname: indexid for indexid, fieldname in fields_with_index_ids if fieldname != 'Date'}
+    
+
+    result = {key: "" for key in index_id_map}
+    
+  
+
+    context = {
         'batchid': batchid,
         'jobid': jobid,
-        'image_data': image_data,
         'user_role': user_role,
+        'bundleid': bundleid,
+        'bundle_count': bundle_count,
+        'bundles_ids': bundles_ids,
+        'result': result,
+        'images': images,
+        'media_url': settings.MEDIA_URL,
+        'is_bundled': is_bundled,
         }
     
     return render(request, 'capture/update-batch.html', context)
+
+
+
+
+
+
+
+@login_required
+@csrf_exempt  
+def create_bundle(request):
+    if request.method == 'POST':        
+        try:
+            form_data = request.POST.dict()  
+            form_data.pop('csrfmiddlewaretoken', None) 
+            
+    
+            current_image = form_data.pop('imageName', None)
+            batch_id = form_data.pop('batch_id', None)
+            job_id = form_data.pop('job_id', None)
+
+            try:
+                bundle = PvcapBundle.objects.create(
+                    batchid=batch_id,
+                    createdate=datetime.now()
+                )
+            except Exception as e:
+                print('exception is:', e)
+
+            upload_images = request.session.get('uploaded_images')
+                
+            save_bundle_images(batch_id, bundle.bundleid, upload_images, current_image)
+
+            save_bundle_form_data(job_id, form_data, batch_id, bundle.bundleid)       
+
+            bundle_id = bundle.batchid
+            bundles = PvcapBundle.objects.filter(batchid=batch_id)
+            bundle_ids = [bundle.bundleid for bundle in bundles if bundle.submit is False]
+
+            batch_dir = os.path.join(settings.MEDIA_ROOT, f'batch_{batch_id}')
+
+            if os.path.exists(batch_dir):
+                images = [f for f in os.listdir(batch_dir) if os.path.isfile(os.path.join(batch_dir, f))]
+
+            response_data = {
+                'success': True,
+                'message': 'Data received successfully',
+                'form_data': form_data,
+                'current_image': current_image,
+                'bundle_id': bundle_id,
+                'batch_id': batch_id,
+                'bundle_ids': bundle_ids,
+                'unbundled_images': images,
+                'media_url': settings.MEDIA_URL
+                }
+
+
+            return JsonResponse(response_data)
+
+
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+        
+
+
+
+
+@csrf_exempt
+def get_bundle_data(request, bundleid, batchid):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            bundleid = data.get('bundle_id')  
+            batchid = data.get('batch_id')
+
+            if not batchid:
+                return JsonResponse({'error': 'Missing batchid'}, status=400)
+
+            if bundleid: 
+                bundle_dir = os.path.join(settings.MEDIA_ROOT, f'batch_{batchid}', f'bundle_{bundleid}')
+            else: 
+                bundle_dir = os.path.join(settings.MEDIA_ROOT, f'batch_{batchid}')
+
+            images = [f for f in os.listdir(bundle_dir) if os.path.isfile(os.path.join(bundle_dir, f))] if os.path.exists(bundle_dir) else []
+
+            if bundleid:  
+                batch = get_object_or_404(PvcapBatch1, batchid=batchid)
+                jobid = batch.jobid
+
+                fields_with_index_ids = PvcapIndex1.objects.filter(jobid=jobid).values_list('indexid', 'fieldname')
+                index_id_map = {fieldname: indexid for indexid, fieldname in fields_with_index_ids}
+
+                rows = PvcapIndexvalue1.objects.filter(bundleid=bundleid)
+                bundle_data = {row.indexid: row.value for row in rows}
+
+                result = {}
+                for fieldname, indexid in index_id_map.items():
+                    if fieldname != 'Date':
+                        result[fieldname] = bundle_data.get(indexid, '')
+            else:
+                result = {}  
+
+            return JsonResponse({
+                'images': images,
+                'result': result,
+                'media_url': settings.MEDIA_URL,
+                'batchid': batchid
+            })
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+
+
+
+
+#function to submit bundles
+def submit_bundle(request):
+    if request.method == 'POST':
+        try:
+            form_data = request.POST.dict()
+            form_data.pop('csrfmiddlewaretoken', None)
+
+            batch_id = form_data.pop('batch_id', None)
+            job_id = form_data.pop('job_id', None)
+            bundleid = form_data.pop('bundle_id', None)
+            current_image = form_data.pop('imageName', None)
+
+
+            if bundleid == 'null':
+                bundleid = None
+
+
+            images = []
+
+            if bundleid is None:
+                try:
+                    bundle = PvcapBundle.objects.create(
+                    batchid=batch_id,
+                    createdate=datetime.now()
+                    )
+                    bundleid = bundle.bundleid  
+                except Exception as e:
+                    return JsonResponse({'error': 'Failed to create bundle'}, status=500)
+
+
+                upload_images = request.session.get('uploaded_images')
+
+
+                save_bundle_images(batch_id, bundle.bundleid, upload_images, current_image)
+                save_bundle_form_data(job_id, form_data, batch_id, bundle.bundleid)
+
+                batch_dir = os.path.join(settings.MEDIA_ROOT, f'batch_{batch_id}')
+                if os.path.exists(batch_dir):
+                    images = [f for f in os.listdir(batch_dir) if os.path.isfile(os.path.join(batch_dir, f))]
+
+
+            section_name = PvcapJob1.objects.get(jobid=job_id).name
+            dgid = create_path(section_name)
+
+
+            if section_name in ['HR', 'Historic Order Books', 'Historic Index Cards']:
+                docid = save_field_data(form_data, job_id, dgid, batch_id)
+            else:
+                docid = None
+
+            if docid is None:
+                return JsonResponse({'error': 'Failed to save field data'}, status=400)
+
+            save_bundle_image_names_to_database(docid, section_name, batch_id, bundleid, dgid)
+
+            try:
+                bundle = PvcapBundle.objects.get(bundleid=bundleid)
+                bundle.submit = True 
+                bundle.save()  
+            except ObjectDoesNotExist:
+                return JsonResponse({'error': 'Bundle ID does not exist'}, status=404)
+            
+
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Form submitted successfully!',
+                'bundleid': bundleid,
+                'unbundled_images': images,
+                'batch_id': batch_id,
+                'media_url': settings.MEDIA_URL
+            })
+
+        except ObjectDoesNotExist as e:
+            return JsonResponse({'error': 'Job ID does not exist'}, status=404)
+        
+        except Exception as e:
+            return JsonResponse({'error': 'An unexpected error occurred'}, status=500)
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})

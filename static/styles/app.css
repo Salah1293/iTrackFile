@@ -122,7 +122,6 @@ img {
   }
   .toggle-menu__lines::after {
     top: 4.6rem;
-    /* btn btn--sub btn--lg; */
     transform-origin: 0 0;
   }
 
@@ -1231,4 +1230,22 @@ img {
 
 .print-option label {
   margin-left: 5px;
+}
+
+
+.button-container {
+  display: flex; /* Align items horizontally */
+  align-items: center; /* Center buttons vertically */
+  justify-content: center; /* Center buttons in the container */
+  gap: 10px; /* Space between all buttons */
+  margin-top: 20px; /* Space between this container and the upper part */
+}
+
+#confirmBundleBtn {
+  background-color: green; /* Green background color */
+  color: white; /* White text color for contrast */
+}
+
+.button-container input {
+  margin: 0; /* Remove any default margin */
 }

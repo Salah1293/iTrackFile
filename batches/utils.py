@@ -74,7 +74,7 @@ def createForm(request, template, classFrom):
 #     return redirect(template)
 
 
-# display images contains evrey thing in page except priynt Rotat and reset mmade by js as they are styling manner
+# display images contains evrey thing in page except print Rotat and reset mmade by js as they are styling manner
 def singleImageView(request, pk, doc_model, obj_model, card_form, section):
     # contains id for all rows displayed
     ids = request.GET.get('ids', '')
@@ -130,9 +130,7 @@ def view_image(pk, obj_model):
         dg_query = PvdmDg1.objects.filter(dgid=dg_id).first()
         if dg_query:
             filelist = image.filelist
-            print("before extract ++++++++++++++++")
             filenames = extract_filenames_base(filelist)
-            print("filenames--------------", filenames)
 
             for filename in filenames:
                 if filename.isdigit() and len(filename) == 8:
@@ -140,7 +138,6 @@ def view_image(pk, obj_model):
                         dg_query.path + dg_query.origdgname + '/IMG1/00000/', filename + '.TIF')
                 else:
                     path = os.path.join(dg_query.path, filename)
-                print('path is:', path)
                 try:
                     with Image.open(path) as img:
                         output = io.BytesIO()
@@ -157,24 +154,24 @@ def view_image(pk, obj_model):
 # navigate images FOR ICONS LAST PREVIOUS AND NEXT
 def navigate_image(ids_list, current_id):
     try:
-        index = ids_list.index(current_id)
+        current_index = ids_list.index(current_id)
     except ValueError:
         return None, None, None, None
 
     first_id = ids_list[0] if ids_list else None
     last_id = ids_list[-1] if ids_list else None
 
-    if index == 0:
+    if current_index == 0:
         prev_id = None
     else:
-        prev_id = ids_list[index - 1]
+        prev_id = ids_list[current_index - 1]
 
-    if index == len(ids_list) - 1:
+    if current_index == len(ids_list) - 1:
         next_id = None
     else:
-        next_id = ids_list[index + 1]
-
+        next_id = ids_list[current_index + 1]
     return first_id, last_id, next_id, prev_id
+
 
 # BASE FUNCTION THAT HAS CONDITIONS FOR EACH IMAGE PATTERN PATHES FUNCTIONS
 def extract_filenames_base(filelist):
@@ -182,11 +179,9 @@ def extract_filenames_base(filelist):
         return extract_filenames_byts_pattern(filelist)
     
     elif '<PATH>' in filelist:
-        print("fireee=====================")
         return extract_filenames_path_pattern(filelist)
     
     elif "Images" in filelist:
-        print("images--------")
         return extract_filenames_extension_pattern(filelist)
 
     else:

@@ -22,7 +22,6 @@ class Role(models.Model):
 class PvdmUsers1(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, blank=True)
-
     userid = models.AutoField(db_column='USERID', primary_key=True)  # Field name made lowercase.
     username = models.CharField(db_column='USERNAME', unique=True, max_length=255, db_collation='Latin1_General_CI_AS')  # Field name made lowercase.
     fullname = models.CharField(db_column='FULLNAME', max_length=255, db_collation='Latin1_General_CI_AS')  # Field name made lowercase.

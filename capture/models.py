@@ -44,7 +44,7 @@ class PvcapIndexvalue1(models.Model):
     indexid = models.BigIntegerField(db_column='INDEXID')  # Field name made lowercase.
     value = models.CharField(db_column='VALUE', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
     batchid = models.BigIntegerField(db_column='BATCHID')  # Field name made lowercase.
-    documentid = models.BigIntegerField(db_column='DOCUMENTID')  # Field name made lowercase.
+    bundleid = models.BigIntegerField(db_column='BUNDLEID')  # Field name made lowercase.
     detailsetid = models.CharField(db_column='DETAILSETID', max_length=255, db_collation='Latin1_General_CI_AS', blank=True, null=True)  # Field name made lowercase.
     confidence = models.FloatField(db_column='CONFIDENCE', blank=True, null=True)  # Field name made lowercase.
     rowindex = models.IntegerField(db_column='ROWINDEX', blank=True, null=True)  # Field name made lowercase.
@@ -87,3 +87,12 @@ class PvcapJob1(models.Model):
 
 
 
+class PvcapBundle(models.Model):
+    bundleid = models.BigAutoField(db_column='BUNDLEID', primary_key=True)
+    batchid = models.IntegerField(db_column='BATCHID', null=False)
+    createdate = models.DateTimeField(db_column='CREATEDATE', null=True)
+    submit = models.BooleanField(default=False)
+
+    class Meta:
+        managed = False  
+        db_table = 'PvcapBundle'
