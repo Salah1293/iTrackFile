@@ -385,9 +385,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-
-    
-
     window.displayImage = function (img) {
         selectedImage.src = img.src;
         currentImageIndex = Array.from(scrollableImages.children).indexOf(img);

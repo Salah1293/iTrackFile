@@ -4,6 +4,15 @@
 <main class="singleBatch my-md">
   <div class="container">
     <div class="layout">
+
+
+
+
+
+
+
+
+
       <div
         class="column column--1of3"
         style=" flex: 1; padding-left: 10px; max-height: 550px; overflow-y: scroll; border-radius: 0.7rem;" >
@@ -16,6 +25,15 @@
            <input type="hidden" id="uploadedImagesData" value='{{ uploaded_images|safe }}'>
         </div>
       </div>
+
+
+
+
+
+
+
+
+
 
       <div class="column column--1of3" style="flex: 6; padding: 0 10px">
         <div class="image-container">
@@ -104,12 +122,19 @@
                 <option value="Surveys">Surveys</option>
               </select>
             </div>
-          {% else %}
-            <div class="form__field">
-              <label style="color: black; font-size: 16px;" id="capture-label" for="formInput#{{ field }}">{{ field }}</label>
-              <input class="input input--text" id="formInput#{{ field }}" type="text" name="{{ field }}" placeholder="Enter {{ field }}" />
-            </div>
-          {% endif %}
+            {% elif field == 'Date' %}
+    <div class="form__field">
+      <label style="color: black; font-size: 16px;" id="capture-label" for="formInput#{{ field }}">{{ field }}</label>
+      <input class="input input--text" id="formInput#{{ field }}" type="text" name="{{ field }}" placeholder="Enter (YYYY-MM-DD)" />
+    </div>
+
+  {% else %}
+    <div class="form__field">
+      <label style="color: black; font-size: 16px;" id="capture-label" for="formInput#{{ field }}">{{ field }}</label>
+      <input class="input input--text" id="formInput#{{ field }}" type="text" name="{{ field }}" placeholder="Enter {{ field }}" />
+    </div>
+  {% endif %}
+
          {% endfor %}
                 </div>
               </div>

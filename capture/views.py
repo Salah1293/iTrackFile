@@ -50,8 +50,8 @@ def create_batch(request):
                 bundle_data = {row.indexid: row.value for row in rows}
                 result = {}
                 for fieldname, indexid in index_id_map.items():
-                    if fieldname != 'Date':
-                        result[fieldname] = bundle_data.get(indexid, '') 
+                    # if fieldname != 'Date':
+                    result[fieldname] = bundle_data.get(indexid, '') 
                 section_name = PvcapJob1.objects.get(jobid=job_id).name
                 dgid = create_path(section_name)
 
@@ -193,22 +193,33 @@ def upload_scanned_images(request):
 @csrf_exempt
 def delete_image(request):
     if request.method == 'POST':
+        # image_url = request.POST.get('deleteUrl')
         image_url = request.POST.get('deleteUrl')
-        image_url = request.POST.get('deleteUrl')
+        print('deleted image is:', image_url)
         uploaded_images = request.session.get('uploaded_images', [])
 
         if image_url in uploaded_images:
             uploaded_images.remove(image_url)
+            print('image removed')
             request.session['uploaded_images'] = uploaded_images
+            print('new images appended.')
 
             image_path = os.path.join(settings.MEDIA_ROOT, image_url.lstrip('/'))
             try:
                 if os.path.exists(image_path):
                     os.remove(image_path)
+                    print('image removed from media dir.')
             except Exception as e:
                 print(f"Error deleting image {image_path}: {e}")
 
-            return JsonResponse({'success': True, 'uploaded_images': uploaded_images})
+            if os.path.exists(settings.MEDIA_ROOT):
+                images = [f for f in os.listdir(settings.MEDIA_ROOT) if os.path.isfile(os.path.join(settings.MEDIA_ROOT, f))]
+
+            return JsonResponse({'success': True,
+                                  'uploaded_images': uploaded_images,
+                                #   'newImages': images,
+                                  'media_url': settings.MEDIA_URL,
+                                   'imageUrl': image_url })
 
         return JsonResponse({'success': False, 'error': 'Image not found in session'}, status=400)
 
@@ -277,6 +288,8 @@ def new_batch(request):
 
 
         fields, indexids, job_id = get_job_data(job_id)
+
+        # fields = [f"{field} (YYYY-MM-DD)" if field == 'Date' else field for field in fields]
 
 
         context = {'fields' : fields, 'batchid': batch.batchid,

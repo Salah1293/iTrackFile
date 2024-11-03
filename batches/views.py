@@ -18,7 +18,7 @@ from users.decorators import roles_required
 from django.contrib.auth.decorators import login_required
 from django.contrib.messages import error
 from users.models import PvdmUsers1, Role
-
+from django.utils.dateformat import DateFormat
 
 # Create your views here.
 
@@ -95,11 +95,6 @@ def view_section_results(request):
         return render(request, 'batches/general-results.html')
 
 
-# @login_required
-# def fillingBatch(request):
-
-#     return render(request, 'batches/filling-batch.html')
-
 
 # criminal search
 @login_required
@@ -141,11 +136,16 @@ def criminalResults(request):
 
             resultCount = criminal.count() if query else 0
 
-            custom_range, criminal = paginate(request, criminal)
+            custom_range, page_obj = paginate(request, criminal)
 
-            all_ids = criminal.object_list.values_list('docid', flat=True)
+            for card in page_obj:
+                if card.docindex2 or card.docindex20:
+                    card.docindex2 = DateFormat(card.docindex2).format('Y-m-d') if card.docindex2 else None
+                    card.docindex20 = DateFormat(card.docindex20).format('Y-m-d') if card.docindex20 else None
 
-            context = {'section_result': criminal,
+            all_ids = list(card.docid for card in page_obj if card.docid)
+
+            context = {'section_result': page_obj,
                        'resultCount': resultCount,
                        'custom_range': custom_range,
                        'all_ids': all_ids,
@@ -198,11 +198,16 @@ def civilResults(request):
 
             resultCount = civil.count() if query else 0
 
-            custom_range, civil = paginate(request, civil)
+            custom_range, page_obj = paginate(request, civil)
 
-            all_ids = civil.object_list.values_list('docid', flat=True)
+            for card in page_obj:
+                if card.docindex2 or card.docindex20:
+                    card.docindex2 = DateFormat(card.docindex2).format('Y-m-d') if card.docindex2 else None
+                    card.docindex20 = DateFormat(card.docindex20).format('Y-m-d') if card.docindex20 else None
 
-            context = {'section_result': civil,
+            all_ids = list(card.docid for card in page_obj if card.docid)
+
+            context = {'section_result': page_obj,
                        'resultCount': resultCount,
                        'custom_range': custom_range,
                        'all_ids': all_ids,
@@ -249,11 +254,15 @@ def criminalCasesResults(request):
 
             resultCount = criminalCases.count() if query else 0
 
-            custom_range, criminalCases = paginate(request, criminalCases)
+            custom_range, page_obj = paginate(request, criminalCases)
 
-            all_ids = criminalCases.object_list.values_list('docid', flat=True)
+            for card in page_obj:
+                if card.createdate :
+                    card.createdate = DateFormat(card.createdate).format('Y-m-d') if card.createdate else None
 
-            context = {'section_result': criminalCases,
+            all_ids = list(card.docid for card in page_obj if card.docid)
+
+            context = {'section_result': page_obj,
                        'resultCount': resultCount,
                        'custom_range': custom_range,
                        'all_ids': all_ids,
@@ -301,12 +310,16 @@ def criminalJuvenileResults(request):
 
             resultCount = ciminalJuvenile.count() if query else 0
 
-            custom_range, ciminalJuvenile = paginate(request, ciminalJuvenile)
+            custom_range, page_obj = paginate(request, ciminalJuvenile)
 
-            all_ids = ciminalJuvenile.object_list.values_list(
-                'docid', flat=True)
+            for card in page_obj:
+                if card.docindex2 or card.docindex20:
+                    card.docindex2 = DateFormat(card.docindex2).format('Y-m-d') if card.docindex2 else None
+                    card.docindex20 = DateFormat(card.docindex20).format('Y-m-d') if card.docindex20 else None
 
-            context = {'section_result': ciminalJuvenile,
+            all_ids = list(card.docid for card in page_obj if card.docid)
+
+            context = {'section_result': page_obj,
                        'resultCount': resultCount,
                        'custom_range': custom_range,
                        'all_ids': all_ids,
@@ -365,13 +378,14 @@ def historicIndexCardsResults(request):
 
             resultCount = historicIndexCards.count() if query else 0
 
-            custom_range, historicIndexCards = paginate(
+            custom_range, page_obj = paginate(
                 request, historicIndexCards)
+
 
             all_ids = historicIndexCards.object_list.values_list(
                 'docid', flat=True)
 
-            context = {'section_result': historicIndexCards,
+            context = {'section_result': page_obj,
                        'resultCount': resultCount,
                        'custom_range': custom_range,
                        'all_ids': all_ids,
@@ -419,6 +433,8 @@ def historicOrderBooksResults(request):
 
             custom_range, historicOrderBooks = paginate(
                 request, historicOrderBooks)
+            
+            
 
             all_ids = historicOrderBooks.object_list.values_list(
                 'docid', flat=True)
@@ -482,11 +498,15 @@ def hrResults(request):
 
             resultCount = hr.count() if query else 0
 
-            custom_range, hr = paginate(request, hr)
+            custom_range, page_obj = paginate(request, hr)
 
-            all_ids = hr.object_list.values_list('docid', flat=True)
+            for card in page_obj:
+                if card.createdate:
+                    card.createdate = DateFormat(card.createdate).format('Y-m-d') if card.createdate else None
 
-            context = {'section_result': hr,
+            all_ids = list(card.docid for card in page_obj if card.docid)
+
+            context = {'section_result': page_obj,
                        'resultCount': resultCount,
                        'custom_range': custom_range,
                        'all_ids': all_ids,
@@ -533,11 +553,16 @@ def bondBooksResults(request):
 
             resultCount = bondBooks.count() if query else 0
 
-            custom_range, bondBooks = paginate(request, bondBooks)
+            custom_range, page_obj = paginate(request, bondBooks)
 
-            all_ids = bondBooks.object_list.values_list('docid', flat=True)
+            for card in page_obj:
+                if card.createdate :
+                    card.createdate = DateFormat(card.createdate).format('Y-m-d') if card.createdate else None
 
-            context = {'section_result': bondBooks,
+            all_ids = list(card.docid for card in page_obj if card.docid)
+
+
+            context = {'section_result': page_obj,
                        'resultCount': resultCount,
                        'custom_range': custom_range,
                        'all_ids': all_ids,
@@ -582,11 +607,15 @@ def chartersResults(request):
 
             resultCount = charters.count() if query else 0
 
-            custom_range, charters = paginate(request, charters)
+            custom_range, page_obj = paginate(request, charters)
 
-            all_ids = charters.object_list.values_list('docid', flat=True)
+            for card in page_obj:
+                if card.createdate :
+                    card.createdate = DateFormat(card.createdate).format('Y-m-d') if card.createdate else None
 
-            context = {'section_result': charters,
+            all_ids = list(card.docid for card in page_obj if card.docid)
+
+            context = {'section_result': page_obj,
                        'resultCount': resultCount,
                        'custom_range': custom_range,
                        'all_ids': all_ids,
@@ -634,13 +663,19 @@ def ConcealedWeaponsResults(request):
 
             resultCount = concealedWeapons.count() if query else 0
 
-            custom_range, concealedWeapons = paginate(
+            custom_range, page_obj = paginate(
                 request, concealedWeapons)
+            
+            for card in page_obj:
+                if card.createdate or card.docindex2 or card.docindex6:
+                    card.createdate = DateFormat(card.createdate).format('Y-m-d') if card.createdate else None
+                    card.docindex2 = DateFormat(card.docindex2).format('Y-m-d') if card.docindex2 else None
+                    card.docindex6 = DateFormat(card.docindex6).format('Y-m-d') if card.docindex6 else None
 
-            all_ids = concealedWeapons.object_list.values_list(
-                'docid', flat=True)
+            all_ids = list(card.docid for card in page_obj if card.docid)
 
-            context = {'section_result': concealedWeapons,
+
+            context = {'section_result': page_obj,
                        'resultCount': resultCount,
                        'custom_range': custom_range,
                        'all_ids': all_ids,
@@ -684,11 +719,18 @@ def indictmentsResults(request):
 
             resultCount = indictments.count() if query else 0
 
-            custom_range, indictments = paginate(request, indictments)
+            custom_range, page_obj = paginate(request, indictments)
 
-            all_ids = indictments.object_list.values_list('docid', flat=True)
+            for card in page_obj:
+                if card.createdate or card.docindex8 or card.docindex9:
+                    card.createdate = DateFormat(card.createdate).format('Y-m-d') if card.createdate else None
+                    card.docindex8 = DateFormat(card.docindex8).format('Y-m-d') if card.docindex8 else None
+                    card.docindex9 = DateFormat(card.docindex9).format('Y-m-d') if card.docindex9 else None
 
-            context = {'section_result': indictments,
+            all_ids = list(card.docid for card in page_obj if card.docid)
+
+
+            context = {'section_result': page_obj,
                        'resultCount': resultCount,
                        'custom_range': custom_range,
                        'all_ids': all_ids,
@@ -729,11 +771,16 @@ def lawChanceryResults(request):
 
             resultCount = lawChancery.count() if query else 0
 
-            custom_range, lawChancery = paginate(request, lawChancery)
+            custom_range, page_obj = paginate(request, lawChancery)
 
-            all_ids = lawChancery.object_list.values_list('docid', flat=True)
+            for card in page_obj:
+                if card.createdate :
+                    card.createdate = DateFormat(card.createdate).format('Y-m-d') if card.createdate else None
 
-            context = {'section_result': lawChancery,
+            all_ids = list(card.docid for card in page_obj if card.docid)
+
+
+            context = {'section_result': page_obj,
                        'resultCount': resultCount,
                        'custom_range': custom_range,
                        'all_ids': all_ids,
@@ -774,13 +821,20 @@ def destructionOrdersResults(request):
 
             resultCount = destructionOrders.count() if query else 0
 
-            custom_range, destructionOrders = paginate(
+            custom_range, page_obj = paginate(
                 request, destructionOrders)
+            
+            for card in page_obj:
+                if  card.createdate or card.docindex2 or card.docindex or card.docindex4 or card.docindex5:
+                    card.createdate = DateFormat(card.createdate).format('Y-m-d') if card.createdate else None
+                    card.docindex2 = DateFormat(card.docindex2).format('Y-m-d') if card.docindex2 else None
+                    card.docindex3 = DateFormat(card.docindex3).format('Y-m-d') if card.docindex3 else None
+                    card.docindex4 = DateFormat(card.docindex4).format('Y-m-d') if card.docindex4 else None
+                    card.docindex5 = DateFormat(card.docindex5).format('Y-m-d') if card.docindex5 else None
 
-            all_ids = destructionOrders.object_list.values_list(
-                'docid', flat=True)
+            all_ids = list(card.docid for card in page_obj if card.docid)
 
-            context = {'section_result': destructionOrders,
+            context = {'section_result': page_obj,
                        'resultCount': resultCount,
                        'custom_range': custom_range,
                        'all_ids': all_ids,
@@ -830,11 +884,17 @@ def adoptionResults(request):
 
             resultCount = adoption.count() if query else 0
 
-            custom_range, adoption = paginate(request, adoption)
+            custom_range, page_obj = paginate(request, adoption)
 
-            all_ids = adoption.object_list.values_list('docid', flat=True)
+            for card in page_obj:
+                if  card.createdate or card.docindex2 or card.docindex20:
+                    card.createdate = DateFormat(card.createdate).format('Y-m-d') if card.createdate else None
+                    card.docindex2 = DateFormat(card.docindex2).format('Y-m-d') if card.docindex2 else None
+                    card.docindex20 = DateFormat(card.docindex20).format('Y-m-d') if card.docindex20 else None
 
-            context = {'section_result': adoption,
+            all_ids = list(card.docid for card in page_obj if card.docid)
+
+            context = {'section_result': page_obj,
                        'resultCount': resultCount,
                        'custom_range': custom_range,
                        'all_ids': all_ids,
@@ -899,11 +959,17 @@ def clerkOrdersResults(request):
 
             resultCount = clerkOrder.count() if query else 0
 
-            custom_range, clerkOrder = paginate(request, clerkOrder)
+            custom_range, page_obj = paginate(request, clerkOrder)
 
-            all_ids = clerkOrder.object_list.values_list('docid', flat=True)
+            for card in page_obj:
+                if  card.createdate or card.docindex2 or card.docindex23:
+                    card.createdate = DateFormat(card.createdate).format('Y-m-d') if card.createdate else None
+                    card.docindex2 = DateFormat(card.docindex2).format('Y-m-d') if card.docindex2 else None
+                    card.docindex23 = DateFormat(card.docindex23).format('Y-m-d') if card.docindex23 else None
 
-            context = {'section_result': clerkOrder,
+            all_ids = list(card.docid for card in page_obj if card.docid)
+
+            context = {'section_result': page_obj,
                        'resultCount': resultCount,
                        'custom_range': custom_range,
                        'all_ids': all_ids,

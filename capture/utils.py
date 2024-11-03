@@ -15,7 +15,8 @@ from django.http import HttpResponseBadRequest, JsonResponse
 from django.core.files.base import ContentFile
 # from pytwain import Twain
 from io import BytesIO
-from datetime import datetime, timezone
+from datetime import datetime
+from django.utils import timezone
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.db import IntegrityError, transaction
 from django.core.files.storage import default_storage
@@ -31,7 +32,7 @@ def get_job_data(job_id):
     index_ids = PvcapIndex1.objects.filter(
         jobid=job_id).values_list('indexid', flat=True)
 
-    fields = [field for field in fields if field != 'Date']
+    # fields = [field for field in fields if field != 'Date']
     return fields, index_ids, job_id
 
 # SAVE VALUE USER ENTRED IN INDEX TABLE
@@ -78,13 +79,13 @@ def count_export_folders(base_path):
 def create_path(section_name):
     if section_name == 'HR':
         # base_path = 'E:\\PVDocs\\Monitored Import Path\\HR\\'
-        base_path = 'E:\\Projects\\iTrackFiles collections\\images'
+        base_path = 'E:\\Projects\\Django\\iTrackFiles collections\\images'
     elif section_name == 'Historic Order Books':
         # base_path = 'E:\\PVDocs\\Monitored Import Path\\HistoricOrderBooks\\'
-        base_path = 'E:\\Projects\\iTrackFiles collections\\images'
+        base_path = 'E:\\Projects\\Django\\iTrackFiles collections\\images'
     elif section_name == 'Historic Index Cards':
         # base_path = 'E:\\PVDocs\\Monitored Import Path\\HistoricIndexCards\\'
-       base_path = 'E:\\Projects\\iTrackFiles collections\\images'
+       base_path = 'E:\\Projects\\Django\\iTrackFiles collections\\images'
     else:
         return
 
@@ -113,6 +114,7 @@ def create_path(section_name):
 
     return dg_entry.dgid
 
+
 # EVERY COLUMN REALTED TO FIELD LABEL
 def map_fields_to_columns(job_id):
     section_name = PvcapJob1.objects.get(jobid=job_id).name
@@ -122,6 +124,8 @@ def map_fields_to_columns(job_id):
         'Historic Index Cards': {'Last Name': 'docindex1', 'First Name': 'docindex2', 'Subject': 'docindex3', 'Record Source': 'docindex4', 'Book Record': 'docindex5', 'Page': 'docindex6', 'Date': 'docindex7', 'Comments': 'docindex8', 'Instrument': 'docindex9', 'Status': 'docindex10', 'Owner': 'docindex11', 'Dates before 1753': 'docindex12'}
     }
     return field_to_column_mapping.get(section_name, {})
+
+
 
 # SAVE COMPLE OR INCOMPLES VALUES IN DOCS TABLE
 def save_field_data(form_data, job_id, dg_id, batch_id):
@@ -152,24 +156,32 @@ def save_field_data(form_data, job_id, dg_id, batch_id):
         instance.sourcedocid = 0
         instance.batchid = batch_id
 
+
+
     for fieldname, value in form_data.items():
         column_name = column_mapping.get(fieldname)
         if column_name:
-            if 'date' in column_name.lower():
+            if 'Date' in column_name.lower():
                 if not value:
-                    continue
+                    continue  
                 try:
-                    value = datetime.strptime(value, '%Y-%m-%d')
-                except ValueError as ve:
+                    value = datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
+                except ValueError:
+                    print(f"Skipping invalid datetime format for field '{fieldname}': '{value}'")
                     continue
+            elif value is None or value == '':
+                print(f"Skipping empty field: {fieldname}")
+                continue
+
             setattr(instance, column_name.lower(), value)
 
     try:
         instance.save()
         return instance.docid
+    except Exception as e:
+        print(f"Error saving field data: {e}")
 
-    except ValidationError as e:
-        return None
+
 
 
 #SAVE IMAGE NAME IN OBJ

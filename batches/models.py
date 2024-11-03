@@ -695,7 +695,7 @@ class PvdmObjs12(models.Model):
     trashuserid = models.IntegerField(db_column='TRASHUSERID', blank=True, null=True)  # Field name made lowercase.
     trashdatetime = models.DateTimeField(db_column='TRASHDATETIME', blank=True, null=True)  # Field name made lowercase.
     totalbytes = models.FloatField(db_column='TOTALBYTES', blank=True, null=True)  # Field name made lowercase.
-    batchid = models.IntegerField(db_column='BATCHID', blank=True, null=True)
+    # batchid = models.IntegerField(db_column='BATCHID', blank=True, null=True)
     class Meta:
         managed = True
         db_table = 'PVDM_OBJS_1_2'

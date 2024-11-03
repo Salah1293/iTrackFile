@@ -22,7 +22,7 @@
                     <th>First Name</th>
                     <th>EIN</th>
                     <th>Employment Type</th>
-                    <th>Scan Date</th>
+                    <th>Create Date</th>
                     <th>Document Type</th>
                     </tr>
             </thead>    
@@ -34,7 +34,7 @@
                   <td>{% if element.docindex2 %}{{ element.docindex2 }}{% endif %}</td>
                   <td>{% if element.docindex3 %}{{ element.docindex3 }}{% endif %}</td>
                   <td>{% if element.docindex4 %}{{ element.docindex4 }}{% endif %}</td>
-                  <td>{% if element.docindex5 %}{{ element.docindex5 }}{% endif %}</td>
+                  <td>{% if element.createdate %}{{ element.createdate }}{% endif %}</td>
                   <td>{% if element.docindex6 %}{{ element.docindex6 }}{% endif %}</td>
                 </tr>
                 {% endfor %}

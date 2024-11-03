@@ -12,7 +12,7 @@ import base64
 import io
 from PIL import Image
 import re
-
+from django.utils.dateformat import DateFormat
 
 # pagination super class
 def paginate(request, query):
@@ -321,38 +321,101 @@ def generate_all_results(query, chosen_section=None):
     if chosen_section:
         if chosen_section == 'Criminal':
             criminal = PvdmDocs11.objects.filter(criminal_query)
+            for card in criminal:
+                if card.docindex2 or card.docindex20:
+                    card.docindex2 = DateFormat(card.docindex2).format('Y-m-d') if card.docindex2 else None
+                    card.docindex20 = DateFormat(card.docindex20).format('Y-m-d') if card.docindex20 else None
+
         elif chosen_section == 'Indictments':
             indictments = PvdmDocs110.objects.filter(indictments_query)
+            for card in indictments:
+                if card.createdate :
+                    card.createdate = DateFormat(card.createdate).format('Y-m-d') if card.createdate else None
+                    card.docindex8 = DateFormat(card.docindex8).format('Y-m-d') if card.docindex8 else None
+                    card.docindex9 = DateFormat(card.docindex9).format('Y-m-d') if card.docindex9 else None
+
         elif chosen_section == 'Concealed Weapons':
             concealedWeapons = PvdmDocs112.objects.filter(
                 concealed_weapons_query)
+            for card in concealedWeapons:
+                if card.createdate :
+                    card.createdate = DateFormat(card.createdate).format('Y-m-d') if card.createdate else None
+                    card.docindex2 = DateFormat(card.docindex2).format('Y-m-d') if card.docindex2 else None
+                    card.docindex6 = DateFormat(card.docindex6).format('Y-m-d') if card.docindex6 else None
+            
         elif chosen_section == 'Historic Order Books':
             historicOrderBooks = PvdmDocs113.objects.filter(
                 historic_order_books_query)
+            
         elif chosen_section == 'Historic Index Cards':
             historicIndexCards = PvdmDocs114.objects.filter(
                 historic_index_cards_query)
+            
         elif chosen_section == 'Destruction Orders':
             destructionOrders = PvdmDocs115.objects.filter(
                 destruction_orders_query)
+            for card in destructionOrders:
+                if card.createdate :
+                    card.createdate = DateFormat(card.createdate).format('Y-m-d') if card.createdate else None
+                    card.docindex2 = DateFormat(card.docindex2).format('Y-m-d') if card.docindex2 else None
+                    card.docindex3 = DateFormat(card.docindex3).format('Y-m-d') if card.docindex3 else None
+                    card.docindex4 = DateFormat(card.docindex4).format('Y-m-d') if card.docindex4 else None
+                    card.docindex5 = DateFormat(card.docindex5).format('Y-m-d') if card.docindex5 else None
+            
         elif chosen_section == 'Bond Books':
             bondBooks = PvdmDocs116.objects.filter(bond_books_query)
+            for card in bondBooks:
+                if card.createdate :
+                    card.createdate = DateFormat(card.createdate).format('Y-m-d') if card.createdate else None
+
         elif chosen_section == 'Civil':
             civil = PvdmDocs12.objects.filter(civil_query)
+            for card in civil:
+                if card.docindex2 or card.docindex20:
+                    card.docindex2 = DateFormat(card.docindex2).format('Y-m-d') if card.docindex2 else None
+                    card.docindex20 = DateFormat(card.docindex20).format('Y-m-d') if card.docindex20 else None
+
         elif chosen_section == 'Criminal Juvenile':
             criminalJuvenile = PvdmDocs13.objects.filter(
                 criminal_juvenile_query)
+            for card in criminalJuvenile:
+                if card.docindex2 or card.docindex20:
+                    card.docindex2 = DateFormat(card.docindex2).format('Y-m-d') if card.docindex2 else None
+                    card.docindex20 = DateFormat(card.docindex20).format('Y-m-d') if card.docindex20 else None
+
         elif chosen_section == 'Adoption':
             adoption = PvdmDocs14.objects.filter(adoption_query)
+            for card in adoption:
+                if  card.createdate :
+                    card.createdate = DateFormat(card.createdate).format('Y-m-d') if card.createdate else None
+                    card.docindex2 = DateFormat(card.docindex2).format('Y-m-d') if card.docindex2 else None
+                    card.docindex20 = DateFormat(card.docindex20).format('Y-m-d') if card.docindex20 else None
 
         elif chosen_section == 'Law Chancery':
             lawChancery = PvdmDocs16.objects.filter(law_chancery_query)
+            for card in lawChancery:
+                if card.createdate :
+                    card.createdate = DateFormat(card.createdate).format('Y-m-d') if card.createdate else None
+
         elif chosen_section == 'Criminal Cases':
             criminalCases = PvdmDocs17.objects.filter(criminal_cases_query)
+            for card in criminalCases:
+                if card.docindex2 :
+                    card.createdate = DateFormat(card.createdate).format('Y-m-d') if card.createdate else None
+
         elif chosen_section == 'Clerk Orders':
             clerkOrders = PvdmDocs18.objects.filter(clerk_orders_query)
+            for card in clerkOrders:
+                if  card.createdate :
+                    card.createdate = DateFormat(card.createdate).format('Y-m-d') if card.createdate else None
+                    card.docindex2 = DateFormat(card.docindex2).format('Y-m-d') if card.docindex2 else None
+                    card.docindex23 = DateFormat(card.docindex23).format('Y-m-d') if card.docindex23 else None
+
         elif chosen_section == 'Charters':
             charters = PvdmDocs19.objects.filter(charters_query)
+            for card in charters:
+                if card.createdate :
+                    card.createdate = DateFormat(card.createdate).format('Y-m-d') if card.createdate else None
 
     else:
         criminal = PvdmDocs11.objects.filter(criminal_query)

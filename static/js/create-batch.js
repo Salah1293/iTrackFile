@@ -1,52 +1,3 @@
-// function createBundle() {
-//     var selectedImage = document.getElementById('selectedImage');
-//     var form = document.getElementById('myform');
-    
-//     // Check if form exists
-//     if (!form) {
-//         console.error("Form not found.");
-//         return;
-//     }
-
-//     // Check if selected image exists
-//     if (!selectedImage || !selectedImage.src) {
-//         console.error("No image selected or #selectedImage not found.");
-//         return;
-//     }
-
-//     var currentImage = selectedImage.src;
-//     console.log("Image displayed is:", currentImage);
-
-//     var imageName = currentImage.split('/').pop();
-
-//     // Collect form data
-//     var formData = new FormData(form); 
-//     formData.append('imageName', imageName); 
-
-//     // Send data to the backend view
-//     fetch('/capture/create-batch/', {  
-//         method: 'POST',
-//         body: formData,
-//         headers: {
-//             'X-CSRFToken': getCookie('csrftoken')
-//         }
-//     })
-//     .then(response => response.json())
-//     .then(data => {
-//         if (data.success) {
-//             console.log('Success:', data.message);
-            
-//             // Clear form
-//             form.reset();
-//             // selectedImage.src = '';  
-//         } else {
-//             console.error('Error:', data.error);
-//         }
-//     })
-//     .catch((error) => {
-//         console.error('Error:', error);
-//     });
-// }
 
 
 
@@ -142,6 +93,70 @@ function getCookie(name) {
 
 
 
+// function deleteImage(currentImage, deleteUrl, csrfToken) {
+//     console.log('Deleted image is:', currentImage);
+
+//     if (currentImage) {
+//         fetch(deleteUrl, {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//                 'X-CSRFToken': csrfToken,
+//             },
+//             body: JSON.stringify({
+//                 deleteUrl: currentImage
+//             })
+//         })
+//         .then(response => {
+//             if (!response.ok) {
+//                 throw new Error(`Error: ${response.status} ${response.statusText}`);
+//             }
+//             return response.json();
+//         })
+//         .then(data => {
+//             if (data.success) {
+//                 removeImageFromList(currentImage);
+//                 console.log('Delete action succeeded');
+                
+//                 // Call reloadImages with the updated images list and media URL
+//                 reloadImages(data.newImages, data.media_url);
+//             }
+//         })
+//         .catch(error => {
+//             console.error("Delete Error:", error);
+//         });
+//     }
+// }
+
+// // Usage example
+// document.getElementById('deleteBtn').addEventListener('click', function () {
+//     const currentImage = document.getElementById('selectedImage').getAttribute('src');
+//     const deleteUrl = '/capture/delete-image/';  // Update with your actual URL
+//     const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+
+//     deleteImage(currentImage, deleteUrl, csrfToken);
+// });
+
+// function reloadImages(images, mediaUrl) {
+//     const scrollableImagesContainer = document.getElementById('scrollableImages');
+//     scrollableImagesContainer.innerHTML = '';
+
+//     images.forEach(image => {
+//         const img = document.createElement('img');
+//         img.src = `${mediaUrl}/${image}`;  
+//         img.alt = "image";
+//         img.className = "scrollable-image";
+//         img.style.maxWidth = "65px";
+//         img.style.maxHeight = "65px";
+//         img.style.margin = "4px";
+//         img.style.objectFit = "cover";
+        
+//         img.onclick = () => displayImage(img);
+
+//         scrollableImagesContainer.appendChild(img);
+//     });
+// }
+
 
 
 $(document).ready(function () {
@@ -189,8 +204,36 @@ $(document).ready(function () {
         });
     });
 
+    // $('#deleteBtn').on('click', function () {
+    //     let currentImage = $('#selectedImage').attr('src');
+    //     console.log('deleted image is:', currentImage)
+    //     if (currentImage) {
+    //         $.ajax({
+    //             url: deleteUrl,
+    //             type: 'POST',
+    //             data: {
+    //                 deleteUrl: currentImage,
+    //                 csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val()
+    //             },
+    //             success: function (data) {
+    //                 if (data.success) {
+    //                     removeImageFromList(currentImage);
+    //                     console.log('delete action successed')
+    //                 }
+    //             },
+    //             error: function (xhr, status, error) {
+    //                 console.error("Delete Error:", status, error);
+    //             }
+    //         });
+    //     }
+    // });
+
+   
+
     $('#deleteBtn').on('click', function () {
         let currentImage = $('#selectedImage').attr('src');
+        console.log('Deleted image is:', currentImage);
+    
         if (currentImage) {
             $.ajax({
                 url: deleteUrl,
@@ -202,6 +245,12 @@ $(document).ready(function () {
                 success: function (data) {
                     if (data.success) {
                         removeImageFromList(currentImage);
+                        console.log('Delete action succeeded');
+                        // removeImageFromList(data.imageUrl)
+                        // displayImages(data.uploaded_images);
+                        
+                        // Call reloadImages with the updated images list and media URL
+                        // reloadImages(data.newImages, data.media_url);
                     }
                 },
                 error: function (xhr, status, error) {
@@ -210,17 +259,37 @@ $(document).ready(function () {
             });
         }
     });
+    
+    // function reloadImages(images, mediaUrl) {
+    //     const scrollableImagesContainer = document.getElementById('scrollableImages');
+    //     scrollableImagesContainer.innerHTML = '';
+    
+    //     images.forEach(image => {
+    //         const img = document.createElement('img');
+    //         img.src = `${mediaUrl}/${image}`;
+    //         img.alt = "image";
+    //         img.className = "scrollable-image";
+    //         img.style.maxWidth = "65px";
+    //         img.style.maxHeight = "65px";
+    //         img.style.margin = "4px";
+    //         img.style.objectFit = "cover";
+            
+    //         img.onclick = () => displayImage(img);
+    
+    //         scrollableImagesContainer.appendChild(img);
+    //     });
+    // }
 
-   
+
 
     function displayImages(images) {
         images.forEach(function (imageUrl, index) {
             console.log("fired")
             // Check if the image already exists to avoid duplication
-            if (!$("img[src='" + imageUrl + "']").length) {
-                const imgElement = `<img src="${imageUrl}" class="scrollable-image" alt="image ${index + 1}" onclick="displayImage(this)">`;
-                $('#scrollableImages').append(imgElement);
-            }
+            // if (!$("img[src='" + imageUrl + "']").length) {
+            //     const imgElement = `<img src="${imageUrl}" class="scrollable-image" alt="image ${index + 1}" onclick="displayImage(this)">`;
+            //     $('#scrollableImages').append(imgElement);
+            // }
         });
     
         // Ensure at least one image is displayed
@@ -247,6 +316,7 @@ $(document).ready(function () {
 
     function removeImageFromList(imageUrl) {
         let currentImageElement = $("img[src='" + imageUrl + "']");
+        console.log('function removeImageFromList fired.')
     
         // Remove the image from the DOM
         currentImageElement.remove();

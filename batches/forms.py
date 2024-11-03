@@ -165,7 +165,7 @@ class HistoricOrderBooksForm(ModelForm):
 #classForm of hr
 class HrForm(ModelForm):
     class Meta:
-        model = PvdmDocs15
+        model = PvdmDocs115
         fields = ['docindex1', 'docindex2', 'docindex3']
         labels = {
             'docindex1' : 'Last Name',
