@@ -1234,18 +1234,28 @@ img {
 
 
 .button-container {
-  display: flex; /* Align items horizontally */
-  align-items: center; /* Center buttons vertically */
-  justify-content: center; /* Center buttons in the container */
-  gap: 10px; /* Space between all buttons */
-  margin-top: 20px; /* Space between this container and the upper part */
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+  gap: 10px; 
+  margin-top: 20px; 
 }
 
 #confirmBundleBtn {
-  background-color: green; /* Green background color */
-  color: white; /* White text color for contrast */
+  background-color: green; 
+  color: white;
 }
 
 .button-container input {
-  margin: 0; /* Remove any default margin */
+  margin: 0; 
+}
+
+.selected-image {
+  border: 4px solid #d30d17; 
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5); 
+}
+
+.selected-bundle {
+  border: 3px solid #d30d17; 
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5); 
 }

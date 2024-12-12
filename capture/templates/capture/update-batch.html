@@ -6,37 +6,16 @@
     <div class="layout">
 
 
-      <!-- <div class="column column--1of3" style="flex: .5; padding-left: 10px; max-height: 550px; overflow-y: auto; border-radius: 0.7rem;">
-        <div class="bundle-icons-container" style="border-radius: 0.7rem; border: 2px solid #070226; padding: 10px; display: flex; flex-wrap: wrap; justify-content: center;">
-            
-            <div class="bundle-icon" style="margin: 4px; display: flex; justify-content: center; align-items: center;">
-                <button class="btn btn--icon" onclick="sendBundleData(null, '{{ batchid }}')" style="width: 30px; height: 30px; padding: 0; background-color: #28a745;">  
-                    <i class="fas fa-image" style="font-size: 16px; color: white;"></i> 
-                </button>
-            </div>
-    
-            {% for bundle_id in bundles_ids %}
-            <div class="bundle-icon" style="margin: 4px; display: flex; justify-content: center; align-items: center;">
-                <button class="btn btn--icon" onclick="sendBundleData('{{ bundle_id }}', '{{ batchid }}')" style="width: 30px; height: 30px; padding: 0;">
-                    <i class="fas fa-box" style="font-size: 16px;"></i>
-                </button>
-            </div>
-            {% endfor %}
-        </div>
-    </div> -->
-    
 
     <div class="column column--1of3" style="flex: .5; padding-left: 10px; max-height: 550px; overflow-y: auto; border-radius: 0.7rem;">
       <div class="bundle-icons-container" style="border-radius: 0.7rem; border: 2px solid #070226; padding: 10px; display: flex; flex-wrap: wrap; justify-content: center;">
           
-          <!-- Button for unbundled images -->
           <div class="bundle-icon" style="margin: 4px; display: flex; justify-content: center; align-items: center;">
               <button class="btn btn--icon" data-bundle-id="null" onclick="sendBundleData(null, '{{ batchid }}')" style="width: 30px; height: 30px; padding: 0; background-color: #28a745;">
                   <i class="fas fa-image" style="font-size: 16px; color: white;"></i> 
               </button>
           </div>
   
-          <!-- Buttons for bundled images -->
           {% for bundle_id in bundles_ids %}
           <div class="bundle-icon" style="margin: 4px; display: flex; justify-content: center; align-items: center;">
               <button class="btn btn--icon" data-bundle-id="{{ bundle_id }}" onclick="sendBundleData('{{ bundle_id }}', '{{ batchid }}')" style="width: 30px; height: 30px; padding: 0;">
@@ -48,8 +27,6 @@
   </div>
 
   
-  
-
       <div class="column column--1of3" style="flex: 1; padding-left: 10px; max-height: 550px; overflow-y: scroll; border-radius: 0.7rem;">
         <div class="scrollable-images" id="scrollableImages" style="border-radius: 0.7rem; border: 2px solid #070226; display: flex; flex-wrap: wrap; justify-content: center;">
             {% for single_image in images %}
@@ -63,8 +40,6 @@
             {% endfor %}
         </div>
       </div>
-
-
 
       <div class="column column--1of3" style="flex: 6; padding: 0 10px">
         <div class="image-container">
@@ -102,7 +77,6 @@
            <form id="myform" class="form" method="POST" action="{% url 'updateBatches' batchid %}">
               {% csrf_token %}
               <input id="batchid" type="hidden" name="batch_id" value="{{batchid}}">
-              <input type="hidden" name="job_id" value="{{jobid}}">
               <input type="hidden" name="job_id" value="{{jobid}}">
               <div class="button-container">
               <div class="form-wrapper">
@@ -154,10 +128,14 @@
                 <option value="Reg Free Negroes Val 2" {% if value == 'Reg Free Negroes Val 2' %}selected{% endif %}>Reg Free Negroes Val 2</option>
                 <option value="Reg Free Negroes Val 3" {% if value == 'Reg Free Negroes Val 3' %}selected{% endif %}>Reg Free Negroes Val 3</option>
                 <option value="Roads" {% if value == 'Roads' %}selected{% endif %}>Roads</option>
-                <option value="Surveys" {% if value == 'Surveys' %}selected{% endif %}>Surveys</option>
-              
+                <option value="Surveys" {% if value == 'Surveys' %}selected{% endif %}>Surveys</option>       
               </select>
             </div>
+            {% elif field == 'Date' %}
+           <div class="form__field">
+            <label style="color: black; font-size: 16px;" id="capture-label" for="formInput#{{ field }}">{{ field }}</label>
+            <input class="input input--text" id="formInput#{{ field }}" type="text" name="{{ field }}" placeholder="Enter YYYY-MM-DD" />
+          </div>
           {% else %}
             <div class="form__field">
               <label style="color: black; font-size: 16px;" id="capture-label" for="formInput#{{ field }}">{{ field }}</label>
@@ -171,11 +149,9 @@
               <div class="button-container" style="margin-top: 5px;"> 
                 <input id="confirmBundleBtn" class="btn btn--sub btn--md my-md" type="button" value="Submit Bundle"/>
                 <input name="complete" class="btn btn--sub btn--md my-md" type="submit" value="Complete"/>
-                <input name="incomplete" class="btn btn--sub btn--md my-md" type="submit" value="InComplete"/>
+                <input name="incomplete" class="btn btn--sub btn--md my-md" type="submit" value="Incomplete"/>
             </div>
-
           </form>
-
 
           </div>
         </div>

@@ -1,40 +1,51 @@
 {% extends 'main.html' %}
 {% load static %}
 {% block content %}
+<script>
+  var uploadUrl = "{% url 'upload_images' %}";
+  var scanUrl = "{% url 'upload_scanned_images' %}";
+  var deleteUrl = "{% url 'delete_image' %}";
+</script>
+
+<script src="{% static 'js/create-batch.js' %}"></script>
 <main class="singleBatch my-md">
   <div class="container">
     <div class="layout">
 
-
-
-
-
-
-
-
-
-      <div
-        class="column column--1of3"
-        style=" flex: 1; padding-left: 10px; max-height: 550px; overflow-y: scroll; border-radius: 0.7rem;" >
-        <div
-          class="scrollable-images"id="scrollableImages"
-           style="border-radius: 0.7rem; border: 2px solid #070226">
-           {% for image_url in uploaded_images %}
-            <img src="{{ image_url }}" class="scrollable-image" alt="image" onclick="displayImage(this)">
-           {% endfor %}
-           <input type="hidden" id="uploadedImagesData" value='{{ uploaded_images|safe }}'>
+      <div class="column column--1of3" style="flex: .5; padding-left: 10px; max-height: 550px; overflow-y: auto; border-radius: 0.7rem;">
+        <div class="bundle-icons-container" style="border-radius: 0.7rem; border: 2px solid #070226; padding: 10px; display: flex; flex-wrap: wrap; justify-content: center;">
+            
+            <div class="bundle-icon" style="margin: 4px; display: flex; justify-content: center; align-items: center;">
+                <button class="btn btn--icon" data-bundle-id="null" onclick="sendBundleData(null, '{{ batchid }}')" style="width: 30px; height: 30px; padding: 0; background-color: #28a745;">
+                    <i class="fas fa-image" style="font-size: 16px; color: white;"></i> 
+                </button>
+            </div>
+    
+            {% for bundle_id in bundles_ids %}
+            <div class="bundle-icon" style="margin: 4px; display: flex; justify-content: center; align-items: center;">
+                <button class="btn btn--icon" data-bundle-id="{{ bundle_id }}" onclick="sendBundleData('{{ bundle_id }}', '{{ batchid }}')" style="width: 30px; height: 30px; padding: 0;">
+                    <i class="fas fa-box" style="font-size: 16px;"></i>
+                </button>
+            </div>
+            {% endfor %}
         </div>
-      </div>
-
-
-
-
-
-
-
-
-
-
+    </div>
+  
+        <div class="column column--1of3" style="flex: 1; padding-left: 10px; max-height: 550px; overflow-y: scroll; border-radius: 0.7rem;">
+          
+          <div class="scrollable-images" id="scrollableImages" style="border-radius: 0.7rem; border: 2px solid #070226; display: flex; flex-wrap: wrap; justify-content: center;">
+              {% for single_image in images %}
+                  {% if is_bundled %}
+                      <img src="{{ media_url }}batch_{{ batchid }}/bundle_{{ bundleid }}/{{ single_image }}" class="scrollable-image" alt="image" onclick="displayImage(this)"
+                           style="max-width: 65px; max-height: 65px; margin: 4px; object-fit: cover;">
+                  {% else %}
+                      <img src="{{ media_url }}batch_{{ batchid }}/{{ single_image }}" class="scrollable-image" alt="image" onclick="displayImage(this)"
+                           style="max-width: 65px; max-height: 65px; margin: 4px; object-fit: cover;">
+                  {% endif %}
+              {% endfor %}
+          </div>
+        </div>
+  
       <div class="column column--1of3" style="flex: 6; padding: 0 10px">
         <div class="image-container">
           <div class="image-wrapper">
@@ -57,8 +68,9 @@
 
             <form id="uploadForm" class="form" method="POST" enctype="multipart/form-data">
               {% csrf_token %}
+        
               <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-              <input type="hidden" name="batch_id" value="{{batchid}}">
+              <input id="batchid" type="hidden" name="batch_id" value="{{batchid}}">
               <input type="hidden" name="job_id" value="{{jobid}}">
               <input type="file" name="images" id="imageInput" multiple style="display: none;">
               <div class="button-container" style="display: flex; align-items: center;">
@@ -68,12 +80,12 @@
             </form>
            <form id="myform" class="form" method="POST" action="{% url 'createBatch' %}">
               {% csrf_token %}
-              <input type="hidden" name="batch_id" value="{{batchid}}">
+              <input id="batchid" type="hidden" name="batch_id" value="{{batchid}}">
               <input type="hidden" name="job_id" value="{{jobid}}">
               <div class="button-container">
               <div class="form-wrapper">
                 <div class="form-fields-container" style="display: flex; flex-wrap: wrap; overflow-y: auto; max-height: 420px;">
-          {% for field in fields %}
+          {% for field, value in result.items %}
           {% if field == 'Document Type' %}
             <div class="form__field">
               <label style="color: black; font-size: 16px;" id="capture-label" for="formInput#{{ field }}">{{ field }}</label>
@@ -122,39 +134,33 @@
                 <option value="Surveys">Surveys</option>
               </select>
             </div>
-            {% elif field == 'Date' %}
-    <div class="form__field">
-      <label style="color: black; font-size: 16px;" id="capture-label" for="formInput#{{ field }}">{{ field }}</label>
-      <input class="input input--text" id="formInput#{{ field }}" type="text" name="{{ field }}" placeholder="Enter (YYYY-MM-DD)" />
-    </div>
-
-  {% else %}
-    <div class="form__field">
-      <label style="color: black; font-size: 16px;" id="capture-label" for="formInput#{{ field }}">{{ field }}</label>
-      <input class="input input--text" id="formInput#{{ field }}" type="text" name="{{ field }}" placeholder="Enter {{ field }}" />
-    </div>
-  {% endif %}
-
+           {% elif field == 'Date' %}
+           <div class="form__field">
+            <label style="color: black; font-size: 16px;" id="capture-label" for="formInput#{{ field }}">{{ field }}</label>
+            <input class="input input--text" id="formInput#{{ field }}" type="text" name="{{ field }}" placeholder="Enter YYYY-MM-DD" />
+          </div>
+          {% else %}
+            <div class="form__field">
+              <label style="color: black; font-size: 16px;" id="capture-label" for="formInput#{{ field }}">{{ field }}</label>
+              <input class="input input--text" id="formInput#{{ field }}" type="text" name="{{ field }}" placeholder="Enter {{ field }}" value="{{value}}" />
+            </div>
+          {% endif %}
          {% endfor %}
                 </div>
               </div>
-                <div  class="complete-button" style="display: flex; align-items: center;">
-                  <input name="complete" class="btn btn--sub btn--md my-md" type="submit" value="Complete"/>
-                  <span style="margin-left: 10px;"></span>
-                  <input name="incomplete" class="btn btn--sub btn--md my-md" type="submit" value="InComplete"/>
-                </div>
+
+              <div class="button-container" style="margin-top: 5px;"> 
+                <input id="confirmBundleBtn" class="btn btn--sub btn--md my-md" type="button" value="Submit Bundle"/>
+                <input name="complete" class="btn btn--sub btn--md my-md" type="submit" value="Complete"/>
+                <input name="incomplete" class="btn btn--sub btn--md my-md" type="submit" value="Incomplete"/>
+            </div>
+
           </form>
           </div>
         </div>
       </div>
     </div>
   </div>
-  <script>
-      var uploadUrl = "{% url 'upload_images' %}";
-      var scanUrl = "{% url 'upload_scanned_images' %}";
-      var deleteUrl = "{% url 'delete_image' %}";
-  </script>
-
-  <script src="{% static 'js/create-batch.js' %}"></script>
+  
 </main>
 {% endblock %}

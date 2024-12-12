@@ -3,35 +3,24 @@
 function createBundle() {
     var selectedImage = document.getElementById('selectedImage');
     var form = document.getElementById('myform');
+ 
 
     if (!form) {
-        console.error("Form not found.");
         return;
     }
 
     if (!selectedImage || !selectedImage.src) {
-        console.error("No image selected or #selectedImage not found.");
         return;
     }
 
     var currentImage = selectedImage.src;
-    console.log("Image displayed is:", currentImage);
-    console.log("form data is:", form);
+  
 
     var imageName = currentImage.split('/').pop();
 
     var formData = new FormData(form); 
     formData.append('imageName', imageName); 
-    console.log("form data is:", formData);
-    console.log("batchIdddd is:", formData.batchId);
-    console.log("ikmage name is is:", formData.imageName);
-
-    for (var pair of formData.entries()) {
-        console.log(pair[0]+ ': ' + pair[1]);
-    }
-
-
-    console.log('Sending form data to /capture/create-batch/');
+   
 
     fetch('/capture/create-bundle/', {  
         method: 'POST',
@@ -41,7 +30,6 @@ function createBundle() {
         }
     })
     .then(response => {
-        console.log('Response received:', response);
         if (response.ok) {
             return response.json();  
         } else {
@@ -56,11 +44,8 @@ function createBundle() {
             const newImages = data.unbundled_images;  
             const mediaUrl = data.media_url;  
             const batchId = data.batch_id; 
-            console.log('batch id is', batchId)
 
-            console.log('Success:', data.message);
             form.reset();  
-            // clearForm(form)
             reloadImages(newImages, mediaUrl, batchId); 
             reloadBundleIcons(data.bundle_ids); 
         } else {
@@ -120,10 +105,6 @@ function reloadImages(unbundledImages, mediaUrl, batchId) {
         img.src = `${mediaUrl}batch_${batchId}/${image}`; 
         img.alt = "image";
         img.className = "scrollable-image";
-        img.style.maxWidth = "65px";
-        img.style.maxHeight = "65px";
-        img.style.margin = "4px";
-        img.style.objectFit = "cover";
         img.onclick = () => displayImage(img);
 
         scrollableImagesContainer.appendChild(img);
@@ -155,20 +136,12 @@ function getBundleId(bundleId) {
 }
 
 
-
-
-
-
-
 function sendBundleData(bundleId, batchId) {
-    console.log("Sending bundleId:", bundleId, "and batchId:", batchId);
 
     var batchid = document.getElementById('batchid').value;
-    console.log('batchid is', batchid);
 
     
     const csrfToken = '{{ csrf_token }}';  
-    console.log('send bundle id to view');
     getBundleId(bundleId);
 
     fetch(`/capture/bundle-data/${bundleId || 'unbundled'}/${batchid}/`, {  
@@ -190,13 +163,25 @@ function sendBundleData(bundleId, batchId) {
         return response.json(); 
     })
     .then(data => {
-        console.log("Success:", data);
         const newImages = data.images;  
         const mediaUrl = data.media_url;  
         const result = data.result; 
 
         updateImages(newImages, mediaUrl, batchid, bundleId);
         fillFormWithResult(result);
+
+        const bundleButtons = document.querySelectorAll('.bundle-icon button');
+        bundleButtons.forEach(button => {
+        button.classList.remove('selected-bundle');
+        });
+
+        const selectedButton = document.querySelector(`button[data-bundle-id="${bundleId}"]`);
+        if (selectedButton) {
+        selectedButton.classList.add('selected-bundle');
+        selectedBundleButton = selectedButton;
+        } else {
+        selectedBundleButton = null;
+        }
 
     })
     .catch((error) => {
@@ -207,7 +192,6 @@ function sendBundleData(bundleId, batchId) {
 
 function updateImages(newImages, mediaUrl, batchId, bundleId) {
     const scrollableImages = document.getElementById('scrollableImages');
-    console.log('batch id isssssssssssss:', batchId)
     getBundleId(bundleId)
     scrollableImages.innerHTML = '';  
 
@@ -220,14 +204,9 @@ function updateImages(newImages, mediaUrl, batchId, bundleId) {
         imgElement.src = `${mediaUrl}${imagePathPrefix}${image}`; 
         imgElement.className = 'scrollable-image';
         imgElement.alt = 'image';
-        imgElement.style.maxWidth = '65px';
-        imgElement.style.maxHeight = '65px';
-        imgElement.style.margin = '4px';
-        imgElement.style.objectFit = 'cover';
         imgElement.onclick = function() { displayImage(this); };
 
         scrollableImages.appendChild(imgElement);
-        console.log('images scrolled',scrollableImages)
     });
 }
 
@@ -247,9 +226,6 @@ function fillFormWithResult(result) {
 }
 
 
-
-
-
 document.addEventListener("DOMContentLoaded", function () {
     const confirmBundleBtn = document.getElementById("confirmBundleBtn");
     var form = document.getElementById('myform');
@@ -257,30 +233,23 @@ document.addEventListener("DOMContentLoaded", function () {
     confirmBundleBtn.addEventListener("click", function () {
         const csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
 
-        console.log('confirm fired');
 
         var currentImage = selectedImage.src;
-        console.log("Image displayed is:", currentImage);
-        console.log("form data is:", form);
 
         var imageName = currentImage.split('/').pop();
         const formData = new FormData(form);
 
         if (savedBundleId === null) {
-            console.log("Green icon clicked. Adding selectedImage to formData.");
             if (imageName) {  
                 formData.append('imageName', imageName);
-                console.log('current_image appended')
             } else {
                 console.error("No selected image found.");
             }
         }
         else{
             formData.append('bundle_id', savedBundleId);
-            console.log('savedBundleId', savedBundleId);
         }
 
-        console.log('formData', formData);
 
         fetch('/capture/submit-bundle/', {
             method: "POST",
@@ -291,13 +260,11 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .then(response => response.json())
         .then(data => {
-            console.log("Success:", data);
 
             clearForm(form);  
             removeSubmittedBundleIcon(data.bundleid);
 
             if (data.unbundled_images && data.unbundled_images.length > 0) {
-                console.log('fireeeed')
                 reloadUnbundledImages(data.unbundled_images, data.media_url, data.batch_id);
             }
 
@@ -312,29 +279,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function removeSubmittedBundleIcon(bundleId) {
     if (bundleId === null) {
-        console.log('Green icon is not removed.');
         return;
     }
 
     const bundleButton = document.querySelector(`button[data-bundle-id="${bundleId}"]`);
-    console.log('bundle id is:', bundleId);
-    console.log('bundle button is:', bundleButton);
 
     if (bundleButton) {
         const bundleIconDiv = bundleButton.parentElement;  
         bundleIconDiv.remove();  
-    } else {
-        console.log('Bundle icon not found for ID:', bundleId);
-    }
+    } 
 }
-
-
-
 
 
 function reloadUnbundledImages(unbundledImages, mediaUrl, batchId) {
     const scrollableImagesContainer = document.getElementById('scrollableImages');
-    console.log('reloadUnbundledImages fired')
     
     scrollableImagesContainer.innerHTML = '';
 
@@ -343,10 +301,6 @@ function reloadUnbundledImages(unbundledImages, mediaUrl, batchId) {
         img.src = `${mediaUrl}batch_${batchId}/${image}`;
         img.alt = "image";
         img.className = "scrollable-image";
-        img.style.maxWidth = "65px";
-        img.style.maxHeight = "65px";
-        img.style.margin = "4px";
-        img.style.objectFit = "cover";
         img.onclick = () => displayImage(img);
 
         scrollableImagesContainer.appendChild(img);
@@ -374,37 +328,92 @@ function clearForm(form) {
 }
 
 
-
-
-
 document.addEventListener("DOMContentLoaded", function () {
+
+
     const selectedImage = document.getElementById("selectedImage");
     const scrollableImages = document.getElementById("scrollableImages");
 
     let currentImageIndex = 0;
 
+    var currentImage = selectedImage.src;
+    var imageName = currentImage.split('/').pop();
 
+    
 
     window.displayImage = function (img) {
         selectedImage.src = img.src;
         currentImageIndex = Array.from(scrollableImages.children).indexOf(img);
+        
+        const images = scrollableImages.querySelectorAll('.scrollable-image');
+        images.forEach(image => image.classList.remove('selected-image'));
+
+        img.classList.add('selected-image');
+        
+        
+        currentImage = selectedImage.src;
+        imageName = currentImage.split('/').pop();
+       
     };
 
     document.getElementById("deleteBtn").addEventListener("click", function () {
+
         if (scrollableImages.children.length > 0) {
-            scrollableImages.removeChild(scrollableImages.children[currentImageIndex]);
+            const imageToDelete = scrollableImages.children[currentImageIndex];
+            const imageUrl = imageToDelete.src.split(window.location.origin)[1]; 
+            
+            const imageNameToDelete = imageUrl.split('/').pop();
 
-            if (currentImageIndex >= scrollableImages.children.length) {
-                currentImageIndex = scrollableImages.children.length - 1;
-            }
+            var form = document.getElementById('myform');
+            var formData = new FormData(form);
+            const batchId = formData.get('batch_id');
 
-            if (scrollableImages.children.length > 0) {
-                selectedImage.src = scrollableImages.children[currentImageIndex].src;
-            } else {
-                selectedImage.src = ""; 
-            }
+
+
+            fetch('/capture/delete-image/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken(), 
+                },
+                body: JSON.stringify({ imageName: imageNameToDelete ,
+                     batchid: batchId })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+
+                        scrollableImages.removeChild(imageToDelete);
+
+                        if (currentImageIndex >= scrollableImages.children.length) {
+                            currentImageIndex = scrollableImages.children.length - 1;
+                        }
+
+                        if (scrollableImages.children.length > 0) {
+                            selectedImage.src = scrollableImages.children[currentImageIndex].src;
+                        } else {
+                            selectedImage.src = ""; 
+                        }
+                    } else {
+                        console.error("Error deleting image:", data.error);
+                    }
+                })
+                .catch(error => console.error("Error:", error));
         }
     });
+
+    function getCSRFToken() {
+        const name = "csrftoken";
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.startsWith(name + "=")) {
+                return cookie.substring(name.length + 1);
+            }
+        }
+        return "";
+    }
+
 
     let zoomLevel = 1;
     document.getElementById("zoomInBtn").addEventListener("click", function () {
@@ -431,3 +440,8 @@ document.addEventListener("DOMContentLoaded", function () {
         selectedImage.style.transform = `rotate(0deg) scale(1)`;
     });
 });
+
+
+
+
+

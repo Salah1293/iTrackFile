@@ -1,81 +1,118 @@
 
 
-
 function createBundle() {
     var selectedImage = document.getElementById('selectedImage');
     var form = document.getElementById('myform');
 
-    // Check if form exists
     if (!form) {
         console.error("Form not found.");
         return;
     }
 
-    // Check if selected image exists
     if (!selectedImage || !selectedImage.src) {
         console.error("No image selected or #selectedImage not found.");
         return;
     }
 
     var currentImage = selectedImage.src;
-    console.log("Image displayed is:", currentImage);
-    console.log("form data is:", form);
 
-    // Extract the image file name from the URL
     var imageName = currentImage.split('/').pop();
 
-    // Collect form data
-    var formData = new FormData(form);  // Create FormData object from form element
-    formData.append('imageName', imageName);  // Add the image name to the form data
-    console.log("form data is:", formData);
-
-    for (var pair of formData.entries()) {
-        console.log(pair[0]+ ': ' + pair[1]);
-    }
-
-
-    console.log('Sending form data to /capture/create-batch/');
-
-    // Fetch function to send the data to the backend view
+    var formData = new FormData(form); 
+    formData.append('imageName', imageName); 
+   
+    
     fetch('/capture/create-bundle/', {  
         method: 'POST',
         body: formData,
         headers: {
-            'X-CSRFToken': getCookie('csrftoken')  // Add CSRF token to the headers
+            'X-CSRFToken': getCookie('csrftoken')  
         }
     })
-    // console.log('ajx sent successfully')
     .then(response => {
-        console.log('Response received:', response);
         if (response.ok) {
-            return response.json();  // Parse the response as JSON if successful
+            return response.json();  
         } else {
-            return response.text().then(text => {  // Get response text for error details
+            return response.text().then(text => {  
                 throw new Error('Server error: ' + response.status + ' - ' + text);
             });
         }
     })
     .then(data => {
         if (data.success) {
-            console.log('Success:', data.message);
-            form.reset();  // Reset the form upon success
-            // Optional: Clear the selected image if desired
-            // selectedImage.src = '';  
+
+            const newImages = data.unbundled_images;  
+            const mediaUrl = data.media_url;  
+            const batchId = data.batch_id; 
+
+            form.reset();  
+            reloadImages(newImages, mediaUrl, batchId); 
+            reloadBundleIcons(data.bundle_ids); 
         } else {
             console.error('Error:', data.error);
         }
     })
     .catch((error) => {
-        console.error('Error:', error);  // Catch network or other unexpected errors
+        console.error('Error:', error); 
     });
 }
 
 
 
+function reloadBundleIcons(bundleIds) {
+    var bundleIconsContainer = document.querySelector('.bundle-icons-container');
+
+    while (bundleIconsContainer.children.length > 1) {
+        bundleIconsContainer.removeChild(bundleIconsContainer.lastChild);
+    }
+
+    bundleIds.forEach(function(bundleId) {
+        var newIcon = document.createElement('div');
+        newIcon.className = 'bundle-icon';
+        newIcon.style.margin = '4px';
+        newIcon.style.display = 'flex';
+        newIcon.style.justifyContent = 'center';
+        newIcon.style.alignItems = 'center';
+
+        var newButton = document.createElement('button');
+        newButton.className = 'btn btn--icon';
+        newButton.style.width = '30px';
+        newButton.style.height = '30px';
+        newButton.style.padding = '0';
+        newButton.setAttribute('data-bundle-id', bundleId);  
+        newButton.onclick = function() {
+            sendBundleData(bundleId); 
+        };
+
+        var icon = document.createElement('i');
+        icon.className = 'fas fa-box'; 
+
+        newButton.appendChild(icon);
+        newIcon.appendChild(newButton);
+        bundleIconsContainer.appendChild(newIcon);
+    });
+}
 
 
 
-// Helper function to get CSRF token (Django-specific)
+function reloadImages(unbundledImages, mediaUrl, batchId) {
+    const scrollableImagesContainer = document.getElementById('scrollableImages');
+    
+    scrollableImagesContainer.innerHTML = '';
+
+    unbundledImages.forEach(image => {
+        const img = document.createElement('img');
+        img.src = `${mediaUrl}batch_${batchId}/${image}`; 
+        img.alt = "image";
+        img.className = "scrollable-image";
+        img.onclick = () => displayImage(img);
+
+        scrollableImagesContainer.appendChild(img);
+    });
+}
+
+
+
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -92,82 +129,213 @@ function getCookie(name) {
 }
 
 
+let savedBundleId; 
 
-// function deleteImage(currentImage, deleteUrl, csrfToken) {
-//     console.log('Deleted image is:', currentImage);
+function getBundleId(bundleId) {
+    savedBundleId = bundleId; 
+}
 
-//     if (currentImage) {
-//         fetch(deleteUrl, {
-//             method: 'POST',
-//             headers: {
-//                 'Content-Type': 'application/json',
-//                 'X-CSRFToken': csrfToken,
-//             },
-//             body: JSON.stringify({
-//                 deleteUrl: currentImage
-//             })
-//         })
-//         .then(response => {
-//             if (!response.ok) {
-//                 throw new Error(`Error: ${response.status} ${response.statusText}`);
-//             }
-//             return response.json();
-//         })
-//         .then(data => {
-//             if (data.success) {
-//                 removeImageFromList(currentImage);
-//                 console.log('Delete action succeeded');
-                
-//                 // Call reloadImages with the updated images list and media URL
-//                 reloadImages(data.newImages, data.media_url);
-//             }
-//         })
-//         .catch(error => {
-//             console.error("Delete Error:", error);
-//         });
-//     }
-// }
 
-// // Usage example
-// document.getElementById('deleteBtn').addEventListener('click', function () {
-//     const currentImage = document.getElementById('selectedImage').getAttribute('src');
-//     const deleteUrl = '/capture/delete-image/';  // Update with your actual URL
-//     const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+function sendBundleData(bundleId, batchId) {
+ 
+    const csrfToken = '{{ csrf_token }}';  
+    var batchid = document.getElementById('batchid').value;
+   
+    getBundleId(bundleId);
 
-//     deleteImage(currentImage, deleteUrl, csrfToken);
-// });
+    fetch(`/capture/bundle-data/${bundleId || 'unbundled'}/${batchid}/`, {  
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken, 
+        },
+        body: JSON.stringify({
+            "bundle_id": bundleId, 
+            "batch_id": batchid
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            console.error(`Error: ${response.status} ${response.statusText}`);
+            return response.text(); 
+        }
+        return response.json(); 
+    })
+    .then(data => {
+        const newImages = data.images;  
+        const mediaUrl = data.media_url;  
+        const result = data.result; 
 
-// function reloadImages(images, mediaUrl) {
-//     const scrollableImagesContainer = document.getElementById('scrollableImages');
-//     scrollableImagesContainer.innerHTML = '';
+        updateImages(newImages, mediaUrl, batchid, bundleId);
+        fillFormWithResult(result);
 
-//     images.forEach(image => {
-//         const img = document.createElement('img');
-//         img.src = `${mediaUrl}/${image}`;  
-//         img.alt = "image";
-//         img.className = "scrollable-image";
-//         img.style.maxWidth = "65px";
-//         img.style.maxHeight = "65px";
-//         img.style.margin = "4px";
-//         img.style.objectFit = "cover";
-        
-//         img.onclick = () => displayImage(img);
+        const bundleButtons = document.querySelectorAll('.bundle-icon button');
+        bundleButtons.forEach(button => {
+        button.classList.remove('selected-bundle');
+        });
 
-//         scrollableImagesContainer.appendChild(img);
-//     });
-// }
+        const selectedButton = document.querySelector(`button[data-bundle-id="${bundleId}"]`);
+        if (selectedButton) {
+        selectedButton.classList.add('selected-bundle');
+        selectedBundleButton = selectedButton;
+        } else {
+        selectedBundleButton = null;
+        }
+
+    })
+    .catch((error) => {
+        console.error("Error:", error);
+    });
+}
+
+
+function updateImages(newImages, mediaUrl, batchId, bundleId) {
+    const scrollableImages = document.getElementById('scrollableImages');
+    getBundleId(bundleId)
+    scrollableImages.innerHTML = '';  
+
+    const imagePathPrefix = bundleId 
+        ? `batch_${batchId}/bundle_${bundleId}/` 
+        : `batch_${batchId}/`;
+
+    newImages.forEach(image => {
+        const imgElement = document.createElement('img');
+        imgElement.src = `${mediaUrl}${imagePathPrefix}${image}`; 
+        imgElement.className = 'scrollable-image';
+        imgElement.alt = 'image';
+        imgElement.onclick = function() { displayImage(this); };
+        scrollableImages.appendChild(imgElement);
+    });
+}
+
+
+function fillFormWithResult(result) {
+    const formInputs = document.querySelectorAll("input[type='text'], textarea");  
+    formInputs.forEach(input => {
+        input.value = "";  
+    });
+
+    for (const field in result) {
+        const input = document.querySelector(`[name="${field}"]`);  
+        if (input) {
+            input.value = result[field]; 
+        }
+    }
+}
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    const confirmBundleBtn = document.getElementById("confirmBundleBtn");
+    var form = document.getElementById('myform');
+
+    confirmBundleBtn.addEventListener("click", function () {
+        const csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+
+
+        var currentImage = selectedImage.src;
+      
+
+        var imageName = currentImage.split('/').pop();
+        const formData = new FormData(form);
+
+        if (savedBundleId === null) {
+            if (imageName) {  
+                formData.append('imageName', imageName);
+            } 
+        }
+        else{
+            formData.append('bundle_id', savedBundleId);
+        }
+
+
+        fetch('/capture/submit-bundle/', {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": csrfToken, 
+            },
+            body: formData 
+        })
+        .then(response => response.json())
+        .then(data => {
+
+            clearForm(form);  
+            removeSubmittedBundleIcon(data.bundleid);
+
+            if (data.unbundled_images && data.unbundled_images.length > 0) {
+                reloadUnbundledImages(data.unbundled_images, data.media_url, data.batch_id);
+            }
+
+        })
+        .catch((error) => {
+            console.error("Error:", error);
+        });
+    });
+});
+
+
+
+function removeSubmittedBundleIcon(bundleId) {
+    if (bundleId === null) {
+        return;
+    }
+
+    const bundleButton = document.querySelector(`button[data-bundle-id="${bundleId}"]`);
+
+    if (bundleButton) {
+        const bundleIconDiv = bundleButton.parentElement;  
+        bundleIconDiv.remove();  
+    } 
+}
+
+
+
+
+
+function reloadUnbundledImages(unbundledImages, mediaUrl, batchId) {
+    const scrollableImagesContainer = document.getElementById('scrollableImages');
+    
+    scrollableImagesContainer.innerHTML = '';
+
+    unbundledImages.forEach(image => {
+        const img = document.createElement('img');
+        img.src = `${mediaUrl}batch_${batchId}/${image}`;
+        img.alt = "image";
+        img.className = "scrollable-image";
+        img.onclick = () => displayImage(img);
+
+        scrollableImagesContainer.appendChild(img);
+    });
+}
+
+
+
+function clearForm(form) {
+    Array.from(form.elements).forEach((element) => {
+        if (element.tagName === "INPUT") {
+            if (element.type !== "hidden") {  
+                if (element.type === "text" || element.type === "file") {
+                    element.value = "";  
+                } else if (element.type === "checkbox" || element.type === "radio") {
+                    element.checked = false; 
+                }
+            }
+        } else if (element.tagName === "SELECT") {
+            element.selectedIndex = 0;  
+        } else if (element.tagName === "TEXTAREA") {
+            element.value = "";  
+        }
+    });
+}
 
 
 
 $(document).ready(function () {
+
     $('#importButton').on('click', function () {
         $('#imageInput').click();
     });
 
-
-
     $('#imageInput').on('change', function () {
-        console.log('fired!')
         let formData = new FormData($('#uploadForm')[0]);
         $.ajax({
             url: uploadUrl,
@@ -176,7 +344,6 @@ $(document).ready(function () {
             processData: false,
             contentType: false,
             success: function (data) {
-                console.log("AJAX Success:", data);
                 displayImages(data.uploaded_images);
                 appendHiddenFields(data.uploaded_images);
             },
@@ -187,16 +354,13 @@ $(document).ready(function () {
     });
 
     $('#scanButton').on('click', function () {
-        console.log("scan button clicked");
         $.ajax({
-            url: scanUrl,
+            url: scanUrl,  
             type: 'POST',
             data: { source: 'scan' },
             success: function (data) {
-                console.log("Scan Success:", data);
                 displayImages(data.uploaded_images);
                 appendHiddenFields(data.uploaded_images);
-                console.log('fired')
             },
             error: function (xhr, status, error) {
                 console.error("Scan Error:", status, error);
@@ -204,192 +368,114 @@ $(document).ready(function () {
         });
     });
 
-    // $('#deleteBtn').on('click', function () {
-    //     let currentImage = $('#selectedImage').attr('src');
-    //     console.log('deleted image is:', currentImage)
-    //     if (currentImage) {
-    //         $.ajax({
-    //             url: deleteUrl,
-    //             type: 'POST',
-    //             data: {
-    //                 deleteUrl: currentImage,
-    //                 csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val()
-    //             },
-    //             success: function (data) {
-    //                 if (data.success) {
-    //                     removeImageFromList(currentImage);
-    //                     console.log('delete action successed')
-    //                 }
-    //             },
-    //             error: function (xhr, status, error) {
-    //                 console.error("Delete Error:", status, error);
-    //             }
-    //         });
-    //     }
-    // });
+    function getCSRFToken() {
+        const csrfToken = document.cookie
+            .split("; ")
+            .find(row => row.startsWith("csrftoken="))
+            ?.split("=")[1];
+        return csrfToken || "";
+    }
 
-   
+    const selectedImage = document.getElementById("selectedImage");
+    const scrollableImages = document.getElementById("scrollableImages");
 
-    $('#deleteBtn').on('click', function () {
-        let currentImage = $('#selectedImage').attr('src');
-        console.log('Deleted image is:', currentImage);
-    
-        if (currentImage) {
-            $.ajax({
-                url: deleteUrl,
-                type: 'POST',
-                data: {
-                    deleteUrl: currentImage,
-                    csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val()
+    let currentImageIndex = 0;
+
+    window.displayImage = function (img) {
+        selectedImage.src = img.src;
+        currentImageIndex = Array.from(scrollableImages.children).indexOf(img);
+
+        const images = scrollableImages.querySelectorAll('.scrollable-image');
+        images.forEach(image => image.classList.remove('selected-image'));
+
+        img.classList.add('selected-image');
+    };
+
+    document.getElementById("deleteBtn").addEventListener("click", function () {
+        if (scrollableImages.children.length > 0) {
+            const imageToDelete = scrollableImages.children[currentImageIndex];
+            const imageUrl = imageToDelete.src.split(window.location.origin)[1]; 
+
+            const imageNameToDelete = imageUrl.split('/').pop();
+
+            fetch('/capture/delete-image/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken(), 
                 },
-                success: function (data) {
-                    if (data.success) {
-                        removeImageFromList(currentImage);
-                        console.log('Delete action succeeded');
-                        // removeImageFromList(data.imageUrl)
-                        // displayImages(data.uploaded_images);
-                        
-                        // Call reloadImages with the updated images list and media URL
-                        // reloadImages(data.newImages, data.media_url);
+                body: JSON.stringify({ imageName: imageNameToDelete })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+
+                    scrollableImages.removeChild(imageToDelete);
+
+                    if (currentImageIndex >= scrollableImages.children.length) {
+                        currentImageIndex = scrollableImages.children.length - 1;
                     }
-                },
-                error: function (xhr, status, error) {
-                    console.error("Delete Error:", status, error);
+
+                    if (scrollableImages.children.length > 0) {
+                        selectedImage.src = scrollableImages.children[currentImageIndex].src;
+                    } else {
+                        selectedImage.src = ""; 
+                    }
+                } else {
+                    console.error("Error deleting image:", data.error);
                 }
-            });
+            })
+            .catch(error => console.error("Error:", error));
         }
     });
-    
-    // function reloadImages(images, mediaUrl) {
-    //     const scrollableImagesContainer = document.getElementById('scrollableImages');
-    //     scrollableImagesContainer.innerHTML = '';
-    
-    //     images.forEach(image => {
-    //         const img = document.createElement('img');
-    //         img.src = `${mediaUrl}/${image}`;
-    //         img.alt = "image";
-    //         img.className = "scrollable-image";
-    //         img.style.maxWidth = "65px";
-    //         img.style.maxHeight = "65px";
-    //         img.style.margin = "4px";
-    //         img.style.objectFit = "cover";
-            
-    //         img.onclick = () => displayImage(img);
-    
-    //         scrollableImagesContainer.appendChild(img);
-    //     });
-    // }
-
-
 
     function displayImages(images) {
         images.forEach(function (imageUrl, index) {
-            console.log("fired")
-            // Check if the image already exists to avoid duplication
-            // if (!$("img[src='" + imageUrl + "']").length) {
-            //     const imgElement = `<img src="${imageUrl}" class="scrollable-image" alt="image ${index + 1}" onclick="displayImage(this)">`;
-            //     $('#scrollableImages').append(imgElement);
-            // }
+            const imgElement = `<img src="${imageUrl}" class="scrollable-image" alt="image ${index + 1}">`;
+            $('#scrollableImages').append(imgElement);
         });
-    
-        // Ensure at least one image is displayed
-        if ($('#selectedImage').attr('src') === '' && images.length > 0) {
+
+        if ($('#selectedImage').attr('src') === '') {
             $('#selectedImage').attr('src', images[0]);
         }
-    
-        // Attach the click event to the new images
+
         $(".scrollable-image").on("click", function () {
-            $("#selectedImage").attr("src", $(this).attr("src"));
-            resetTransform();  // This should reset any zoom/rotation transformations
+            window.displayImage(this);
         });
     }
-
-
-    
 
     function appendHiddenFields(images) {
         images.forEach(function (imageUrl) {
             $('#uploadForm').append(`<input type="hidden" name="uploaded_images" value="${imageUrl}">`);
-            console.log('images appended', images)
         });
     }
 
-    function removeImageFromList(imageUrl) {
-        let currentImageElement = $("img[src='" + imageUrl + "']");
-        console.log('function removeImageFromList fired.')
-    
-        // Remove the image from the DOM
-        currentImageElement.remove();
-    
-        let remainingImages = $(".scrollable-image");
-    
-        if (remainingImages.length > 0) {
-            // If there are images left, select the next one
-            let nextImage = remainingImages.first();
-            $("#selectedImage").attr("src", nextImage.attr("src"));
-        } else {
-            // If no images are left, clear the selected image
-            $("#selectedImage").attr("src", '');
-        }
+    function resetTransform() {
+        selectedImage.style.transform = 'scale(1) rotate(0deg)';
     }
-    
-    
-    function displayNextImage() {
-        let remainingImages = $('#scrollableImages img');
-        console.log("Remaining images:", remainingImages.length); // Check number of remaining images
-    
-        if (remainingImages.length > 0) {
-            let nextImage = $('#scrollableImages img:first').attr('src');
-            console.log("Next image to display:", nextImage); // Log the next image URL
-    
-            if (nextImage) {
-                $('#selectedImage').attr('src', nextImage);
-            } else {
-                $('#selectedImage').attr('src', '');
-            }
-        } else {
-            console.log("No images left to display.");
-            $('#selectedImage').attr('src', '');
-        }
-    }
-    
 
     let zoomLevel = 1;
-    let rotationAngle = 0;
-    let positionX = 0;
-    let positionY = 0;
-
-    $('#zoomInBtn').on('click', function () {
+    document.getElementById("zoomInBtn").addEventListener("click", function () {
         zoomLevel += 0.1;
-        updateTransform();
+        selectedImage.style.transform = `scale(${zoomLevel})`;
     });
 
-    $('#zoomOutBtn').on('click', function () {
-        if (zoomLevel > 0.1) zoomLevel -= 0.1;
-        updateTransform();
+    document.getElementById("zoomOutBtn").addEventListener("click", function () {
+        if (zoomLevel > 0.2) {
+            zoomLevel -= 0.1;
+            selectedImage.style.transform = `scale(${zoomLevel})`;
+        }
     });
 
-    $('#rotateBtn').on('click', function () {
-        rotationAngle = (rotationAngle + 90) % 360;
-        updateTransform();
+    let rotateAngle = 0;
+    document.getElementById("rotateBtn").addEventListener("click", function () {
+        rotateAngle += 90;
+        selectedImage.style.transform = `rotate(${rotateAngle}deg) scale(${zoomLevel})`;
     });
 
-    $('#resetBtn').on('click', function () {
-        resetTransform();
-    });
-
-    function updateTransform() {
-        $("#selectedImage").css(
-            "transform",
-            `scale(${zoomLevel}) rotate(${rotationAngle}deg) translate(${positionX}px, ${positionY}px)`
-        );
-    }
-
-    function resetTransform() {
+    document.getElementById("resetBtn").addEventListener("click", function () {
         zoomLevel = 1;
-        rotationAngle = 0;
-        positionX = 0;
-        positionY = 0;
-        updateTransform();
-    }
+        rotateAngle = 0;
+        selectedImage.style.transform = `rotate(0deg) scale(1)`;
+    });
 });

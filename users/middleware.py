@@ -11,7 +11,7 @@ class SessionExpiryMiddleware:
         if session_expiry_time:
             if timezone.now() > session_expiry_time:
                 request.session.flush()  
-                return redirect('login')  
+                return redirect('/users/')  
 
         response = self.get_response(request)
         return response
