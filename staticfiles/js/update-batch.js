@@ -3,25 +3,25 @@
 function createBundle() {
     var selectedImage = document.getElementById('selectedImage');
     var form = document.getElementById('myform');
+ 
 
     if (!form) {
-        console.error("Form not found.");
         return;
     }
 
     if (!selectedImage || !selectedImage.src) {
-        console.error("No image selected or #selectedImage not found.");
         return;
     }
 
     var currentImage = selectedImage.src;
+  
 
     var imageName = currentImage.split('/').pop();
 
     var formData = new FormData(form); 
     formData.append('imageName', imageName); 
    
-    
+
     fetch('/capture/create-bundle/', {  
         method: 'POST',
         body: formData,
@@ -137,10 +137,11 @@ function getBundleId(bundleId) {
 
 
 function sendBundleData(bundleId, batchId) {
- 
-    const csrfToken = '{{ csrf_token }}';  
+
     var batchid = document.getElementById('batchid').value;
-   
+
+    
+    const csrfToken = '{{ csrf_token }}';  
     getBundleId(bundleId);
 
     fetch(`/capture/bundle-data/${bundleId || 'unbundled'}/${batchid}/`, {  
@@ -204,6 +205,7 @@ function updateImages(newImages, mediaUrl, batchId, bundleId) {
         imgElement.className = 'scrollable-image';
         imgElement.alt = 'image';
         imgElement.onclick = function() { displayImage(this); };
+
         scrollableImages.appendChild(imgElement);
     });
 }
@@ -233,7 +235,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
         var currentImage = selectedImage.src;
-      
 
         var imageName = currentImage.split('/').pop();
         const formData = new FormData(form);
@@ -241,7 +242,9 @@ document.addEventListener("DOMContentLoaded", function () {
         if (savedBundleId === null) {
             if (imageName) {  
                 formData.append('imageName', imageName);
-            } 
+            } else {
+                console.error("No selected image found.");
+            }
         }
         else{
             formData.append('bundle_id', savedBundleId);
@@ -288,9 +291,6 @@ function removeSubmittedBundleIcon(bundleId) {
 }
 
 
-
-
-
 function reloadUnbundledImages(unbundledImages, mediaUrl, batchId) {
     const scrollableImagesContainer = document.getElementById('scrollableImages');
     
@@ -328,75 +328,47 @@ function clearForm(form) {
 }
 
 
+document.addEventListener("DOMContentLoaded", function () {
 
-$(document).ready(function () {
-
-    $('#importButton').on('click', function () {
-        $('#imageInput').click();
-    });
-
-    $('#imageInput').on('change', function () {
-        let formData = new FormData($('#uploadForm')[0]);
-        $.ajax({
-            url: uploadUrl,
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function (data) {
-                displayImages(data.uploaded_images);
-                appendHiddenFields(data.uploaded_images);
-            },
-            error: function (xhr, status, error) {
-                console.error("AJAX Error:", status, error);
-            }
-        });
-    });
-
-    $('#scanButton').on('click', function () {
-        $.ajax({
-            url: scanUrl,  
-            type: 'POST',
-            data: { source: 'scan' },
-            success: function (data) {
-                displayImages(data.uploaded_images);
-                appendHiddenFields(data.uploaded_images);
-            },
-            error: function (xhr, status, error) {
-                console.error("Scan Error:", status, error);
-            }
-        });
-    });
-
-    function getCSRFToken() {
-        const csrfToken = document.cookie
-            .split("; ")
-            .find(row => row.startsWith("csrftoken="))
-            ?.split("=")[1];
-        return csrfToken || "";
-    }
 
     const selectedImage = document.getElementById("selectedImage");
     const scrollableImages = document.getElementById("scrollableImages");
 
     let currentImageIndex = 0;
 
+    var currentImage = selectedImage.src;
+    var imageName = currentImage.split('/').pop();
+
+    
+
     window.displayImage = function (img) {
         selectedImage.src = img.src;
         currentImageIndex = Array.from(scrollableImages.children).indexOf(img);
-
+        
         const images = scrollableImages.querySelectorAll('.scrollable-image');
         images.forEach(image => image.classList.remove('selected-image'));
 
         img.classList.add('selected-image');
+        
+        
+        currentImage = selectedImage.src;
+        imageName = currentImage.split('/').pop();
+       
     };
 
     document.getElementById("deleteBtn").addEventListener("click", function () {
+
         if (scrollableImages.children.length > 0) {
             const imageToDelete = scrollableImages.children[currentImageIndex];
             const imageUrl = imageToDelete.src.split(window.location.origin)[1]; 
-
+            
             const imageNameToDelete = imageUrl.split('/').pop();
+
+            var form = document.getElementById('myform');
+            var formData = new FormData(form);
+            const batchId = formData.get('batch_id');
+
+
 
             fetch('/capture/delete-image/', {
                 method: 'POST',
@@ -404,55 +376,44 @@ $(document).ready(function () {
                     'Content-Type': 'application/json',
                     'X-CSRFToken': getCSRFToken(), 
                 },
-                body: JSON.stringify({ imageName: imageNameToDelete })
+                body: JSON.stringify({ imageName: imageNameToDelete ,
+                     batchid: batchId })
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
 
-                    scrollableImages.removeChild(imageToDelete);
+                        scrollableImages.removeChild(imageToDelete);
 
-                    if (currentImageIndex >= scrollableImages.children.length) {
-                        currentImageIndex = scrollableImages.children.length - 1;
-                    }
+                        if (currentImageIndex >= scrollableImages.children.length) {
+                            currentImageIndex = scrollableImages.children.length - 1;
+                        }
 
-                    if (scrollableImages.children.length > 0) {
-                        selectedImage.src = scrollableImages.children[currentImageIndex].src;
+                        if (scrollableImages.children.length > 0) {
+                            selectedImage.src = scrollableImages.children[currentImageIndex].src;
+                        } else {
+                            selectedImage.src = ""; 
+                        }
                     } else {
-                        selectedImage.src = ""; 
+                        console.error("Error deleting image:", data.error);
                     }
-                } else {
-                    console.error("Error deleting image:", data.error);
-                }
-            })
-            .catch(error => console.error("Error:", error));
+                })
+                .catch(error => console.error("Error:", error));
         }
     });
 
-    function displayImages(images) {
-        images.forEach(function (imageUrl, index) {
-            const imgElement = `<img src="${imageUrl}" class="scrollable-image" alt="image ${index + 1}">`;
-            $('#scrollableImages').append(imgElement);
-        });
-
-        if ($('#selectedImage').attr('src') === '') {
-            $('#selectedImage').attr('src', images[0]);
+    function getCSRFToken() {
+        const name = "csrftoken";
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.startsWith(name + "=")) {
+                return cookie.substring(name.length + 1);
+            }
         }
-
-        $(".scrollable-image").on("click", function () {
-            window.displayImage(this);
-        });
+        return "";
     }
 
-    function appendHiddenFields(images) {
-        images.forEach(function (imageUrl) {
-            $('#uploadForm').append(`<input type="hidden" name="uploaded_images" value="${imageUrl}">`);
-        });
-    }
-
-    function resetTransform() {
-        selectedImage.style.transform = 'scale(1) rotate(0deg)';
-    }
 
     let zoomLevel = 1;
     document.getElementById("zoomInBtn").addEventListener("click", function () {
@@ -479,3 +440,8 @@ $(document).ready(function () {
         selectedImage.style.transform = `rotate(0deg) scale(1)`;
     });
 });
+
+
+
+
+

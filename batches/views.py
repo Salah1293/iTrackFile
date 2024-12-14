@@ -1,3 +1,5 @@
+from datetime import datetime
+from time import localtime
 from django.shortcuts import render, redirect
 from .models import *
 from django.db.models import Q, Value
@@ -19,6 +21,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.messages import error
 from users.models import PvdmUsers1, Role
 from django.utils.dateformat import DateFormat
+import openpyxl
+from openpyxl.styles import Alignment, Font, PatternFill, Border, Side
+
 
 # Create your views here.
 
@@ -382,7 +387,7 @@ def historicIndexCardsResults(request):
                 request, historicIndexCards)
 
 
-            all_ids = historicIndexCards.object_list.values_list(
+            all_ids = page_obj.object_list.values_list(
                 'docid', flat=True)
 
             context = {'section_result': page_obj,
@@ -431,15 +436,15 @@ def historicOrderBooksResults(request):
 
             resultCount = historicOrderBooks.count() if query else 0
 
-            custom_range, historicOrderBooks = paginate(
+            custom_range, page_obj = paginate(
                 request, historicOrderBooks)
             
             
 
-            all_ids = historicOrderBooks.object_list.values_list(
+            all_ids = page_obj.object_list.values_list(
                 'docid', flat=True)
 
-            context = {'section_result': historicOrderBooks,
+            context = {'section_result': page_obj,
                        'resultCount': resultCount,
                        'custom_range': custom_range,
                        'all_ids': all_ids,
@@ -1006,3 +1011,75 @@ def single_image_view(request, section, pk):
     doc_model, obj_model, card_form = model_mapping[section]
 
     return singleImageView(request, pk, doc_model, obj_model, card_form, section)
+
+
+
+def export_table(request):
+
+    section_result = PvdmDocs114.objects.all()  
+
+    workbook = openpyxl.Workbook()
+    worksheet = workbook.active
+    worksheet.title = 'Historic Index Cards'
+
+    headers = [
+        'Last Name', 'First Name', 'Subject', 'Status', 'Owner',
+        'Instrument', 'Record Source', 'Book Record', 'Page', 'Date',
+        'Dates Before 1753', 'Comments'
+    ]
+    worksheet.append(headers)
+
+    header_font = Font(bold=True, color='FFFFFF', size=12)  
+    header_fill = PatternFill(start_color='009c00', end_color='009c00', fill_type='solid')  
+    header_border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
+
+    for cell in worksheet["1:1"]:
+        cell.font = header_font
+        cell.fill = header_fill
+        cell.alignment = Alignment(horizontal='center', vertical='center')
+        cell.border = header_border  
+
+    data_font = Font(bold=True, size=11) 
+    data_border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
+
+    for index, element in enumerate(section_result, start=2): 
+        row = []
+        for field in [element.docindex1, element.docindex2, element.docindex3, element.docindex10,
+                      element.docindex11, element.docindex9, element.docindex4, element.docindex5,
+                      element.docindex6, element.docindex7, element.docindex12, element.docindex8]:
+            if isinstance(field, datetime):
+                field = field.replace(tzinfo=None)
+            row.append(field)
+        
+        worksheet.append(row)
+
+        if index % 2 == 0:
+            fill_color = PatternFill(start_color='FFFFFF', end_color='FFFFFF', fill_type='solid') 
+        else:
+            fill_color = PatternFill(start_color='D3D3D3', end_color='D3D3D3', fill_type='solid') 
+        
+        for cell in worksheet[index]:
+            cell.fill = fill_color
+            cell.alignment = Alignment(horizontal='center', vertical='center')
+            cell.font = data_font 
+            cell.border = data_border 
+
+    for col in worksheet.columns:
+        max_length = 0
+        column = col[0].column_letter  
+        for cell in col:
+            try:
+                if len(str(cell.value)) > max_length:
+                    max_length = len(str(cell.value))
+            except:
+                pass
+        adjusted_width = (max_length + 2) 
+        worksheet.column_dimensions[column].width = adjusted_width
+
+    current_datetime = datetime.now().strftime('(%Y-%m-%d)-(%H:%M %p)')
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename="historic-index-cards-{current_datetime}.xlsx"'
+
+    workbook.save(response)
+
+    return response

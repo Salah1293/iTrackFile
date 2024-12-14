@@ -55,7 +55,14 @@
         </table>
         </div>
         <br>
-        <p id="result">Result : <span id="resultCount">{{ resultCount }}</span> row{{ resultCount|pluralize:'s'}}</p>
+        <div style="display: flex; align-items: center;">
+          <p id="result" style="margin-right: 20px;">Result: <span id="resultCount">{{ resultCount }}</span> row{{ resultCount|pluralize:'s'}}</p>
+          <div class="export-button-container">
+            <a href="{% url 'export_table' %}" class="btn btn-primary" id="exportBtn">
+              Export to Excel
+            </a>
+          </div>
+        </div>
       </div>
           
         </div>     

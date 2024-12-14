@@ -6,7 +6,6 @@ from . import views
 urlpatterns =[
     path('', views.landingBatches, name="landingBatches"),
     path('general_search/', views.general_search, name="generalResults"),
-    # path('filling-batch/', views.fillingBatch, name="fillingBatch"),
     path('civil-search/', views.civilSearch, name="civilSearch"),
     path('civil-results/', views.civilResults, name="civilResults"),
     path('criminal-cases-search/', views.criminalCasesSearch, name="criminalCasesSearch"),
@@ -37,8 +36,8 @@ urlpatterns =[
     path('adoption-results/', views.adoptionResults, name="adoptionResults"),
     path('clerk-orders-search/', views.clerkOrdersSearch, name="clerkOrdersSearch"),
     path('clerk-orders-results/', views.clerkOrdersResults, name="clerkOrdersResults"),
-    
     path('single-image/<str:section>/<str:pk>/', views.single_image_view, name="singleImage"),
     path('section-results/', views.view_section_results, name='sectionResults'),
+    path('export/', views.export_table, name='export_table'),
    
 ]
