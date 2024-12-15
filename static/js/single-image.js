@@ -72,8 +72,6 @@ document.querySelector(".print-popup .cancel-btn").addEventListener('click', fun
 
 var idsList = document.getElementById('ids_list').value;
 document.querySelector(".firstBtn").addEventListener('click', function () {
-    console.log("First  button clicked", section); 
-    console.log("last button.", section.value); 
     let firstDocId = this.getAttribute('data-item-id');
     if (firstDocId) {
         let newUrl = `/single-image/${section.value}/${firstDocId}/?ids=${encodeURIComponent(idsList)}`;
@@ -82,8 +80,6 @@ document.querySelector(".firstBtn").addEventListener('click', function () {
 });
 
 document.querySelector(".lastBtn").addEventListener('click', function () {
-    console.log("last button.", section); 
-    console.log("last button.", section.value); 
     let lastDocId = this.getAttribute('data-item-id');
     if (lastDocId) {
         let newUrl = `/single-image/${section.value}/${lastDocId}/?ids=${encodeURIComponent(idsList)}`;
@@ -92,8 +88,6 @@ document.querySelector(".lastBtn").addEventListener('click', function () {
 });
 
 document.querySelector(".prevBtn").addEventListener('click', function () {
-    console.log("prev button.", section); 
-    console.log("last button.", section.value); 
     let prevDocId = this.getAttribute('data-item-id');
     if (prevDocId) {
         let newUrl = `/single-image/${section.value}/${prevDocId}/?ids=${encodeURIComponent(idsList)}`;
@@ -103,14 +97,11 @@ document.querySelector(".prevBtn").addEventListener('click', function () {
 document.addEventListener('DOMContentLoaded', function () {
     document.body.addEventListener('click', function (e) {
         if (e.target && e.target.classList.contains('nextBtn')) {
-            console.log("Next button clicked. Current section:", section.value); 
 
             let nextDocId = e.target.getAttribute('data-item-id');
-            console.log("Next document ID:", nextDocId);
 
             if (nextDocId) {
                 let newUrl = `/single-image/${section.value}/${nextDocId}/?ids=${encodeURIComponent(idsList)}`;
-                console.log("Navigating to:", newUrl);
 
                 window.location.href = newUrl;
             } else {
@@ -119,33 +110,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
-
-
-// document.querySelector(".nextBtn").addEventListener('click', function () {
-//     console.log("Next button clicked", section); 
-//     console.log("last button.", section.value); 
-//     let nextDocId = this.getAttribute('data-item-id');
-//     if (nextDocId) {
-//         let newUrl = `/single-image/${section.value}/${nextDocId}/?ids=${encodeURIComponent(idsList)}`;
-//         window.location.href = newUrl;
-//     }
-// });
-
-
-
-
-// document.querySelector(".nextBtn").addEventListener('click', function () {
-//     console.log("Next button clicked");
-//     let nextDocId = this.getAttribute('data-item-id');
-//     console.log("Next document ID:", nextDocId);
-//     // Check if `nextDocId` is correctly retrieved and the URL generation works as expected
-//     if (nextDocId) {
-//         let newUrl = `/single-image/${section.value}/${nextDocId}/?ids=${encodeURIComponent(idsList)}`;
-//         console.log("New URL:", newUrl);
-//         // Ensure the new URL is correct and navigate to it
-//         window.location.href = newUrl;
-//     }
-// });
 
 
 
@@ -178,7 +142,6 @@ function navigateImage(direction) {
     xxx.forEach((element, index) => {
         let cleanElement = element.trim().replace(/'/g, '');
         zzz.push(cleanElement);
-        console.log(`The ${index + 1} is: ${cleanElement}`);
     });
 
     

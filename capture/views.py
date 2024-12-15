@@ -543,8 +543,7 @@ def get_bundle_data(request, bundleid, batchid):
                 return JsonResponse({'error': 'Missing batchid'}, status=400)
 
             if bundleid:
-                bundle_dir = os.path.join(settings.MEDIA_ROOT, f'batch_{
-                                          batchid}', f'bundle_{bundleid}')
+                bundle_dir = os.path.join(settings.MEDIA_ROOT, f'batch_{batchid}', f'bundle_{bundleid}')
             else:
                 bundle_dir = os.path.join(
                     settings.MEDIA_ROOT, f'batch_{batchid}')

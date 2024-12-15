@@ -1,5 +1,3 @@
-from datetime import datetime
-from time import localtime
 from django.shortcuts import render, redirect
 from .models import *
 from django.db.models import Q, Value
@@ -21,9 +19,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.messages import error
 from users.models import PvdmUsers1, Role
 from django.utils.dateformat import DateFormat
+from django.utils.dateformat import DateFormat
 import openpyxl
 from openpyxl.styles import Alignment, Font, PatternFill, Border, Side
-
+from datetime import datetime
 
 # Create your views here.
 
@@ -50,6 +49,7 @@ def general_search(request):
         return render(request, 'batches/landing-page.html', {'query': query})
 
     all_results = generate_all_results(query)
+    
 
     context = {'query': query, 'all_results': all_results}
     return render(request, 'batches/general-results.html', context)
@@ -347,8 +347,11 @@ def historicIndexCardsSearch(request):
 @roles_required('admin', 'hr_manager', 'hr_staff', 'general_staff', 'historic_staff')
 def historicIndexCardsResults(request):
     form = HistoricIndexCardsForm()
+    export_url = None
     if request.method == 'GET':
         form = HistoricIndexCardsForm(request.GET)
+        query_params = request.GET.dict()
+        query_params.pop('csrfmiddlewaretoken', None)
         if form.is_valid():
             last_name = form.cleaned_data.get('docindex1', '')
             first_name = form.cleaned_data.get('docindex2', '')
@@ -385,19 +388,24 @@ def historicIndexCardsResults(request):
 
             custom_range, page_obj = paginate(
                 request, historicIndexCards)
+            for card in page_obj:
+                if card.docindex7 :
+                    card.docindex7 = DateFormat(card.docindex7).format('Y-m-d') if card.docindex7 else None
 
-
-            all_ids = page_obj.object_list.values_list(
-                'docid', flat=True)
-
+            all_ids = list(card.docid for card in page_obj if card.docid)
+            query_string = '&'.join([f'{key}={value}' for key, value in query_params.items()])
+            export_url = f"{reverse('export_historic_cards_table')}?{query_string}"
+            is_card=True
             context = {'section_result': page_obj,
                        'resultCount': resultCount,
                        'custom_range': custom_range,
                        'all_ids': all_ids,
+                       'export_url': export_url,
+                       'is_card': is_card,
                        'section': 'historic-index-cards'}
             return render(request, 'batches/historic-index-cards-results.html', context)
 
-    context = {'section_result': PvdmDocs114.objects.none(), 'resultCount': 0}
+    context = {'section_result': PvdmDocs114.objects.none(), 'export_url': export_url, 'resultCount': 0}
     return redirect('hitoricIndexCardsResults')
 
 
@@ -413,9 +421,11 @@ def historicOrderBooksSearch(request):
 @roles_required('admin', 'hr_manager', 'hr_staff', 'general_staff', 'historic_staff')
 def historicOrderBooksResults(request):
     form = HistoricOrderBooksForm()
-
+    export_url = None
     if request.method == 'GET':
         form = HistoricOrderBooksForm(request.GET)
+        query_params = request.GET.dict()
+        query_params.pop('csrfmiddlewaretoken', None)
         if form.is_valid():
             book_type_label = form.cleaned_data.get('docindex1', '')
             year = form.cleaned_data.get('docindex2', '')
@@ -443,15 +453,19 @@ def historicOrderBooksResults(request):
 
             all_ids = page_obj.object_list.values_list(
                 'docid', flat=True)
-
+            query_string = '&'.join([f'{key}={value}' for key, value in query_params.items()])
+            export_url = f"{reverse('export_historic_books_table')}?{query_string}"
+            is_book =True
             context = {'section_result': page_obj,
                        'resultCount': resultCount,
                        'custom_range': custom_range,
+                       'export_url': export_url,
                        'all_ids': all_ids,
+                       'is_book' : is_book,
                        'section': 'historic-order-books'}
             return render(request, 'batches/historic-order-books-results.html', context)
 
-    context = {'section_result': PvdmDocs113.objects.none(), 'resultCount': 0}
+    context = {'section_result': PvdmDocs113.objects.none(), 'export_url': export_url, 'resultCount': 0}
     return redirect('historicOrderBooks')
 
 
@@ -1014,10 +1028,23 @@ def single_image_view(request, section, pk):
 
 
 
-def export_table(request):
+#generates excel file for historic index cards
+def export_historic_cards_table(request):
 
-    section_result = PvdmDocs114.objects.all()  
+    query_params = request.GET.dict()
+    page_number = query_params.pop('page', None)  
+    query_params.pop('csrfmiddlewaretoken', None)  
+    
+    query = Q()
+    for key, value in query_params.items():
+        if value:
+            query &= Q(**{key: value})
 
+    historicIndexCards = PvdmDocs114.objects.filter(query) if query else PvdmDocs114.objects.none()
+
+    section_result = list(historicIndexCards)
+
+  
     workbook = openpyxl.Workbook()
     worksheet = workbook.active
     worksheet.title = 'Historic Index Cards'
@@ -1048,7 +1075,7 @@ def export_table(request):
                       element.docindex11, element.docindex9, element.docindex4, element.docindex5,
                       element.docindex6, element.docindex7, element.docindex12, element.docindex8]:
             if isinstance(field, datetime):
-                field = field.replace(tzinfo=None)
+                field = field.strftime('%Y-%m-%d') 
             row.append(field)
         
         worksheet.append(row)
@@ -1079,6 +1106,116 @@ def export_table(request):
     current_datetime = datetime.now().strftime('(%Y-%m-%d)-(%H:%M %p)')
     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = f'attachment; filename="historic-index-cards-{current_datetime}.xlsx"'
+
+    workbook.save(response)
+
+    return response
+
+
+
+# Generates excel file for historic order books
+def export_historic_books_table(request):
+    
+    
+    BOOK_TYPE_CHOICES = dict([
+        ('bond_book_1', 'Bond Book 1'),
+        ('court_order_superior', 'Court Order Superior'),
+        ('court_quarterly_sessions', 'Court Quarterly Sessions'),
+        ('estray_book', 'Estray Book'),
+        ('land_causes_1', 'Land Causes 1'),
+        ('land_causes_2', 'Land Causes 2'),
+        ('land_records_long_standing', 'Land Records Long Standing'),
+        ('minute_book', 'Minute Book'),
+        ('ordinary_bond_book', 'Ordinary Bond Book'),
+        ('quite_rents', 'Quite Rents'),
+        ('reg_free_negroes_val_2', 'Reg Free Negroes Val 2'),
+        ('reg_free_negroes_val_3', 'Reg Free Negroes Val 3'),
+        ('roads', 'Roads'),
+        ('surveys', 'Surveys'),
+    ])
+
+    query_params = request.GET.dict()
+    page_number = query_params.pop('page', None)
+    query_params.pop('csrfmiddlewaretoken', None)
+
+    docindex1_key = query_params.get('docindex1', '').strip()
+    docindex1_value = BOOK_TYPE_CHOICES.get(docindex1_key, None)
+
+    query = Q()
+
+    if docindex1_value:
+        query &= Q(docindex1=docindex1_value)
+
+    year = query_params.get('docindex2', '').strip()
+    if year:
+        query &= Q(docindex2=year)
+
+    historicOrderBooks = PvdmDocs113.objects.filter(query) if query else PvdmDocs113.objects.none()
+
+
+    if not historicOrderBooks.exists():
+        return HttpResponse("No data found for the given query.", status=404)
+
+    section_result = list(historicOrderBooks)
+
+
+    workbook = openpyxl.Workbook()
+    worksheet = workbook.active
+    worksheet.title = 'Historic Order Books'
+
+    headers = [
+        'Book Type', 'Year', 'Page A', 'Page B'
+    ]
+    worksheet.append(headers)
+
+    header_font = Font(bold=True, color='FFFFFF', size=12)  
+    header_fill = PatternFill(start_color='009c00', end_color='009c00', fill_type='solid')  
+    header_border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
+
+    for cell in worksheet["1:1"]:
+        cell.font = header_font
+        cell.fill = header_fill
+        cell.alignment = Alignment(horizontal='center', vertical='center')
+        cell.border = header_border  
+
+    data_font = Font(bold=True, size=11)
+    data_border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
+
+    for index, element in enumerate(section_result, start=2):
+        row = []
+        for field in [element.docindex1, element.docindex2, element.docindex3, element.docindex4]:
+            if isinstance(field, datetime):
+                field = field.strftime('%Y-%m-%d') 
+            row.append(field)
+
+        worksheet.append(row)
+
+        if index % 2 == 0:
+            fill_color = PatternFill(start_color='FFFFFF', end_color='FFFFFF', fill_type='solid')
+        else:
+            fill_color = PatternFill(start_color='D3D3D3', end_color='D3D3D3', fill_type='solid')
+
+        for cell in worksheet[index]:
+            cell.fill = fill_color
+            cell.alignment = Alignment(horizontal='center', vertical='center')
+            cell.font = data_font
+            cell.border = data_border
+
+    for col in worksheet.columns:
+        max_length = 0
+        column = col[0].column_letter
+        for cell in col:
+            try:
+                if len(str(cell.value)) > max_length:
+                    max_length = len(str(cell.value))
+            except:
+                pass
+        adjusted_width = (max_length + 2)
+        worksheet.column_dimensions[column].width = adjusted_width
+
+    current_datetime = datetime.now().strftime('(%Y-%m-%d)-(%H:%M %p)')
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename="historic-order-books-{current_datetime}.xlsx"'
 
     workbook.save(response)
 

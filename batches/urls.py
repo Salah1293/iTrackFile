@@ -38,6 +38,6 @@ urlpatterns =[
     path('clerk-orders-results/', views.clerkOrdersResults, name="clerkOrdersResults"),
     path('single-image/<str:section>/<str:pk>/', views.single_image_view, name="singleImage"),
     path('section-results/', views.view_section_results, name='sectionResults'),
-    path('export/', views.export_table, name='export_table'),
-   
+    path('export_cards/', views.export_historic_cards_table, name='export_historic_cards_table'),
+    path('export_books/', views.export_historic_books_table, name='export_historic_books_table'),
 ]

@@ -14,6 +14,7 @@ from PIL import Image
 import re
 from django.utils.dateformat import DateFormat
 
+
 # pagination super class
 def paginate(request, query):
     page = request.GET.get('page')
@@ -50,28 +51,6 @@ def createForm(request, template, classFrom):
     context = {'form': form}
     return render(request, template, context)
 
-
-# # factory method for card search
-# def createSearch(request, form, params, model_class, template):
-#     if request.method == 'GET':
-#         form = form()
-#         if form.is_valid():
-#             query = Q()
-#             for param, field in params.items():
-#                 value = form.cleaned_data.get(param, '')
-#                 if value:
-#                     query &= Q(**{field: value})
-
-#                 results = model_class.objects.filter(
-#                     query) if query else model_class.objects.none()
-#                 result_count = results.count() if query else 0
-#                 custom_range, results = paginate(request, results)
-#                 context = {'form': form, 'results': results,
-#                            'result_count': result_count, 'custom_range': custom_range}
-#                 return render(request, template, context)
-#     context = {'from': form, 'results': model_class.objects.none(),
-#                result_count: 0}
-#     return redirect(template)
 
 
 # display images contains evrey thing in page except print Rotat and reset mmade by js as they are styling manner
@@ -455,6 +434,8 @@ def generate_all_results(query, chosen_section=None):
 
     all_results = {key: value for key, value in all_results.items() if value}
 
+    
+
     return all_results
 
 # GET TABLE NAME THAT HAS THE KEYWORD THAT THE USER USED FOR SERRCH
@@ -471,7 +452,6 @@ def get_section_name(chosen_section):
         'Civil': 'civil',
         'Criminal Juvenile': 'criminal-juvenile',
         'Adoption': 'adoption',
-        # 'HR': 'hr',
         'Law Chancery': 'law-chancery',
         'Criminal Cases': 'criminal-cases',
         'Clerk Orders': 'clerk-orders',

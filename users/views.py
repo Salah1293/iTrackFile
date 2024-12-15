@@ -23,16 +23,10 @@ def loginUser(request):
         return redirect('landingBatches')
     
     if request.method == 'POST':
-        print(request.POST)
-
-
 
         username = request.POST['username'].lower()
         password = request.POST['password']
 
-
-        print("Username entered:", username)
-        print("Password entered:", password)
 
         try:
             user = User.objects.get(username=username)
@@ -46,15 +40,12 @@ def loginUser(request):
 
 
         user = authenticate(request, username=username, password=password)
-        print("Authenticated user:", user)
 
         if user is not None:
             login(request, user)
-            print("User logged in successfully")
             return redirect(request.GET.get('next', 'landingBatches'))
         else:
             messages.error(request, 'Username or password is incorrect')
-            print("Authentication failed")
 
     return render(request, 'users/login.html')
 

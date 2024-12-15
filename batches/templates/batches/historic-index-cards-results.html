@@ -57,14 +57,15 @@
         <br>
         <div style="display: flex; align-items: center;">
           <p id="result" style="margin-right: 20px;">Result: <span id="resultCount">{{ resultCount }}</span> row{{ resultCount|pluralize:'s'}}</p>
+          {% if is_card %}
           <div class="export-button-container">
-            <a href="{% url 'export_table' %}" class="btn btn-primary" id="exportBtn">
-              Export to Excel
+            <a href="{{ export_url }}&page={{ section_result.number }}" class="btn btn-primary" id="exportBtn">
+                Export to Excel
             </a>
           </div>
+          {% endif %}
         </div>
-      </div>
-          
+      </div>        
         </div>     
     </section>
     {% include 'pagination.html' with queryset=section_result custom_range=custom_range %}

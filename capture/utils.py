@@ -30,8 +30,6 @@ def get_job_data(job_id):
         jobid=job_id).values_list('fieldname', flat=True)
     index_ids = PvcapIndex1.objects.filter(
         jobid=job_id).values_list('indexid', flat=True)
-
-    # fields = [field for field in fields if field != 'Date']
     return fields, index_ids, job_id
 
 # SAVE VALUE USER ENTRED IN INDEX TABLE
@@ -77,13 +75,10 @@ def count_export_folders(base_path):
 # CREATE PATH
 def create_path(section_name):
     if section_name == 'HR':
-        # base_path = 'E:\\PVDocs\\Monitored Import Path\\HR\\'
         base_path = 'E:\\Projects\\Django\\iTrackFiles collections\\images'
     elif section_name == 'Historic Order Books':
-        # base_path = 'E:\\PVDocs\\Monitored Import Path\\HistoricOrderBooks\\'
         base_path = 'E:\\Projects\\Django\\iTrackFiles collections\\images'
     elif section_name == 'Historic Index Cards':
-        # base_path = 'E:\\PVDocs\\Monitored Import Path\\HistoricIndexCards\\'
        base_path = 'E:\\Projects\\Django\\iTrackFiles collections\\images'
     else:
         return
@@ -141,8 +136,6 @@ def save_field_data(form_data, job_id, dg_id, batch_id):
 
     instance = table_model()
     instance.jobid = job_id
-
-
 
     if section_name in ['HR', 'Historic Order Books', 'Historic Index Cards']:
         instance.createdate = datetime.now()
@@ -272,9 +265,7 @@ def delete_batch_dir(batch_id):
 
 
 def get_client_ip(request):
-    """
-    Get the client's IP address from the request object.
-    """
+   
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
     if x_forwarded_for:
         ip = x_forwarded_for.split(',')[0]
