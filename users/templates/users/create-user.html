@@ -1,0 +1,35 @@
+
+{% extends 'main.html' %}
+{% load static %}
+{% block content %}
+<main class="formPage my-xl">
+    <div class="content-box">
+        <div class="formWrapper">
+            <div class="title-container">
+                <h2 id="cardName">{% if form.instance.pk %}Update User{% else %}Create User{% endif %}</h2>
+            </div>
+            <a class="backButton" href="{% url 'managing' %}"><i class="im im-angle-left"><</i></a>
+            <br>
+            <form id="myForm" class="form" method="POST" action="">
+                {% csrf_token %}
+                <div class="form__field">
+                    {% for field in form %}
+                    <div class="input-wrapper">
+                        <label id="formLabel" for="formInput#text">{{ field.label }}</label>
+                        {{ field }}
+                    </div>
+                    {% endfor %}
+                </div>
+                <div id="buttonSection">
+                    <button id="formButton" class="btn btn--sub btn--lg my-md" type="submit">{% if form.instance.pk %}Update{% else %}Create{% endif %}</button>
+                    <button id="formButton" type="button" class="btn btn--sub btn--lg my-md" onclick="resetForm()">Clear</button>
+                    <a href="{% url 'managing' %}">
+                        <button id="formButton" class="btn btn--sub btn--lg my-md" type="button">Cancel</button>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+<script src="{% static 'js/scripts.js' %}"></script>
+{% endblock content %}

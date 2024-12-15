@@ -1,0 +1,98 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block content %}
+
+<main >
+    <div id="viewContainer" class="container"> 
+          <div id="buttonsContainer">
+            <input type="hidden" id="ids_list" value="{{ ids_list|join:',' }}">
+            <a class="back-link" href="{{ previous_page_url }}">Back</a>
+            {% if first_doc != none %}
+            <span id="spanButton" class="firstBtn" data-item-id="{{ first_doc }}">First</span>
+            {% endif %}
+            {% if next_doc != None %}
+            <span id="spanButton" class="nextBtn" data-item-id="{{ next_doc }}">Next</span>
+            {% endif %}
+            {% if prev_doc != None %}          
+            <span id="spanButton" class="prevBtn" data-item-id="{{ prev_doc }}">Prev</span>
+            {% endif %}
+            {% if last_doc != None %}
+            <span id="spanButton" class="lastBtn" data-item-id="{{ last_doc }}">Last</span> 
+            {% endif %}  
+            <span id="spanButton" class="printbtn" onclick="showPrintPopup()">Print</span>
+            <span id="spanButton" onclick="rotateImage()">Rotate</span>
+            <span id="spanButton" onclick="resetTransform()">Reset</span>
+            <span id="spanButton" class="editbtn">Edit</span>             
+            <span id="spanButton" class="deletebtn">Delete</span>  
+          </div>
+
+          <div id="singleSelectedImage" class="image-container">
+            {% if image_data %}
+            <input type="hidden" id="imageDataArr" value="{{ image_data }}">
+            <input type="hidden" id="section" value="{{ section }}">
+
+                <img id="selectedImage" class="singleBatch__preview" src="data:image/jpeg;base64,{{ image_data.0 }}" alt="Image">
+                
+                {% if image_data|length > 1 %}   
+
+                <button class="prevImageBtn" style="display: none;" onclick="navigateImage(-1)">❮</button>
+                <button class="nextImageBtn" onclick="navigateImage(1)">❯</button>
+                <input type="hidden" id="imageDataLength" value="{{ image_data_length }}">
+                <input type="hidden" id="currentImageIndex" value="0">
+                {% endif %}
+            {% else %}
+                <p>No images available</p>
+            {% endif %}
+         </div>
+
+          <div class="popup" id="draggableForm">
+            <div id="drag-handle">
+            <div class="close-btn">&times;</div>
+          <form  method="POST">
+            <h2 >Update Info</h2>
+            {% csrf_token %}
+            <div class="scrollable-fields">
+              {% for field in form %}
+              <div class="form-element">
+                <label >{{ field.label }}</label>
+                {{ field }}
+              </div>
+              {% endfor %}
+            </div>
+            <br>
+            <button name="edit" id="spanButton" class="cls" type="submit">Update</button> 
+            <button id="spanButton" class="cancel-btn" type="button">Cancel</button>
+          </form>
+           </div>
+           </div>
+
+        <div class="delete-popup" id="delete-popup">
+          <div class="close-btn">&times;</div>
+          <form  method="POST">
+            <h2>Delete Document</h2>
+            <p>Are you sure you wanna delete the document?</p>
+            {% csrf_token %}
+            <br>
+            <button name="delete" id="spanButton" class="cls" type="submit">Delete</button>
+            <button id="spanButton" class="cancel-btn" type="button">Cancel</button>  
+          </form>
+        </div>  
+
+      <div class="print-popup" id="print-popup">
+          <div class="close-btn" onclick="closePrintPopup()">&times;</div>
+          <h2>Select Images to Print</h2>
+          <div id="print-images-container">
+              <!-- <textarea id="imageIndices" ></textarea> -->
+          </div>
+          <input type="hidden" id="imageDataArr" value="{{ image_data }}">
+          <br>
+          <button id="spanButton" class="cls" type="button" onclick="printImages()">Print</button>
+          <button id="spanButton" class="cancel-btn" type="button" onclick="closePrintPopup()">Cancel</button>
+      </div>
+
+    </div>
+
+  </main>
+  <script src="{% static 'js/single-image.js' %}"></script>
+
+{% endblock content %}

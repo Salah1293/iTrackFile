@@ -1,0 +1,84 @@
+
+{% extends 'main.html' %}
+{% load static %}
+{% block content %}
+
+<!-- Main Section -->
+<main class="batches">
+   
+    <!-- Search Result: BatchList -->
+    <section id="batchy" class="batchList">
+      <div class="container">  
+        <div class="column">
+          <div id="table-title-container">
+            <h2 id="tableName">CRIMINAL JUVENILE</h2>
+            </div>
+          
+          <div id="table-container" class="table-container">
+          <table id="my-styled-table" class="table table-striped my-styled-table" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Case Number</th>
+                    <th>Order Date</th>
+                    <th>Judge Name</th>
+                    <th>Sealed</th>
+                    <th>Defendant Company</th>
+                    <th>Defendant Last Name</th>
+                    <th>Defendant First Name</th>
+                    <th>Defendant Middle</th>
+                    <th>Defendant Suffix</th>
+                    <th>Plaintiff Company</th>
+                    <th>Plaintiff Last Name</th>
+                    <th>Plaintiff First Name</th>
+                    <th>Plaintiff Middle</th>
+                    <th>Plaintiff Suffix</th>
+                    <th>Subject Company</th>
+                    <th>Subject Last Name</th>
+                    <th>Subject First Name</th>
+                    <th>Subject Middle</th>
+                    <th>Subject Suffix</th>
+                    <th>Scan Date</th>
+                </tr>
+            </thead>
+            <tbody>
+              <div class="table-body">
+              {% for element in section_result %}
+              <tr onclick="redirectToSingleImage('{{ section }}', '{{ element.docid }}', '{{ all_ids|join:',' }}')">
+                <td>{% if element.docindex1 %}{{ element.docindex1 }}{% endif %}</td>
+                  <td>{% if element.docindex2 %}{{ element.docindex2 }}{% endif %}</td>
+                  <td>{% if element.docindex3 %}{{ element.docindex3 }}{% endif %}</td>
+                  <td>{% if element.docindex4 %}{{ element.docindex4 }}{% endif %}</td>
+                  <td>{% if element.docindex5 %}{{ element.docindex5 }}{% endif %}</td>
+                  <td>{% if element.docindex6 %}{{ element.docindex6 }}{% endif %}</td>
+                  <td>{% if element.docindex7 %}{{ element.docindex7 }}{% endif %}</td>
+                  <td>{% if element.docindex8 %}{{ element.docindex8 }}{% endif %}</td>
+                  <td>{% if element.docindex9 %}{{ element.docindex9 }}{% endif %}</td>
+                  <td>{% if element.docindex10 %}{{ element.docindex10 }}{% endif %}</td>
+                  <td>{% if element.docindex11 %}{{ element.docindex11 }}{% endif %}</td>
+                  <td>{% if element.docindex12 %}{{ element.docindex12 }}{% endif %}</td>
+                  <td>{% if element.docindex13 %}{{ element.docindex13 }}{% endif %}</td>
+                  <td>{% if element.docindex14 %}{{ element.docindex14 }}{% endif %}</td>
+                  <td>{% if element.docindex15 %}{{ element.docindex15 }}{% endif %}</td>
+                  <td>{% if element.docindex16 %}{{ element.docindex16 }}{% endif %}</td>
+                  <td>{% if element.docindex17 %}{{ element.docindex17 }}{% endif %}</td>
+                  <td>{% if element.docindex18 %}{{ element.docindex18 }}{% endif %}</td>
+                  <td>{% if element.docindex19 %}{{ element.docindex19 }}{% endif %}</td>
+                  <td>{% if element.docindex20 %}{{ element.docindex20 }}{% endif %}</td>
+                </tr>
+                {% endfor %}
+              </div>
+            </tbody>
+        </table>
+        </div>
+        <br>
+        <p id="result">Result : <span id="resultCount">{{ resultCount }}</span> row{{ resultCount|pluralize:'s'}}</p>
+      </div>
+          
+        </div>     
+    </section>
+    {% include 'pagination.html' with queryset=section_result custom_range=custom_range %}
+</main>
+
+<script src="{% static 'js/results.js' %}"></script>
+
+{% endblock content %}

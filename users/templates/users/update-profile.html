@@ -1,0 +1,24 @@
+{% extends 'main.html' %}
+{% block content %}
+<main class="formPage my-xl">
+    <div class="content-box">
+        <div class="formWrapper">
+            <div class="title-container">
+                <h2 id="cardName">Update User</h2>
+            </div>
+            <form id="myForm" class="form" method="POST" action="">
+                {% csrf_token %}
+                <div class="form__field">
+                    {% for field in form %}
+                    <div class="input-wrapper">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                    </div>
+                    {% endfor %}
+                </div>
+                <button type="submit" class="btn btn--sub btn--lg my-md">Update</button>
+            </form>
+        </div>
+    </div>
+</main>
+{% endblock %}

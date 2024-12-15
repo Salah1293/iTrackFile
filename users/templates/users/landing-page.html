@@ -1,0 +1,89 @@
+
+{% extends 'main.html' %}
+{% load static %}
+{% block content %}
+
+
+
+<!-- Main Section -->
+<main class="batches">
+    <section class="hero-section text-center">
+      <div class="container container--narrow">
+        <div class="hero-section__box">
+          <h2>Search for <span>Batches</span></h2>
+        </div>
+
+        <div class="hero-section__search">
+          <form class="form" action="{% url 'generalResults' %}" method="get">
+            <div class="form__field">
+              <label for="formInput#search">Search By Batches</label>
+              <input class="input input--text" id="formInput#search" type="text" name="text"
+                placeholder="Search by Batch" />
+            </div>
+
+            <input class="btn btn--sub btn--lg" type="submit" value="Search" />
+          </form>
+        </div>
+      </div>
+    </section>
+    <!-- Search Result: BatchList -->
+    <section class="batchList">
+
+        <div class="container">  
+          <div class="button-container">  
+          <div class="column">
+            
+            <a href="{% url 'adoptionSearch' %}">
+              <button type="button" class="btn btn-secondary">Adoptions</button>
+            </a>
+            <a href="{% url 'bondBooksSearch' %}">
+              <button type="button" class="btn btn-secondary">Bond Books</button>
+            </a>
+            <a href="{% url 'chartersSearch' %}">
+              <button type="button" class="btn btn-secondary">Charters</button>
+            </a>
+            <a href="{% url 'civilSearch' %}">
+              <button type="button" class="btn btn-secondary">Civil</button>
+            </a>
+            <a href="{% url 'clerkOrdersSearch' %}">
+              <button type="button" class="btn btn-secondary">Clerk Orders</button>
+            </a>
+            <a href="{% url 'ConcealedWeaponsSearch' %}">
+              <button type="button" class="btn btn-secondary">Concealed Weapons</button>
+            </a>
+            <a href="{% url 'criminalSearch' %}">
+              <button type="button" class="btn btn-secondary">Criminal</button>
+            </a>              
+            <a href="{% url 'criminalCasesSearch' %}">
+              <button type="button" class="btn btn-secondary">Criminal Cases</button>
+            </a>              
+            <a href="{% url 'criminalJuvenileSearch' %}">
+              <button type="button" class="btn btn-secondary">Criminal Juvenile</button>
+            </a>              
+            <a href="{% url 'destructionOrdersSearch' %}">
+              <button type="button" class="btn btn-secondary">Destruction Orders</button>
+            </a>              
+            <a href="{% url 'historicIndexCardsSearch' %}">
+              <button type="button" class="btn btn-secondary">Hisoric Index Cards</button>
+            </a>
+            <a href="{% url 'historicOrderBooksSearch' %}">
+              <button type="button" class="btn btn-secondary">Historic Order Books</button>
+            </a> 
+            <a href="{% url 'hrSearch' %}">
+              <button type="button" class="btn btn-secondary">Hr</button>
+            </a>
+            <a href="{% url 'indictmentsSearch' %}">
+              <button type="button" class="btn btn-secondary">Indictments</button>
+            </a>
+            <a href="{% url 'lawChancerySearch' %}">
+              <button type="button" class="btn btn-secondary">Law & Chancery</button>
+            </a>
+                        
+          </div>   
+        </div>    
+        </div>    
+    </section>
+</main>
+
+
+{% endblock content %}

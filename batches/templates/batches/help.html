@@ -1,0 +1,40 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block content %}
+
+    <h1>iTrackFiles Help Page</h1>
+
+    <div id="login-page" class="section">
+        <h2>Login Page</h2>
+        <p>To access the iTrackFiles application, you need to log in with your credentials on the login page.</p>
+        <p>After logging in, you will be directed to the landing page where you can search for files and records.</p>
+        <img src="{% static 'images/login.png' %}" alt="Login Page">
+    </div>
+
+    
+    <div id="capture" class="section">
+        <h2>Capture</h2>
+        <p>The Capture section allows you to create new batches and manage existing ones. Use the top menu bar to navigate.</p>
+        <h3>New Batch</h3>
+        <p>Click on the "New Batch" button to open the capture form screen.</p>
+        <img src="{% static 'images/capture.png' %}" alt="New Batch">
+        <h3>Incomplete Batches</h3>
+        <p>Click on the "Incomplete Batches" button to view and continue working on unfinished batches.</p>
+        <img src="{% static 'images/incomplete-batches-image.png' %}" alt="Incomplete Batches">
+        <h3>Scanner Setting</h3>
+        <p>Click on the "Scanner Setting" button to configure the scanner settings.</p>
+        <img src="{% static 'images/scannersettings.png' %}" alt="Scanner Setting">
+    </div>
+
+    <div id="search" class="section">
+        <h2>Search</h2>
+        <p>Use the search functionality to find specific records. You can filter and sort results based on different criteria.</p>
+        <h3>Search Results</h3>
+        <p>Click on any section (e.g., Civil) to view the search results in a table format.</p>
+        <img src="{% static 'images/searchandlanding.png' %}" alt="Search Results">
+        <p>Double-click on any row to access options like First, Next, Previous, Print, Rotate, Reset, Edit, and Delete.</p>
+        <img src="{% static 'images/searchresults.png' %}" alt="Row Options">
+    </div>
+
+
+{% endblock content %}

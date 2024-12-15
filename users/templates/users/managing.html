@@ -1,0 +1,24 @@
+{% extends "main.html" %}
+
+
+{% block content %}
+
+<div class="auth">
+    <div class="card">
+      <div class="auth__header text-center">       
+        <h2 class="heading-man">Admin Operations</h2>
+      </div>
+      <div class="auth__actions">
+        <a href="{% url 'userList' %}" class="btn btn--sub btn--lg">View Users</a>
+    </div>
+      <div class="auth__actions">
+        <a href="{% url 'createUser' %}" class="btn btn--sub btn--lg">Create User</a>
+    </div>
+      <div class="auth__actions">
+        <a href="{% url 'updateUser' %}" class="btn btn--sub btn--lg">Update User</a>
+    </div>
+    </div>
+  </div>
+
+
+{% endblock content %}

@@ -1,0 +1,52 @@
+{% extends 'main.html' %}
+
+{% block content %}
+
+<!-- Main Section -->
+<main class="formPage my-xl">
+    <div class="content-box">
+        <div class="formWrapper">
+            <h2 style="text-align: center;" >Capture</h2>
+            <a class="backButton" href="{% url 'capture' %}"><i class="im im-angle-left"><</i></a>
+            <br>
+        
+            <form class="form" method="POST" action="{% url 'newBatch' %}" onsubmit="console.log('Form is being submitted');">
+                {% csrf_token %}
+                <div class="form__field">
+                    {% if user_role == 'hr_manager' or user_role == 'hr_staff' %}
+                    <label id="formLabel" for="formInput#job">Job</label>
+                    <select class="input input--text" id="formInput#job" name="job"> 
+                        <option value="HR">HR</option>
+                    </select>
+                    {% endif %}     
+                    {% if user_role == 'historic_staff' %}
+                    <label id="formLabel" for="formInput#job">Job</label>
+                    <select class="input input--text" id="formInput#job" name="job"> 
+                        <option value="" selected disabled>Choose Section</option>                
+                        <option value="Historic Index Cards">Historic Index Cards</option>
+                        <option value="Historic Order Books">Historic Order Books</option>
+                    </select>
+                        {% endif %}
+                </div>
+                  
+                <div class="form__field">
+                    <label id="formLabel" for="formInput#text">Name</label>
+                    <input class="input input--text" id="formInput#text" type="text" name="name"
+                        placeholder="Enter Name" />
+                </div>
+
+                <div class="form__field">
+                    <label id="formLabel" for="formInput#text">Description</label>
+                    <input class="input input--text" id="formInput#text" type="text" name="description"
+                        placeholder="Enter Description" />
+                </div>    
+                <button class="btn btn--sub btn--lg  my-md" type="submit" >Create</button>
+                <a href="{% url 'capture' %}">
+                <button class="btn btn--sub btn--lg  my-md" type="button" >Cancel</button>
+                </a>
+            </form>
+        </div>
+    </div>
+</main>
+
+{% endblock content %}

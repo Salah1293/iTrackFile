@@ -1,0 +1,29 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block content %}
+
+<main class="batches">
+    <section id="batchy" class="batchList">
+        <div class="container">
+            <div class="column">
+                <!-- <p>the searched key is: {{query}}</p> -->
+
+                <div>
+                    <form method="GET" action="{% url 'sectionResults' %}" >
+                        {% csrf_token %}
+                        <input type="hidden" value="{{query}}" name="query">
+                        <div>
+                        {% for table_name, result in all_results.items %}
+                                <button class="btn btn--sub btn--lg  my-md" type="submit" name="table_name" value="{{table_name}}">{{ table_name }}</button>
+                        {% endfor %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</main>
+<script src="{% static 'js/results.js' %}"></script>
+
+{% endblock content %}

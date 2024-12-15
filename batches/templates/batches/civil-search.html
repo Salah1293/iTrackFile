@@ -1,0 +1,60 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block content %}
+
+
+ <main class="formPage my-xl">
+    <div class="content-box">
+        <div class="formWrapper">
+            <div class="title-container">
+            <h2 id="cardName">CIVIL</h2>
+        </div>
+            <a class="backButton" href="{% url 'landingBatches' %}"><i class="im im-angle-left"><</i></a>
+            <br>
+            <form id="myForm" class="form" method="GET" action="{% url 'civilResults' %}">
+                {% csrf_token %}
+                
+                
+                    <div class="form__field">
+                        <div class="input-wrapper">
+                        <label id="formLabel" for="case_number">Case Number</label>
+                        {{form.case_number}}
+                        <!-- <input type="text" name="case_number" class="input" autocomplete="off"/> -->
+                    </div>
+                    </div>
+                    <div class="form__field">
+                        <div class="special-input-wrapper">
+                        <label id="formLabel" for="formInput#text">Order Date</label>
+                        <input type="date" name="start_date" class="input" autocomplete="off"/>
+                        <p id="betweenDates">to</p>
+                        <input type="date" name="end_date" class="input" autocomplete="off" />
+                    </div>
+                    </div>
+                    <div class="form__field">
+                        <div class="input-wrapper">
+                        <label id="formLabel" for="first_name">Last Name</label>
+                        <input type="text" name="last_name" class="input" autocomplete="off"/>
+                    </div>
+                    </div>
+                    <div class="form__field">
+                        <div class="input-wrapper">
+                        <label id="formLabel" for="last_name">First Name</label>
+                        <input type="text" name="first_name" class="input" autocomplete="off"/>
+                    </div>
+                    </div>
+                
+                <div id="buttonSection">
+                <a href="{% url 'civilResults' %}">
+                <button id="formButton" class="btn btn--sub btn--lg  my-md" type="submit">Search</button>
+                </a>
+                <button id="formButton" type="button" class="btn btn--sub btn--lg my-md" onclick="resetForm()">Clear</button>
+                <a href="{% url 'landingBatches' %}">
+                <button id="formButton" class="btn btn--sub btn--lg  my-md" type="button">Cancel</button>
+                </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+<script src="{% static 'js/scripts.js' %}" ></script> 
+{% endblock content %}

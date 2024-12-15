@@ -1,0 +1,21 @@
+{% extends "main.html" %}
+
+
+{% block content %}
+
+<div class="auth">
+    <div class="card">
+      <div class="auth__header text-center">       
+        <h2 class="heading-man">Capture Operations</h2>
+      </div>
+      <div class="auth__actions">
+        <a href="{% url 'newBatch' %}" class="btn btn--sub btn--lg">New Batch</a>
+    </div>
+    <div class="auth__actions">
+        <a href="{% url 'incompleteBatch' %}" class="btn btn--sub btn--lg">Incomplete Batches</a>
+    </div>
+    </div>
+  </div>
+
+
+{% endblock content %}

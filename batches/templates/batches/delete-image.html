@@ -1,0 +1,24 @@
+
+{% extends 'main.html' %}
+{% load static %}
+{% block content %}
+
+
+
+ <!-- Main Section -->
+ <main class="formPage my-xl">
+    <div class="content-box">
+        <div class="formWrapper">
+            
+            <br>
+
+            <form class="form" method="POST">
+                <p>Are your sure you want to delete this Batch?</p>
+                <a class="btn btn--sub btn--lg  my-md" href="{% url 'singleImage' %}">&#x2190 Go Back</a>
+                <input class="btn btn--sub btn--lg  my-md" type="submit" value="Delete" />
+            </form>
+        </div>
+    </div>
+</main>
+
+{% endblock content %}

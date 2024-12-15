@@ -1,0 +1,56 @@
+
+{% extends 'main.html' %}
+{% load static %}
+{% block content %}
+
+<!-- Main Section -->
+<main class="batches">
+   
+    <!-- Search Result: BatchList -->
+    <section id="batchy" class="batchList">
+      <div class="container">  
+        <div class="column">
+          <div id="table-title-container">
+            <h2 id="tableName">CRIMINAL CASES</h2>
+            </div>
+          
+          <div id="table-container" class="table-container">
+          <table id="my-styled-table" class="table table-striped my-styled-table" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Case Number</th>
+                    <th>Last/Corporation</th>
+                    <th>First</th>
+                    <th>Middle</th>
+                    <th>Document Creation Date</th>
+                </tr>
+            </thead>
+            <tbody>
+              <div class="table-body">
+              {% for element in section_result %}
+              <tr onclick="redirectToSingleImage('{{ section }}', '{{ element.docid }}', '{{ all_ids|join:',' }}')">
+                <td>{% if element.docindex1 %}{{ element.docindex1 }}{% endif %}</td>
+                  <td>{% if element.docindex2 %}{{ element.docindex2 }}{% endif %}</td>
+                  <td>{% if element.docindex3 %}{{ element.docindex3 }}{% endif %}</td>
+                  <td>{% if element.docindex4 %}{{ element.docindex4 }}{% endif %}</td>
+                  <td>{% if element.docindex5 %}{{ element.docindex5 }}{% endif %}</td>
+                 <td>{% if element.createdate %}{{ element.createdate }}{% endif %}</td>
+                </tr>
+              {% endfor %}
+            </div> 
+            </tbody>
+        </table>
+        </div>
+        <br>
+        <p id="result">Result : <span id="resultCount">{{ resultCount }}</span> row{{ resultCount|pluralize:'s'}}</p>
+      </div>
+          </div>
+            
+    </section>
+    {% include 'pagination.html' with queryset=section_result custom_range=custom_range %}
+</main>
+
+<script src="{% static 'js/results.js' %}"></script>
+
+{% endblock content %}
