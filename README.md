@@ -17,5 +17,5 @@
 ## **Technologies Used**
 - **Backend**: Django, Python
 - **Frontend**: HTML, CSS, JavaScript (UI components built with UIKit)
-- **Database**: SQLite (can be replaced with other RDBMS for production)
+- **Database**: SQL Server
 - **File Management**: Static and media file handling with Django's STATICFILES_DIRS and MEDIA_ROOT
