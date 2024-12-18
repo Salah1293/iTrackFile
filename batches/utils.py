@@ -213,6 +213,8 @@ def edit_document(request, pk, doc_model, card_form):
         form = card_form(instance=data)
     return form
 
+
+
 # delete document
 def delete_document(request, pk, ids_list, doc_model, obj_model):
     if request.method == 'POST':

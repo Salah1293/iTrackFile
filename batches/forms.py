@@ -659,7 +659,7 @@ class UpdateHistoricIndexCards(BaseUpdateForm):
             'docindex5' : 'Book Record',
             'docindex6' : 'Page',
             'docindex7' : 'Date',
-            'docindex7' : 'Comments'
+            'docindex8' : 'Comments'
             }
 
 
@@ -667,20 +667,20 @@ class UpdateHistoricIndexCards(BaseUpdateForm):
 class UpdateHistoricOrderBooks(BaseUpdateForm):
 
     BOOK_TYPE_CHOICES = [
-    ('bond_book_1', 'Bond Book 1'),
-    ('court_order_superior', 'Court Order Superior'),
-    ('court_quarterly_sessions', 'Court Quarterly Sessions'),
-    ('estray_book', 'Estray Book'),
-    ('land_causes_1', 'Land Causes 1'),
-    ('land_causes_2', 'Land Causes 2'),
-    ('land_records_long_standing', 'Land Records Long Standing'),
-    ('minute_book', 'Minute Book'),
-    ('ordinary_bond_book', 'Ordinary Bond Book'),
-    ('quite_rents', 'Quite Rents'),
-    ('reg_free_negroes_val_2', 'Reg Free Negroes Val 2'),
-    ('reg_free_negroes_val_3', 'Reg Free Negroes Val 3'),
-    ('roads', 'Roads'),
-    ('surveys', 'Surveys'),
+    ('Bond Book 1', 'Bond Book 1'),
+    ('Court Order Superior', 'Court Order Superior'),
+    ('Court Quarterly Sessions', 'Court Quarterly Sessions'),
+    ('Estray Book', 'Estray Book'),
+    ('Land Causes 1', 'Land Causes 1'),
+    ('Land Causes 2', 'Land Causes 2'),
+    ('Land Records Long Standing', 'Land Records Long Standing'),
+    ('Minute Book', 'Minute Book'),
+    ('Ordinary Bond Book', 'Ordinary Bond Book'),
+    ('Quite Rents', 'Quite Rents'),
+    ('Reg Free Negroes Val 2', 'Reg Free Negroes Val 2'),
+    ('Reg Free Negroes Val 3', 'Reg Free Negroes Val 3'),
+    ('Roads', 'Roads'),
+    ('Surveys', 'Surveys'),
 ]
     
     docindex1 = forms.ChoiceField(choices=BOOK_TYPE_CHOICES, required=True)
@@ -710,17 +710,17 @@ class UpdateHistoricOrderBooks(BaseUpdateForm):
 class UpdateHr(BaseUpdateForm):
 
     EMPLOYMENT_TYPE_CHOICES = [
-        ('attached', 'Attached'),
-        ('court_intern', 'Court Intern'),
-        ('judicial_intern', 'Judicial Intern'),
-        ('lt', 'LT'),
-        ('merit', 'Merit'),
-        ('volunteer', 'Volunteer'),
+        ('Attached', 'Attached'),
+        ('Court Intern', 'Court Intern'),
+        ('Judicial Intern', 'Judicial Intern'),
+        ('LT', 'LT'),
+        ('Merit', 'Merit'),
+        ('Volunteer', 'Volunteer'),
     ]
 
     DOCUMENT_TYPE_CHOICES = [
-        ('medical', 'Medical'),
-        ('personnel', 'Personnel'),
+        ('Medical', 'Medical'),
+        ('Personnel', 'Personnel'),
     ]
 
 

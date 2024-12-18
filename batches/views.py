@@ -20,9 +20,11 @@ from django.contrib.messages import error
 from users.models import PvdmUsers1, Role
 from django.utils.dateformat import DateFormat
 from django.utils.dateformat import DateFormat
-import openpyxl
 from openpyxl.styles import Alignment, Font, PatternFill, Border, Side
 from datetime import datetime
+from django.http import StreamingHttpResponse
+from openpyxl import Workbook
+from openpyxl.writer.excel import save_virtual_workbook
 
 # Create your views here.
 
@@ -1028,95 +1030,73 @@ def single_image_view(request, section, pk):
 
 
 
+
+
 #generates excel file for historic index cards
 def export_historic_cards_table(request):
-
     query_params = request.GET.dict()
-    page_number = query_params.pop('page', None)  
-    query_params.pop('csrfmiddlewaretoken', None)  
-    
+    query_params.pop('csrfmiddlewaretoken', None)
+    page_number = query_params.pop('page', None)
+
     query = Q()
     for key, value in query_params.items():
         if value:
             query &= Q(**{key: value})
 
-    historicIndexCards = PvdmDocs114.objects.filter(query) if query else PvdmDocs114.objects.none()
-
-    section_result = list(historicIndexCards)
-
-  
-    workbook = openpyxl.Workbook()
-    worksheet = workbook.active
-    worksheet.title = 'Historic Index Cards'
+    historicIndexCards = PvdmDocs114.objects.filter(query).only(
+        'docindex1', 'docindex2', 'docindex3', 'docindex10',
+        'docindex11', 'docindex9', 'docindex4', 'docindex5',
+        'docindex6', 'docindex7', 'docindex12', 'docindex8'
+    ).iterator(chunk_size=1000)
 
     headers = [
         'Last Name', 'First Name', 'Subject', 'Status', 'Owner',
         'Instrument', 'Record Source', 'Book Record', 'Page', 'Date',
         'Dates Before 1753', 'Comments'
     ]
-    worksheet.append(headers)
 
-    header_font = Font(bold=True, color='FFFFFF', size=12)  
-    header_fill = PatternFill(start_color='009c00', end_color='009c00', fill_type='solid')  
-    header_border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
+    def generate_excel():
+        workbook = Workbook()
+        worksheet = workbook.active
+        worksheet.title = 'Historic Index Cards'
 
-    for cell in worksheet["1:1"]:
-        cell.font = header_font
-        cell.fill = header_fill
-        cell.alignment = Alignment(horizontal='center', vertical='center')
-        cell.border = header_border  
+        worksheet.append(headers)
 
-    data_font = Font(bold=True, size=11) 
-    data_border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
+        for element in historicIndexCards:
+            row = [
+                element.docindex1, element.docindex2, element.docindex3, element.docindex10,
+                element.docindex11, element.docindex9, element.docindex4, element.docindex5,
+                element.docindex6, element.docindex7, element.docindex12, element.docindex8
+            ]
+            row = [field.strftime('%Y-%m-%d') if isinstance(field, datetime) else field for field in row]
+            worksheet.append(row)
 
-    for index, element in enumerate(section_result, start=2): 
-        row = []
-        for field in [element.docindex1, element.docindex2, element.docindex3, element.docindex10,
-                      element.docindex11, element.docindex9, element.docindex4, element.docindex5,
-                      element.docindex6, element.docindex7, element.docindex12, element.docindex8]:
-            if isinstance(field, datetime):
-                field = field.strftime('%Y-%m-%d') 
-            row.append(field)
-        
-        worksheet.append(row)
+        for col in worksheet.columns:
+            max_length = 0
+            column = col[0].column_letter
+            for cell in col:
+                try:
+                    if len(str(cell.value)) > max_length:
+                        max_length = len(str(cell.value))
+                except:
+                    pass
+            adjusted_width = (max_length + 2)
+            worksheet.column_dimensions[column].width = adjusted_width
 
-        if index % 2 == 0:
-            fill_color = PatternFill(start_color='FFFFFF', end_color='FFFFFF', fill_type='solid') 
-        else:
-            fill_color = PatternFill(start_color='D3D3D3', end_color='D3D3D3', fill_type='solid') 
-        
-        for cell in worksheet[index]:
-            cell.fill = fill_color
-            cell.alignment = Alignment(horizontal='center', vertical='center')
-            cell.font = data_font 
-            cell.border = data_border 
-
-    for col in worksheet.columns:
-        max_length = 0
-        column = col[0].column_letter  
-        for cell in col:
-            try:
-                if len(str(cell.value)) > max_length:
-                    max_length = len(str(cell.value))
-            except:
-                pass
-        adjusted_width = (max_length + 2) 
-        worksheet.column_dimensions[column].width = adjusted_width
+        yield save_virtual_workbook(workbook)
 
     current_datetime = datetime.now().strftime('(%Y-%m-%d)-(%H:%M %p)')
-    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response = StreamingHttpResponse(
+        generate_excel(),
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
     response['Content-Disposition'] = f'attachment; filename="historic-index-cards-{current_datetime}.xlsx"'
-
-    workbook.save(response)
-
     return response
 
 
 
-# Generates excel file for historic order books
+#Generates excel file for historic order books
 def export_historic_books_table(request):
-    
-    
     BOOK_TYPE_CHOICES = dict([
         ('bond_book_1', 'Bond Book 1'),
         ('court_order_superior', 'Court Order Superior'),
@@ -1135,88 +1115,52 @@ def export_historic_books_table(request):
     ])
 
     query_params = request.GET.dict()
-    page_number = query_params.pop('page', None)
-    query_params.pop('csrfmiddlewaretoken', None)
-
     docindex1_key = query_params.get('docindex1', '').strip()
     docindex1_value = BOOK_TYPE_CHOICES.get(docindex1_key, None)
+    year = query_params.get('docindex2', '').strip()
 
     query = Q()
-
     if docindex1_value:
         query &= Q(docindex1=docindex1_value)
-
-    year = query_params.get('docindex2', '').strip()
     if year:
         query &= Q(docindex2=year)
 
-    historicOrderBooks = PvdmDocs113.objects.filter(query) if query else PvdmDocs113.objects.none()
+    historic_books = PvdmDocs113.objects.filter(query).only(
+        'docindex1', 'docindex2', 'docindex3', 'docindex4').iterator(chunk_size=1000)
+    
+    headers = ['Book Type', 'Year', 'Page A', 'Page B']
 
+    def generate_excel():
+        workbook = Workbook()
+        worksheet = workbook.active
+        worksheet.title = 'Historic Order Books'
 
-    if not historicOrderBooks.exists():
-        return HttpResponse("No data found for the given query.", status=404)
+        
+        worksheet.append(headers)
 
-    section_result = list(historicOrderBooks)
+        for book in historic_books:
+            row = [book.docindex1, book.docindex2, book.docindex3, book.docindex4]
+            row = [field.strftime('%Y-%m-%d') if isinstance(field, datetime) else field for field in row]
+            worksheet.append(row)
 
+        for col in worksheet.columns:
+            max_length = 0
+            column = col[0].column_letter
+            for cell in col:
+                try:
+                    if len(str(cell.value)) > max_length:
+                        max_length = len(str(cell.value))
+                except:
+                    pass
+            adjusted_width = (max_length + 2)
+            worksheet.column_dimensions[column].width = adjusted_width
 
-    workbook = openpyxl.Workbook()
-    worksheet = workbook.active
-    worksheet.title = 'Historic Order Books'
-
-    headers = [
-        'Book Type', 'Year', 'Page A', 'Page B'
-    ]
-    worksheet.append(headers)
-
-    header_font = Font(bold=True, color='FFFFFF', size=12)  
-    header_fill = PatternFill(start_color='009c00', end_color='009c00', fill_type='solid')  
-    header_border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
-
-    for cell in worksheet["1:1"]:
-        cell.font = header_font
-        cell.fill = header_fill
-        cell.alignment = Alignment(horizontal='center', vertical='center')
-        cell.border = header_border  
-
-    data_font = Font(bold=True, size=11)
-    data_border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
-
-    for index, element in enumerate(section_result, start=2):
-        row = []
-        for field in [element.docindex1, element.docindex2, element.docindex3, element.docindex4]:
-            if isinstance(field, datetime):
-                field = field.strftime('%Y-%m-%d') 
-            row.append(field)
-
-        worksheet.append(row)
-
-        if index % 2 == 0:
-            fill_color = PatternFill(start_color='FFFFFF', end_color='FFFFFF', fill_type='solid')
-        else:
-            fill_color = PatternFill(start_color='D3D3D3', end_color='D3D3D3', fill_type='solid')
-
-        for cell in worksheet[index]:
-            cell.fill = fill_color
-            cell.alignment = Alignment(horizontal='center', vertical='center')
-            cell.font = data_font
-            cell.border = data_border
-
-    for col in worksheet.columns:
-        max_length = 0
-        column = col[0].column_letter
-        for cell in col:
-            try:
-                if len(str(cell.value)) > max_length:
-                    max_length = len(str(cell.value))
-            except:
-                pass
-        adjusted_width = (max_length + 2)
-        worksheet.column_dimensions[column].width = adjusted_width
+        yield save_virtual_workbook(workbook)
 
     current_datetime = datetime.now().strftime('(%Y-%m-%d)-(%H:%M %p)')
-    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response = StreamingHttpResponse(generate_excel(),
+                                     content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = f'attachment; filename="historic-order-books-{current_datetime}.xlsx"'
-
-    workbook.save(response)
-
     return response
+
+

@@ -1,6 +1,6 @@
 # **iTrackFiles**
 
-*iTrackFiles* is a Django-based web application designed for efficient document and image management. This application simplifies the process of uploading, organizing, and retrieving scanned and imported files, providing seamless integration with scanners and file directories.
+*iTrackFiles* is a Django-based web application designed for efficient document and image management. This application simplifies the process of uploading, organizing, and retrieving scanned and imported files, providing seamless integration with file directories.
 
 ## **Features**
 - **Batch Management**: Create, update, and organize document batches for streamlined operations.
