@@ -99,6 +99,7 @@ def singleImageView(request, pk, doc_model, obj_model, card_form, section):
     return render(request, 'batches/single-image.html', context)
 
 
+
 # view image FOR THE PREVIOUS FUNCTION
 def view_image(pk, obj_model):
     images = obj_model.objects.filter(docid=pk)
@@ -113,21 +114,30 @@ def view_image(pk, obj_model):
 
             for filename in filenames:
                 if filename.isdigit() and len(filename) == 8:
-                    path = os.path.join(
-                        dg_query.path + dg_query.origdgname + '/IMG1/00000/', filename + '.TIF')
+                    if obj_model == PvdmObjs17:
+                        num = int(filename)
+                        subdir = f"{(num // 1000) + 0:05d}"  
+                        path = os.path.join(
+                            dg_query.path + dg_query.origdgname + f'/IMG1/{subdir}/', filename + '.TIF'
+                        )
+                    else:
+                        path = os.path.join(
+                            dg_query.path + dg_query.origdgname + '/IMG1/00000/', filename + '.TIF'
+                        )
                 else:
                     path = os.path.join(dg_query.path, filename)
+                
                 try:
                     with Image.open(path) as img:
                         output = io.BytesIO()
                         img.convert("RGB").save(output, format="JPEG")
-                        image_data = base64.b64encode(
-                            output.getvalue()).decode('utf-8')
+                        image_data = base64.b64encode(output.getvalue()).decode('utf-8')
                         images_data.append(image_data)
                 except FileNotFoundError:
                     pass
 
     return images_data
+
 
 
 # navigate images FOR ICONS LAST PREVIOUS AND NEXT
@@ -196,7 +206,7 @@ def extract_filenames_path_pattern(filelist):
     pattern = re.compile(r'<PATH>(.*?)</PATH>')
     return pattern.findall(filelist)
 
-# EDIT FUNCTIONS
+# EDIT CARTS FUNCTION
 def edit_document(request, pk, doc_model, card_form):
     form = None
     if request.method == 'POST':

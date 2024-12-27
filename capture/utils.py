@@ -147,6 +147,7 @@ def save_field_data(form_data, job_id, dg_id, batch_id):
 
     for fieldname, value in form_data.items():
         column_name = column_mapping.get(fieldname)
+        print('value is:', value)
         if column_name:
             if 'date' in column_name.lower():
                 if not value :

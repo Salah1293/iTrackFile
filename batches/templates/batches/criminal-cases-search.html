@@ -14,18 +14,11 @@
             <form id="myForm" class="form" method="GET" action="{% url 'criminalCasesResults' %}">
                 {% csrf_token %}      
                 <div class="form__field">
-                    {% for field in form %} 
-                        {% if field.name == 'docindex1' %}
-                            <div class="special-input-wrapper">
-                                <label id="formLabel" for="formInput#text">Order Date</label>
-                                <input type="date" name="order_date" class="input" autocomplete="off"/>
-                            </div>
-                        {% elif field.name != 'order_date' %}
-                            <div class="input-wrapper">
-                                <label id="formLabel" for="formInput#text">{{field.label}}</label>
-                                {{field}}
-                            </div>
-                        {% endif %}
+                    {% for field in form %}
+                    <div class="input-wrapper">
+                    <label id="formLabel" for="formInput#text">{{field.label}}</label>
+                    {{field}}
+                    </div>
                     {% endfor %}
                 </div>
                 <div id="buttonSection">

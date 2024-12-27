@@ -66,9 +66,9 @@ class CriminalCasesForm(ModelForm):
             'docindex4': 'First'
         }
 
-        widgets = {
-            'docindex1': forms.DateInput(attrs={'type': 'date'})
-        }
+        # widgets = {
+        #     'docindex1': forms.DateInput(attrs={'type': 'date'})
+        # }
 
     def __init__(self, *args, **kwargs):
         super(CriminalCasesForm, self).__init__(*args, **kwargs)
@@ -649,7 +649,7 @@ class UpdateHistoricIndexCards(BaseUpdateForm):
     class Meta:
         model = PvdmDocs114
         fields = ['docindex1', 'docindex2', 'docindex3', 'docindex4', 'docindex5',
-                  'docindex6', 'docindex7', 'docindex8']
+                  'docindex6', 'docindex7', 'docindex8', 'docindex10']
 
         labels = {
             'docindex1' : 'Last Name',
@@ -659,7 +659,8 @@ class UpdateHistoricIndexCards(BaseUpdateForm):
             'docindex5' : 'Book Record',
             'docindex6' : 'Page',
             'docindex7' : 'Date',
-            'docindex8' : 'Comments'
+            'docindex8' : 'Comments',
+            'docindex10' : 'Status',
             }
 
 

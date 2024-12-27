@@ -41,7 +41,7 @@ def create_batch(request):
                             fieldname in fields_with_index_ids}
             create_last_bundle(batch_id, job_id, form_data)
             bundles = PvcapBundle.objects.filter(batchid=batch_id)
-            bundles_ids = [bundle.bundleid for bundle in bundles]
+            bundles_ids = [bundle.bundleid for bundle in bundles  if bundle.submit is False]
 
             bundle_data = {}
             for bundleid in bundles_ids:
@@ -379,12 +379,45 @@ def update_batch(request, pk):
 
         batch_id = form_data.pop('batch_id', None)
 
+        fields_with_index_ids = PvcapIndex1.objects.filter(
+                jobid=jobid).values_list('indexid', 'fieldname')
+        index_id_map = {fieldname: indexid for indexid,
+                            fieldname in fields_with_index_ids}
+        bundles = PvcapBundle.objects.filter(batchid=batchid)
+        bundles_ids = [bundle.bundleid for bundle in bundles  if bundle.submit is False]
+        bundle_data = {}
+        for bundleid in bundles_ids:
+            # indexibg bundleid in indexvalue table to enhance performance
+            rows = PvcapIndexvalue1.objects.filter(bundleid=bundleid)
+            bundle_data = {row.indexid: row.value for row in rows}
+            result = {}
+              
+            for fieldname, indexid in index_id_map.items():
+                    
+                result[fieldname] = bundle_data.get(indexid, '')
+
+
+            section_name = PvcapJob1.objects.get(jobid=jobid).name
+            dgid = create_path(section_name)
+
+            if section_name in ['HR', 'Historic Order Books', 'Historic Index Cards']:
+                docid = save_field_data(result, jobid, dgid, batchid)
+            else:
+                docid = None
+
+            if docid is None:
+                return JsonResponse({'error': 'Failed to save field data'}, status=400)
+
+            save_bundle_image_names_to_database(
+                docid, section_name, batchid, bundleid, dgid)
+
+
         job_id = form_data.pop('job_id', None)
-        bundleid = form_data.pop('bundle_id', None)
         current_image = form_data.pop('imageName', None)
         batch.iscomplete = True
         batch.save()
 
+        bundleid = form_data.pop('bundle_id', None)
         if bundleid == 'null':
             bundleid = None
 
